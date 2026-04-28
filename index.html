@@ -35,7 +35,8 @@
             --success: #4CAF50;
             --danger: #A04747;
             --warning: #D8A25E;
-            --pending: #D8A25E;
+            --pending: #FF9800;
+            --upcoming: #FFA726;
             
             --card-bg: rgba(255, 255, 255, 0.05);
             --card-border: rgba(216, 162, 94, 0.2);
@@ -46,7 +47,6 @@
             --radius-full: 50px;
             
             --shadow-soft: 0 8px 32px rgba(0, 0, 0, 0.3);
-            --shadow-glow: 0 0 15px rgba(216, 162, 94, 0.3);
             
             --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
         }
@@ -60,8 +60,13 @@
         }
 
         /* Override ALL browser defaults for text selection */
-        *::selection { background: rgba(160, 71, 71, 0.5) !important; color: white !important; }
-        *::-moz-selection { background: rgba(160, 71, 71, 0.5) !important; color: white !important; }
+        ::selection { background: var(--primary); color: white; }
+        ::-moz-selection { background: var(--primary); color: white; }
+
+        /* Disable text selection on interactive elements */
+        .room-box, .btn, .nav-item, .tab-btn, .status-badge {
+            user-select: none; -webkit-user-select: none;
+        }
 
         body {
             background-color: var(--bg-main);
@@ -135,7 +140,7 @@
         .nav-item i { width: 24px; text-align: center; color: white; }
         .nav-item:hover, .nav-item:focus-visible { background: var(--card-bg); color: var(--highlight); outline: none; }
         .nav-item.active {
-            background: linear-gradient(90deg, rgba(160, 71, 71, 0.2) 0%, transparent 100%);
+            background: rgba(160, 71, 71, 0.2);
             color: var(--highlight);
             border-left-color: var(--primary);
         }
@@ -150,8 +155,7 @@
             contain: layout style paint;
         }
 
-        .view-section { animation: fadeSlideIn 0.4s ease-out; }
-        @keyframes fadeSlideIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .view-section { animation: fadeIn 0.4s ease-out; }
 
         /* -----------------------------------
            COMPONENTS
@@ -174,7 +178,7 @@
 
         /* Button Ripple Effect */
         .btn {
-            background: linear-gradient(135deg, var(--primary), #8a3a3a);
+            background: var(--primary);
             color: white;
             border: none;
             padding: 0.8rem 1.5rem;
@@ -188,7 +192,7 @@
             justify-content: center;
             gap: 0.5rem;
             font-size: 0.9rem;
-            box-shadow: 0 4px 15px rgba(160, 71, 71, 0.2);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
             outline: none;
             position: relative;
             overflow: hidden;
@@ -201,22 +205,22 @@
         .btn:active::after { width: 300px; height: 300px; transition: 0s; }
 
         .btn i { color: white; }
-        .btn:hover { background: linear-gradient(135deg, #b85454, #A04747); transform: translateY(-2px); box-shadow: var(--shadow-soft); }
-        .btn:active { transform: scale(0.96); box-shadow: none; transition: 0.1s; }
+        .btn:hover { background: #b85454; transform: translateY(-2px); box-shadow: var(--shadow-soft); }
+        .btn:active { transform: scale(0.98); box-shadow: none; transition: 0.1s; }
         .btn:focus-visible { outline: 2px solid var(--secondary); outline-offset: 2px; }
         
         .btn-secondary { background: transparent; border: 1px solid var(--secondary); color: var(--secondary); box-shadow: none; }
         .btn-secondary i { color: var(--secondary); }
         .btn-secondary:hover { background: rgba(216, 162, 94, 0.2); color: var(--highlight); }
         
-        .btn-highlight { background: linear-gradient(135deg, var(--highlight), #d4c466); color: var(--bg-main); box-shadow: 0 4px 15px rgba(238, 223, 122, 0.2); }
+        .btn-highlight { background: var(--highlight); color: var(--bg-main); box-shadow: 0 4px 15px rgba(238, 223, 122, 0.2); }
         .btn-highlight i { color: var(--bg-main); }
-        .btn-highlight:hover { background: linear-gradient(135deg, #ffeaa7, var(--highlight)); }
+        .btn-highlight:hover { background: #ffeaa7; }
 
         /* Inputs & Form Controls - Min 48px height, 16px font to prevent iOS zoom */
         input, select, textarea {
             width: 100%;
-            background: rgba(0, 0, 0, 0.2);
+            background: rgba(0, 0, 0, 0.3);
             border: 1px solid var(--card-border);
             color: white;
             padding: 1rem;
@@ -233,7 +237,7 @@
             outline-offset: 2px;
         }
         input:disabled, select:disabled, textarea:disabled, input[readonly] {
-            opacity: 0.6; background: rgba(0,0,0,0.3); cursor: not-allowed; color: var(--text-muted);
+            opacity: 0.8; background: rgba(0,0,0,0.5); cursor: not-allowed; color: var(--text-muted);
         }
 
         /* Custom Theme for Dropdowns (Select) */
@@ -241,7 +245,7 @@
             background-color: rgba(0, 0, 0, 0.3) !important;
             color: white !important;
             border: 1px solid var(--card-border) !important;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23D8A25E' d='M6 8L1 3h10z'/%3E%3C/svg%3E") !important;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23ffffff' d='M6 8L1 3h10z'/%3E%3C/svg%3E") !important;
             background-repeat: no-repeat !important;
             background-position: right 1rem center !important;
             -webkit-appearance: none !important;
@@ -257,23 +261,17 @@
             border: 1px solid var(--card-border) !important; color: white !important;
             font-family: 'Poppins', sans-serif !important; padding: 0.8rem 1rem; border-radius: var(--radius-md);
         }
-        /* Custom calendar icon color - Invert/Adjust to white/gold */
         input[type="date"]::-webkit-calendar-picker-indicator, input[type="datetime-local"]::-webkit-calendar-picker-indicator {
-            filter: invert(1) brightness(2); cursor: pointer; opacity: 1; background-color: transparent;
+            filter: invert(1); cursor: pointer; opacity: 1; background-color: transparent;
         }
-        input[type="date"]::-webkit-datetime-edit-fields-wrapper, input[type="date"]::-webkit-datetime-edit-text, input[type="date"]::-webkit-datetime-edit-day-field, input[type="date"]::-webkit-datetime-edit-month-field, input[type="date"]::-webkit-datetime-edit-year-field { color: white; }
         ::-webkit-calendar-picker { background-color: var(--bg-surface); border: 1px solid var(--card-border); border-radius: var(--radius-md); }
-        input.custom-date-auto { color-scheme: dark; background: rgba(0, 0, 0, 0.3); border: 1px dashed var(--card-border); color: var(--success) !important; font-weight: 500; min-height: 48px; }
-        input.custom-date-auto::-webkit-calendar-picker-indicator { filter: invert(0.8) sepia(1) saturate(5) hue-rotate(30deg); cursor: pointer; opacity: 0.8; }
+        
+        input.custom-date-auto { background: rgba(0, 0, 0, 0.5); border: 1px dashed var(--card-border); color: var(--highlight); font-weight: 500; min-height: 48px; }
 
         /* Icons */
-        .fa-calendar, .fa-calendar-check, .fa-calendar-xmark, .fa-calendar-days, .fa-calendar-week { color: var(--secondary) !important; }
-        
         .input-with-icon { position: relative; display: flex; align-items: center; margin-bottom: 1rem; width: 100%; }
-        .input-with-icon i { position: absolute; left: 1rem; color: var(--secondary); font-size: 1.1rem; pointer-events: none;}
+        .input-with-icon i { position: absolute; left: 1rem; color: white; font-size: 1.1rem; pointer-events: none;}
         .input-with-icon input { padding-left: 3rem; margin-bottom: 0; background: rgba(0, 0, 0, 0.3); }
-        .clickable-icon { pointer-events: all !important; cursor: pointer; padding: 10px; }
-        .clickable-icon:hover { color: white !important; }
         
         .grid-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem; }
         .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
@@ -287,55 +285,52 @@
         .room-box {
             background: var(--card-bg); border: 1px solid var(--card-border); border-radius: var(--radius-md);
             padding: 1.5rem 1rem; text-align: center; cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            position: relative; overflow: hidden; z-index: 1; opacity: 0;
-            animation: fadeInCard 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            transition: all 0.2s ease-out; position: relative; overflow: hidden; z-index: 1; opacity: 0;
+            animation: fadeIn 0.4s ease-out forwards;
         }
-        @keyframes fadeInCard { from { opacity: 0; transform: translateY(20px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
         
-        .room-box:hover { transform: translateY(-8px) scale(1.03); box-shadow: 0 15px 40px rgba(216, 162, 94, 0.2); border-color: var(--highlight); z-index: 10; }
-        .room-box:active { transform: scale(0.97); transition: 0.1s; }
+        .room-box:hover { transform: translateY(-5px) scale(1.02); box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4); border-color: var(--highlight); z-index: 10; }
+        .room-box:active { transform: scale(0.98); transition: 0.1s; }
         .room-number { font-size: 1.8rem; font-weight: 700; color: var(--highlight); margin-bottom: 0.2rem; }
         .room-floor { font-size: 0.8rem; color: var(--text-muted); }
         
         /* Status Badge Animations */
         .status-badge { display: inline-block; padding: 0.4rem 0.8rem; border-radius: var(--radius-full); font-size: 0.75rem; font-weight: 600; margin-top: 0.5rem; letter-spacing: 0.5px; }
         
-        @keyframes pulse-green { 0% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.4); } 70% { box-shadow: 0 0 0 8px rgba(76, 175, 80, 0); } 100% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0); } }
-        @keyframes pulse-yellow { 0% { box-shadow: 0 0 0 0 rgba(216, 162, 94, 0.4); } 70% { box-shadow: 0 0 0 8px rgba(216, 162, 94, 0); } 100% { box-shadow: 0 0 0 0 rgba(216, 162, 94, 0); } }
-        @keyframes statusGlow { 0%, 100% { box-shadow: 0 0 5px currentColor; } 50% { box-shadow: 0 0 20px currentColor, 0 0 40px currentColor; } }
+        .status-free { background: var(--success); color: white; }
+        .status-occupied { background: var(--primary); color: white; }
+        .status-upcoming { background: var(--upcoming); color: #000; }
+        .status-pending { background: var(--pending); color: #000; animation: pulse-yellow 1.5s infinite; font-weight: bold; }
         
-        .status-free { background: var(--success); color: white; animation: pulse-green 2s infinite, statusGlow 2s infinite; }
-        .status-occupied { background: var(--primary); color: white; animation: statusGlow 2s infinite; box-shadow: 0 0 15px rgba(160, 71, 71, 0.5); }
-        .status-pending { background: var(--pending) !important; color: #000000 !important; animation: pulse-yellow 2s infinite; font-weight: bold; }
+        @keyframes pulse-yellow { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
         
         .room-box.booked { border-bottom: 4px solid var(--primary); }
         .room-box.available { border-bottom: 4px solid var(--success); }
         .room-box.pending { border-bottom: 4px solid var(--pending); }
+        .room-box.upcoming { border-bottom: 4px solid var(--upcoming); }
         
         .room-box.available i { color: var(--success); opacity: 0.5; position: absolute; right: -10px; bottom: -10px; font-size: 4rem; z-index: -1; transition: 0.3s; }
         .room-box.booked i { color: var(--primary); opacity: 0.2; position: absolute; right: -10px; bottom: -10px; font-size: 4rem; z-index: -1; }
+        .room-box.upcoming i { color: var(--upcoming); opacity: 0.3; position: absolute; right: -10px; bottom: -10px; font-size: 4rem; z-index: -1; }
         .room-box.pending i { color: var(--pending); opacity: 0.3; position: absolute; right: -10px; bottom: -10px; font-size: 4rem; z-index: -1; }
         .room-box:hover i { transform: scale(1.1); opacity: 0.4; }
 
         /* Custom Dialogs & Modals */
-        .modal-overlay {
+        .dialog-overlay, .modal-overlay {
             position: fixed; top: 0; left: 0; right: 0; bottom: 0;
             background: rgba(0,0,0,0.8); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
             z-index: 5000; display: flex; justify-content: center; align-items: center;
             opacity: 0; pointer-events: none; transition: var(--transition); padding: 1rem;
         }
-        .modal-overlay.active { opacity: 1; pointer-events: all; }
-        .modal-content {
+        .dialog-overlay.active, .modal-overlay.active { opacity: 1; pointer-events: all; }
+        .modal-content, .dialog-box {
             background: var(--bg-surface); border: 1px solid var(--card-border); border-radius: var(--radius-lg);
             width: 100%; max-width: 800px; max-height: 90vh; overflow-y: auto;
-            transform: scale(0.9) translateY(20px); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s;
+            transform: translateY(20px); transition: transform 0.3s ease-out, opacity 0.3s;
             position: relative; box-shadow: var(--shadow-soft);
         }
-        .modal-overlay.active .modal-content { transform: scale(1) translateY(0); }
-        
-        .dialog-box { max-width: 400px; text-align: center; overflow: visible; padding: 2.5rem 1.5rem; }
-        .dialog-icon { font-size: 3rem; margin-bottom: 1rem; color: var(--highlight); }
+        .modal-overlay.active .modal-content, .dialog-overlay.active .dialog-box { transform: translateY(0); }
+        .dialog-box { max-width: 400px; text-align: center; padding: 2rem; }
         
         .modal-header { padding: 1.5rem; border-bottom: 1px solid var(--card-border); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; background: var(--bg-surface); z-index: 10; }
         .modal-body { padding: 1.5rem; }
@@ -351,8 +346,7 @@
         .tab-btn:hover, .tab-btn:focus-visible { color: white; background: rgba(255,255,255,0.05); border-radius: 8px 8px 0 0; }
         .tab-btn.active { color: var(--highlight); border-bottom-color: var(--highlight); }
         .tab-content { display: none; }
-        .tab-content.active { display: block; animation: slideInContent 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
-        @keyframes slideInContent { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+        .tab-content.active { display: block; animation: fadeIn 0.3s ease-out forwards; }
 
         /* Image Uploader & Canvas */
         .image-uploader-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 1rem; margin-bottom: 1rem; }
@@ -360,7 +354,8 @@
         .img-preview-box img { width: 100%; height: 100%; object-fit: cover; transition: 0.3s; }
         .img-preview-box:hover { border-color: var(--highlight); color: var(--highlight); }
         .remove-img-btn { position: absolute; top: 5px; right: 5px; background: rgba(255,0,0,0.8); color: white; border: none; border-radius: 50%; width: 28px; height: 28px; cursor: pointer; display: flex; justify-content: center; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.5); transition: 0.2s; }
-        .signature-wrapper { border: 1px solid var(--card-border); border-radius: var(--radius-md); background: rgba(255,255,255,0.95); margin-bottom: 1rem; position: relative; overflow: hidden; box-shadow: inset 0 2px 10px rgba(0,0,0,0.1); }
+        
+        .signature-wrapper { border: 1px solid var(--card-border); border-radius: var(--radius-md); background: #ffffff; margin-bottom: 1rem; position: relative; overflow: hidden; }
         .signature-pad { width: 100%; height: 200px; touch-action: none; display: block; cursor: crosshair; }
         .clear-sig-btn { position: absolute; top: 10px; right: 10px; padding: 0.4rem 0.8rem; background: var(--bg-surface); font-size: 0.8rem; color: white; border: none; border-radius: 6px; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.2); transition: 0.1s;}
         .clear-sig-btn:active { transform: scale(0.95); }
@@ -380,24 +375,24 @@
         #capture-btn { width: 64px; height: 64px; border-radius: 50%; background: var(--primary); border: 4px solid white; cursor: pointer; transition: 0.2s; box-shadow: 0 0 15px rgba(0,0,0,0.5); }
         #capture-btn:active { transform: scale(0.9); background: white; }
 
-        /* QR Code Configuration & Styling - Solid Red Border with Corners */
+        /* QR Code Configuration & Styling - Solid Red Border with Square Corners */
         .qr-wrapper { 
             position: relative; background: #ffffff; padding: 1.8rem; border-radius: 8px; 
-            display: inline-block; border: 5px solid #ff0000 !important; margin: 1rem 0; 
-            box-shadow: 0 10px 30px rgba(255,0,0,0.3);
+            display: inline-block; border: 4px solid #A04747 !important; margin: 1rem 0; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
         }
-        .qr-corner { position: absolute; width: 20px; height: 20px; z-index: 2; pointer-events: none; border: 4px solid; }
-        .qr-tl { top: -5px; left: -5px; border-color: #ff0000 #000000 #000000 #ff0000; border-radius: 3px 0 0 0; }
-        .qr-tr { top: -5px; right: -5px; border-color: #ff0000 #ff0000 #000000 #000000; border-radius: 0 3px 0 0; }
-        .qr-bl { bottom: -5px; left: -5px; border-color: #000000 #000000 #ff0000 #ff0000; border-radius: 0 0 0 3px; }
-        .qr-br { bottom: -5px; right: -5px; border-color: #000000 #ff0000 #ff0000 #000000; border-radius: 0 0 3px 0; }
+        .qr-corner { position: absolute; width: 16px; height: 16px; z-index: 2; pointer-events: none; border: 4px solid #A04747; }
+        .qr-tl { top: -4px; left: -4px; border-right: none; border-bottom: none; }
+        .qr-tr { top: -4px; right: -4px; border-left: none; border-bottom: none; }
+        .qr-bl { bottom: -4px; left: -4px; border-right: none; border-top: none; }
+        .qr-br { bottom: -4px; right: -4px; border-left: none; border-top: none; }
         .qr-wrapper img, .qr-wrapper canvas { display: block; margin: 0 auto; }
         
         /* Custom Context Menu */
         .custom-context-menu {
             position: fixed; background: var(--bg-surface); border: 1px solid var(--card-border); border-radius: var(--radius-md);
             padding: 0.5rem; z-index: 9999; box-shadow: 0 10px 40px rgba(0,0,0,0.5); min-width: 200px;
-            animation: fadeInCard 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            animation: fadeIn 0.2s ease-out;
         }
         .context-menu-item {
             padding: 0.8rem 1rem; cursor: pointer; border-radius: 8px; transition: 0.2s;
@@ -408,13 +403,14 @@
 
         /* Install Banner Animation */
         .install-banner {
-            position: fixed; top: 0; left: 0; right: 0; z-index: 5000; padding: 0.8rem;
-            background: var(--bg-surface); border-bottom: 1px solid var(--card-border);
-            box-shadow: 0 5px 20px rgba(0,0,0,0.3); animation: slideDown 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: fixed; top: 0; left: 0; right: 0; z-index: 1500;
+            background: var(--bg-surface); border-bottom: 1px solid var(--secondary);
+            padding: 0.8rem 1rem; display: flex; align-items: center; justify-content: space-between;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.5); animation: slideDown 0.5s ease-out;
             backdrop-filter: blur(10px);
         }
+        .install-banner .install-btn { background: var(--primary); color: white; border: none; padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; font-weight: 600; min-height: 40px;}
         @keyframes slideDown { from { transform: translateY(-100%); } to { transform: translateY(0); } }
-        .install-banner-content { max-width: 600px; margin: 0 auto; }
 
         /* Auth Screen */
         .auth-wrapper {
@@ -435,7 +431,7 @@
         .toast {
             background: var(--glass-bg); border-left: 4px solid var(--primary); color: white;
             padding: 1rem 1.5rem; border-radius: var(--radius-md); box-shadow: var(--shadow-soft);
-            backdrop-filter: blur(10px); animation: slideInRight 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            backdrop-filter: blur(10px); animation: slideInRight 0.3s ease-out forwards;
             display: flex; align-items: center; gap: 1rem; pointer-events: all;
         }
         .toast.success { border-left-color: var(--success); }
@@ -443,12 +439,12 @@
 
         .notification-popup {
             position: fixed; top: 20px; right: 20px; z-index: 9999;
-            animation: slideInRight 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            animation: slideInRight 0.4s ease-out;
             max-width: 350px; width: 100%;
         }
 
         .loading-overlay {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 9999;
+            position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 9999;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
             backdrop-filter: blur(4px); opacity: 0; pointer-events: none; transition: 0.3s;
         }
@@ -456,7 +452,7 @@
         .spinner { width: 50px; height: 50px; border: 4px solid rgba(255,255,255,0.1); border-top-color: var(--highlight); border-radius: 50%; animation: spin 1s linear infinite; }
 
         /* Utilities */
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes slideInRight { from { transform: translateX(120%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
         @keyframes spin { 100% { transform: rotate(360deg); } }
         
@@ -470,8 +466,7 @@
         .mt-1 { margin-top: 1rem; } .mt-2 { margin-top: 2rem; }
         .mb-1 { margin-bottom: 1rem; }
         .empty-state { padding: 3rem; text-align: center; color: var(--text-muted); }
-        .empty-state i { font-size: 3rem; color: rgba(255,255,255,0.1); margin-bottom: 1rem; animation: bounce 2s infinite; }
-        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        .empty-state i { font-size: 3rem; color: rgba(255,255,255,0.1); margin-bottom: 1rem; }
 
         /* Customer Bottom Navigation Bar */
         .customer-bottom-bar {
@@ -482,7 +477,7 @@
             backdrop-filter: blur(10px);
         }
         .customer-bottom-bar .btn { flex: 1; margin: 0 0.2rem; font-size: 0.7rem; padding: 0.5rem; flex-direction: column; gap: 4px; min-height: 50px; border: none; }
-        .customer-bottom-bar .btn i { font-size: 1.2rem; }
+        .customer-bottom-bar .btn i { font-size: 1.2rem; color: white; }
 
         /* -----------------------------------
            📱 RESPONSIVE DESIGN ALL DEVICES
@@ -490,15 +485,16 @@
         
         /* Small Mobile (< 400px) */
         @media (max-width: 400px) {
-            .room-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 0.6rem !important; }
-            .room-number { font-size: 1.2rem !important; }
             .stats-row { grid-template-columns: 1fr; gap: 0.8rem; }
             .flex-row > * { flex: 100%; } 
         }
 
-        /* Medium Mobile (401px to 768px) */
-        @media (max-width: 768px) {
+        /* Medium Mobile (<= 767px) */
+        @media (max-width: 767px) {
             .app-container { flex-direction: column; }
+            .room-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 0.8rem; }
+            .room-number { font-size: 1.4rem !important; }
+            
             .sidebar { 
                 position: fixed; bottom: 0; left: 0; right: 0; height: 75px;
                 flex-direction: row; justify-content: space-around; 
@@ -511,30 +507,32 @@
             .nav-item { flex: 1; flex-direction: column; padding: 0.5rem 0; min-height: 75px; gap: 4px; border: none !important; border-top: 3px solid transparent !important; justify-content: center; }
             .nav-item.active { background: linear-gradient(0deg, rgba(160, 71, 71, 0.2) 0%, transparent 100%); border-top-color: var(--primary) !important; border-left: none !important; }
             .nav-item i { font-size: 1.2rem; }
-            .nav-item span { font-size: 0.6rem; display: block; text-align: center; } 
+            .nav-item span { font-size: 0.65rem; display: block; text-align: center; } 
             
             .main-content { padding: 1rem; flex: 1; overflow-y: auto; padding-bottom: calc(90px + env(safe-area-inset-bottom, 0));}
             .grid-header { flex-direction: column; align-items: stretch; gap: 0.5rem; }
-            .stat-card { flex-direction: column; text-align: center; padding: 1rem; }
+            h2 { font-size: 1.4rem !important; }
+            h3 { font-size: 1.1rem !important; }
             
-            .modal-content { height: 100vh; max-height: 100vh; border-radius: 0; transform: translateY(100%); width: 100vw;}
-            .modal-overlay.active .modal-content { transform: translateY(0); }
+            .modal-content, .dialog-box { height: 100vh; max-height: 100vh; border-radius: 0; width: 100vw; margin: 0; padding: 1rem;}
+            .dialog-box { height: auto; max-height: 90vh; border-radius: var(--radius-md); padding: 1.5rem; }
             .modal-overlay { padding: 0; }
             
-            .room-grid { grid-template-columns: repeat(3, 1fr); }
             .toast-container { bottom: calc(85px + env(safe-area-inset-bottom, 0)); left: 10px; right: 10px; }
             .toast { width: 100%; box-sizing: border-box; }
+            .flex-row > * { flex: 1 1 100%; } /* Stack inputs */
         }
 
-        /* Tablet Portrait (769px to 1024px) */
-        @media (min-width: 769px) and (max-width: 1024px) and (orientation: portrait) {
+        /* Tablet Portrait (768px to 1024px) */
+        @media (min-width: 768px) and (max-width: 1024px) and (orientation: portrait) {
             .app-container { flex-direction: column; }
             .sidebar { width: 100%; flex-direction: row; height: auto; flex-shrink: 0;}
             .sidebar-header { border-right: 1px solid var(--card-border); border-bottom: none; }
             .nav-links { display: flex; flex-direction: row; padding: 0; overflow-x: auto; align-items: center; }
             .nav-item { border-left: none; border-bottom: 4px solid transparent; flex: 1; justify-content: center; }
             .nav-item.active { border-bottom-color: var(--primary); background: rgba(255,255,255,0.05); border-left: none;}
-            .room-grid { grid-template-columns: repeat(4, 1fr); }
+            .room-grid { grid-template-columns: repeat(3, 1fr); }
+            .stats-row { grid-template-columns: repeat(3, 1fr); }
         }
 
         /* Mobile/Tablet Landscape (< 1024px) */
@@ -544,68 +542,30 @@
             .sidebar-header h1, .sidebar-header p, .nav-item span { display: none; }
             .nav-links { flex-direction: column; justify-content: flex-start; }
             .nav-item { flex-direction: row; justify-content: center; padding: 1.5rem 0; min-height: 60px; border-top: none !important; border-left: 4px solid transparent !important;}
-            .nav-item.active { border-left-color: var(--primary) !important; background: linear-gradient(90deg, rgba(160, 71, 71, 0.2) 0%, transparent 100%); }
+            .nav-item.active { border-left-color: var(--primary) !important; background: rgba(160, 71, 71, 0.2); }
             .nav-item i { font-size: 1.5rem; }
             .main-content { padding: 1rem; padding-bottom: 1rem; }
             .room-grid { grid-template-columns: repeat(4, 1fr); }
-            #camera-container { max-width: 60%; }
+            .modal-content { max-height: 90vh; }
         }
 
-        /* Desktop (> 1025px) handled by base CSS */
-        @media (min-width: 1025px) {
-            .room-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+        /* Extra landscape vertical space fixes */
+        @media (orientation: landscape) and (max-height: 600px) {
+            .main-content { padding: 0.8rem; }
+            .tab-content { max-height: 55vh; overflow-y: auto; }
+            .modal-overlay, .dialog-overlay { position: fixed; } /* Prevent keyboard push */
         }
     </style>
 </head>
 <body>
 
-    <!-- 5. Install App Banner -->
-    <div id="install-banner" class="install-banner d-none">
-        <div class="install-banner-content">
-            <div class="flex-row" style="align-items: center; gap: 0.8rem; flex-wrap: nowrap;">
-                <div style="background: var(--primary); width: 45px; height: 45px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                    <i class="fa-solid fa-hotel" style="font-size: 1.2rem; color: white;"></i>
-                </div>
-                <div style="flex: 1;">
-                    <strong style="color: white; font-size: 1rem;">Hotel Bengal</strong>
-                    <p style="font-size: 0.7rem; color: var(--text-muted); margin: 0;">Install for quick access</p>
-                </div>
-                <button onclick="installApp()" class="btn" style="padding: 0.5rem 1rem; min-height: 36px; background: var(--highlight); color: var(--bg-main); font-size: 0.8rem; flex-shrink: 0;">
-                    <i class="fa-solid fa-download" style="color: var(--bg-main);"></i> Install
-                </button>
-                <button onclick="dismissInstall()" style="background: none; border: none; color: var(--text-muted); padding: 0.5rem; cursor: pointer; flex-shrink: 0; outline:none;">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Custom Dialog Overlays (Replaces alert, prompt, confirm) -->
-    <div id="modal-confirm" class="modal-overlay" style="z-index: 10000;">
-        <div class="modal-content" style="max-width: 400px; padding: 0;">
-            <div class="modal-header">
-                <h3 id="confirm-title">Confirmation</h3>
-                <button class="modal-close" onclick="closeModal('modal-confirm')"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            <div class="modal-body text-center">
-                <i id="confirm-icon" class="fa-solid fa-circle-question text-highlight" style="font-size: 3rem; margin-bottom: 1rem;"></i>
-                <p id="confirm-message" style="margin-bottom: 1.5rem; font-size: 1.1rem;"></p>
-                <div class="flex-row mt-1" id="confirm-buttons"></div>
-            </div>
-        </div>
-    </div>
-
-    <div id="modal-prompt" class="modal-overlay" style="z-index: 10000;">
-        <div class="modal-content" style="max-width: 400px; padding: 0;">
-            <div class="modal-header">
-                <h3 id="prompt-title">Input Required</h3>
-                <button class="modal-close" onclick="closeModal('modal-prompt')"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            <div class="modal-body">
-                <p id="prompt-message" style="margin-bottom: 1rem;"></p>
-                <input type="text" id="prompt-input" placeholder="Type here...">
-                <div class="flex-row mt-1" id="prompt-buttons"></div>
-            </div>
+    <!-- Custom Dialog Overlays -->
+    <div id="modal-confirm" class="dialog-overlay">
+        <div class="dialog-box">
+            <i id="confirm-icon" class="fa-solid fa-circle-question text-highlight" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+            <h3 id="confirm-title" style="margin-bottom:0.5rem;">Confirmation</h3>
+            <p id="confirm-message" style="margin-bottom: 1.5rem; font-size: 1rem; color: var(--text-muted);"></p>
+            <div class="flex-row mt-1" id="confirm-buttons" style="justify-content: center;"></div>
         </div>
     </div>
 
@@ -630,7 +590,7 @@
     <div id="auth-view" class="auth-wrapper noise-bg">
         <div class="auth-card card">
             <h1 class="text-highlight" style="font-size: clamp(2rem, 5vw, 2.5rem); letter-spacing: 3px; margin-bottom: 0.5rem;">HOTEL BENGAL</h1>
-            <p style="color: var(--secondary); margin-bottom: 2rem;">Authorized Management Personnel Only</p>
+            <p style="color: var(--secondary); margin-bottom: 2rem;">Management Access Only</p>
             
             <form id="login-form">
                 <div class="flex-col" style="text-align: left;">
@@ -693,12 +653,15 @@
 
                 <!-- Success State (Service) -->
                 <div id="guest-req-success" class="d-none mt-2 card text-center" style="background: rgba(76, 175, 80, 0.1); border-color: var(--success);">
-                    <i class="fa-solid fa-circle-check text-success" style="font-size: 3rem; margin-bottom: 1rem; display: inline-block; animation: pulse-green 2s infinite; border-radius: 50%;"></i>
+                    <i class="fa-solid fa-circle-check text-success" style="font-size: 3rem; margin-bottom: 1rem; display: inline-block; animation: pulse-yellow 2s infinite; border-radius: 50%;"></i>
                     <h3 style="color: var(--success);">Sent Successfully</h3>
                     <p style="font-size: 0.9rem; margin-top: 0.5rem;" id="success-msg-desc">Our staff has been notified.</p>
-                    <div id="another-request-section" class="mt-2 text-center">
+                    <div id="another-request-section" class="mt-2 flex-col" style="gap:0.8rem">
                         <button class="btn btn-secondary w-100" onclick="resetRequestForm()">
                             <i class="fa-solid fa-plus"></i> New Request
+                        </button>
+                        <button class="btn w-100" onclick="showCustomerSection('c-tab-rooms')">
+                            <i class="fa-solid fa-door-open"></i> Browse Available Rooms
                         </button>
                     </div>
                 </div>
@@ -772,7 +735,7 @@
                 
                 <!-- Booking Success Message -->
                 <div id="booking-success" class="card d-none mt-2 text-center" style="border-color: var(--success);">
-                    <i class="fa-solid fa-circle-check text-success" style="font-size: 3rem; animation: pulse-green 2s infinite; border-radius: 50%;"></i>
+                    <i class="fa-solid fa-circle-check text-success" style="font-size: 3rem; animation: pulse-yellow 2s infinite; border-radius: 50%;"></i>
                     <h3 style="color: var(--success); margin: 1rem 0;">Booking Request Sent!</h3>
                     <p>Room will show as <span class="status-badge status-pending">PENDING</span> until confirmed.</p>
                 </div>
@@ -790,7 +753,7 @@
         <!-- Customer Bottom Navigation Bar -->
         <div class="customer-bottom-bar" id="customer-bottom-bar">
             <button class="btn btn-secondary" onclick="showCustomerSection('c-tab-home')" id="btn-c-home">
-                <i class="fa-solid fa-house"></i> Services
+                <i class="fa-solid fa-bell-concierge"></i> Services
             </button>
             <button class="btn btn-secondary" onclick="showCustomerSection('c-tab-rooms')" id="btn-c-rooms">
                 <i class="fa-solid fa-door-open"></i> Book Room
@@ -819,15 +782,15 @@
                 <a class="nav-item active" data-target="view-dashboard" title="All Rooms">
                     <i class="fa-solid fa-table-cells-large"></i> <span>All Rooms</span>
                 </a>
-                <a class="nav-item" data-target="view-requests" title="Guest Needs">
-                    <i class="fa-solid fa-bell"></i> <span>Guest Needs</span>
+                <a class="nav-item" data-target="view-requests" title="Service Requests">
+                    <i class="fa-solid fa-bell"></i> <span>Service Requests</span>
                     <span id="req-badge" class="d-none" style="background: var(--danger); padding: 2px 6px; border-radius: 10px; font-size: 0.7rem; margin-left: auto; font-weight: bold;">0</span>
                 </a>
-                <a class="nav-item" data-target="view-history" title="Records">
-                    <i class="fa-solid fa-clock-rotate-left"></i> <span>Records</span>
+                <a class="nav-item" data-target="view-history" title="Past Bookings">
+                    <i class="fa-solid fa-clock-rotate-left"></i> <span>Past Bookings</span>
                 </a>
-                <a class="nav-item" data-target="view-admin" title="Settings & Tools">
-                    <i class="fa-solid fa-gear"></i> <span>Settings & Tools</span>
+                <a class="nav-item" data-target="view-admin" title="Settings">
+                    <i class="fa-solid fa-gear"></i> <span>Settings</span>
                 </a>
                 <a class="nav-item" id="btn-logout" style="margin-top: auto;" title="Sign Out">
                     <i class="fa-solid fa-right-from-bracket"></i> <span>Sign Out</span>
@@ -860,9 +823,10 @@
                         </select>
                         <select id="filter-status" style="margin: 0; flex: 1;">
                             <option value="all">All Status</option>
-                            <option value="available">Free (खाली)</option>
-                            <option value="booked">Occupied (भरा हुआ)</option>
-                            <option value="pending">Pending (लंबित)</option>
+                            <option value="available">Free</option>
+                            <option value="booked">Occupied</option>
+                            <option value="upcoming">Upcoming</option>
+                            <option value="pending">Pending</option>
                         </select>
                     </div>
                 </div>
@@ -887,10 +851,10 @@
                 </div>
             </div>
 
-            <!-- VIEW: CUSTOMER MESSAGES -->
+            <!-- VIEW: SERVICE REQUESTS -->
             <div id="view-requests" class="view-section d-none">
                 <div class="flex-row" style="justify-content: space-between; margin-bottom: 1.5rem;">
-                    <h2 style="font-size: 1.8rem;"><i class="fa-solid fa-bell-concierge text-secondary"></i> Guest Needs</h2>
+                    <h2 style="font-size: 1.8rem;"><i class="fa-solid fa-bell-concierge text-secondary"></i> Service Requests</h2>
                     <button class="btn btn-secondary" onclick="pollRequests(true)"><i class="fa-solid fa-rotate-right"></i> Refresh</button>
                 </div>
                 
@@ -902,7 +866,7 @@
                     </table>
                 </div>
 
-                <h3 class="text-highlight mb-1 mt-2"><i class="fa-solid fa-bell-concierge"></i> Service Requests</h3>
+                <h3 class="text-highlight mb-1 mt-2"><i class="fa-solid fa-bell-concierge"></i> Service Needs</h3>
                 <div class="card table-responsive noise-bg">
                     <table id="requests-table">
                         <thead><tr><th>Time</th><th>Room</th><th>Category</th><th>Message</th><th>Status</th><th>Action</th></tr></thead>
@@ -911,9 +875,9 @@
                 </div>
             </div>
 
-            <!-- VIEW: HISTORY -->
+            <!-- VIEW: PAST BOOKINGS -->
             <div id="view-history" class="view-section d-none">
-                <h2 style="font-size: 1.8rem; margin-bottom: 1.5rem;"><i class="fa-solid fa-clock-rotate-left text-secondary"></i> Records</h2>
+                <h2 style="font-size: 1.8rem; margin-bottom: 1.5rem;"><i class="fa-solid fa-clock-rotate-left text-secondary"></i> Past Bookings</h2>
                 <div class="flex-row" style="margin-bottom: 1rem;">
                     <div class="input-with-icon" style="max-width: 350px; margin: 0; width: 100%;">
                         <i class="fa-solid fa-magnifying-glass"></i>
@@ -922,20 +886,20 @@
                 </div>
                 <div class="card table-responsive noise-bg">
                     <table id="history-table">
-                        <thead><tr><th>Date Out</th><th>Room</th><th>Guest Name</th><th>Arrival Date</th><th>Departure Date</th><th>Total</th><th>Bill</th></tr></thead>
+                        <thead><tr><th>Date Out</th><th>Room</th><th>Guest Name</th><th>Arrival Date</th><th>Departure Date</th><th>Total Cost</th><th>Bill</th></tr></thead>
                         <tbody id="history-tbody"></tbody>
                     </table>
                 </div>
             </div>
 
-            <!-- VIEW: ADMIN -->
+            <!-- VIEW: SETTINGS -->
             <div id="view-admin" class="view-section d-none">
-                <h2 style="font-size: 1.8rem; margin-bottom: 1.5rem;"><i class="fa-solid fa-gear text-secondary"></i> Settings & Tools</h2>
+                <h2 style="font-size: 1.8rem; margin-bottom: 1.5rem;"><i class="fa-solid fa-gear text-secondary"></i> Settings</h2>
                 <div class="stats-row">
                     <div class="card noise-bg">
-                        <h3 class="text-highlight mb-1"><i class="fa-solid fa-database"></i> Data Settings</h3>
+                        <h3 class="text-highlight mb-1"><i class="fa-solid fa-database"></i> Data Controls</h3>
                         <p class="text-muted mb-1" style="font-size: 0.9rem; margin-bottom: 1rem;">Erase all local bookings, rooms, and photos.</p>
-                        <button id="btn-factory-reset" class="btn" style="background: linear-gradient(135deg, var(--danger), #6a1a1a); width: 100%;"><i class="fa-solid fa-triangle-exclamation"></i> ⚠ Reset All Data</button>
+                        <button id="btn-factory-reset" class="btn" style="background: var(--danger); width: 100%;"><i class="fa-solid fa-triangle-exclamation"></i> ⚠ Delete All Data</button>
                     </div>
                     <div class="card noise-bg">
                         <h3 class="text-highlight mb-1"><i class="fa-solid fa-file-export"></i> Backup Data</h3>
@@ -988,6 +952,7 @@
                                 <label>Full Name *</label>
                                 <input type="text" id="ci-name" required placeholder="Guest full name">
                             </div>
+                            
                             <div class="flex-row" style="margin-bottom: 1rem;">
                                 <div class="flex-col" style="flex:2;">
                                     <label>Phone Number *</label>
@@ -998,18 +963,36 @@
                                     <input type="number" id="ci-members" value="1" min="1" max="10">
                                 </div>
                             </div>
+                            
+                            <div class="flex-row" style="margin-bottom: 1rem;">
+                                <div class="flex-col" style="flex:1;">
+                                    <label>Booking Type *</label>
+                                    <select id="ci-booking-type" onchange="toggleAdvanceBooking()">
+                                        <option value="current">Current Check-in</option>
+                                        <option value="advance">Advance Booking</option>
+                                    </select>
+                                </div>
+                                <div class="flex-col d-none" style="flex:1;" id="advance-date-container">
+                                    <label>Planned Check-in Date *</label>
+                                    <div class="input-with-icon">
+                                        <i class="fa-solid fa-calendar-plus text-warning"></i>
+                                        <input type="date" id="ci-planned-date" onchange="calcDue()">
+                                    </div>
+                                </div>
+                            </div>
+
                             <div class="flex-row">
                                 <div class="flex-col" style="flex:1;">
-                                    <label>Arrival Date & Time *</label>
+                                    <label>Arrival Time</label>
                                     <div class="input-with-icon">
-                                        <i class="fa-solid fa-calendar-check"></i>
-                                        <input type="datetime-local" id="ci-date-auto" class="custom-date-auto" required onchange="calcDue()">
+                                        <i class="fa-solid fa-calendar-check text-success"></i>
+                                        <input type="text" id="ci-date-auto" class="custom-date-auto" readonly data-iso="" style="color:white !important;">
                                     </div>
                                 </div>
                                 <div class="flex-col" style="flex:1;">
                                     <label>Check-out Date *</label>
                                     <div class="input-with-icon">
-                                        <i class="fa-solid fa-calendar-xmark"></i>
+                                        <i class="fa-solid fa-calendar-xmark text-danger"></i>
                                         <input type="date" id="ci-checkout" required onchange="calcDue()">
                                     </div>
                                 </div>
@@ -1050,20 +1033,20 @@
                                     <input type="number" id="ci-rent" required value="1500" oninput="calcDue()">
                                 </div>
                                 <div class="flex-col" style="flex:1;">
-                                    <label>Advance Amount (₹)</label>
+                                    <label>Deposit Paid (₹)</label>
                                     <input type="number" id="ci-advance" required value="0" oninput="calcDue()">
                                 </div>
                             </div>
                             <div class="card" style="margin-bottom: 1.5rem; background: rgba(0,0,0,0.4); border-color: rgba(255,255,255,0.1);">
                                 <div class="flex-row" style="justify-content: space-between;">
-                                    <span>Total Room Charges Est: <strong id="ci-total-calc" class="text-highlight">₹1500</strong></span>
+                                    <span>Total Stay Cost Est: <strong id="ci-total-calc" class="text-highlight">₹1500</strong></span>
                                     <span>Balance Due: <strong id="ci-due-calc" class="text-primary" style="font-size: 1.2rem;">₹1500</strong></span>
                                 </div>
                             </div>
 
                             <label>Guest Signature <span class="text-danger">*</span></label>
                             <div class="signature-wrapper">
-                                <canvas id="ci-signature" width="800" height="300" class="signature-pad"></canvas>
+                                <canvas id="ci-signature" class="signature-pad"></canvas>
                                 <button type="button" class="clear-sig-btn" onclick="clearSignature('ci-signature')"><i class="fa-solid fa-eraser"></i> Clear</button>
                             </div>
 
@@ -1082,7 +1065,7 @@
                             </div>
                             <br>
                             <button type="button" class="btn btn-secondary mt-1" onclick="downloadQR()">
-                                <i class="fa-solid fa-download"></i> Download Custom QR
+                                <i class="fa-solid fa-download"></i> Download QR
                             </button>
                         </div>
                     </form>
@@ -1092,7 +1075,7 @@
                 <div id="form-manage" class="d-none">
                      <div class="tabs">
                         <button class="tab-btn active" onclick="switchTab(this, 'tab-m-info')"><i class="fa-solid fa-circle-info"></i> Guest Details</button>
-                        <button class="tab-btn" onclick="switchTab(this, 'tab-m-checkout')"><i class="fa-solid fa-cash-register"></i> Guest Departure</button>
+                        <button class="tab-btn" onclick="switchTab(this, 'tab-m-checkout')" id="m-checkout-tab-btn"><i class="fa-solid fa-cash-register"></i> Guest Departure</button>
                     </div>
 
                     <div id="tab-m-info" class="tab-content active">
@@ -1103,15 +1086,18 @@
                                     <p class="text-muted" id="m-phone"><i class="fa-solid fa-phone"></i> +91 0000000000</p>
                                 </div>
                                 <div id="m-pending-actions" class="d-none">
-                                    <button class="btn" style="background:var(--success); min-height: 36px; padding: 0.5rem;" onclick="manageBookingFromRoom(true)"><i class="fa-solid fa-check"></i> Accept</button>
+                                    <button class="btn" style="background:var(--success); min-height: 36px; padding: 0.5rem;" onclick="manageBookingFromRoom(true)"><i class="fa-solid fa-check"></i> Approve</button>
                                     <button class="btn" style="background:var(--danger); min-height: 36px; padding: 0.5rem;" onclick="manageBookingFromRoom(false)"><i class="fa-solid fa-xmark"></i> Reject</button>
+                                </div>
+                                <div id="m-upcoming-actions" class="d-none">
+                                    <button class="btn" style="background:var(--primary); min-height: 36px; padding: 0.5rem;" onclick="checkInUpcomingBooking()"><i class="fa-solid fa-door-open"></i> Confirm Check-in Now</button>
                                 </div>
                             </div>
                             
                             <div class="flex-row" style="margin-top: 1rem; border-top: 1px dashed var(--card-border); padding-top: 1rem;">
-                                <div><small class="text-muted">Arrival Date & Time</small><br><span id="m-ci-date" style="font-weight: 500;">--</span></div>
+                                <div><small class="text-muted" id="m-arr-lbl">Arrival Date</small><br><span id="m-ci-date" style="font-weight: 500;">--</span></div>
                                 <div><small class="text-muted">Check-out Date</small><br><span id="m-co-date" style="font-weight: 500;">--</span></div>
-                                <div><small class="text-muted">Advance Amount</small><br><span class="text-success" style="font-weight: bold;">₹<span id="m-advance"></span></span></div>
+                                <div><small class="text-muted">Deposit Paid</small><br><span class="text-success" style="font-weight: bold;">₹<span id="m-advance"></span></span></div>
                             </div>
                         </div>
                         
@@ -1128,7 +1114,7 @@
                                 <span>Total Room Charges:</span><strong>₹<span id="co-total">--</span></strong>
                             </div>
                             <div class="flex-row" style="justify-content: space-between; margin-bottom: 0.5rem;">
-                                <span>Advance Amount:</span><strong class="text-success">- ₹<span id="co-advance">--</span></strong>
+                                <span>Deposit Paid:</span><strong class="text-success">- ₹<span id="co-advance">--</span></strong>
                             </div>
                             <div class="flex-row" style="justify-content: space-between; border-top: 1px dashed var(--card-border); padding-top: 0.5rem; margin-top: 0.5rem;">
                                 <span>Balance Due:</span><strong class="text-primary" style="font-size: 1.4rem;">₹<span id="co-due">--</span></strong>
@@ -1152,11 +1138,11 @@
 
                         <label>Final Guest Signature <span class="text-danger">*</span></label>
                         <div class="signature-wrapper">
-                            <canvas id="co-signature" width="800" height="300" class="signature-pad"></canvas>
+                            <canvas id="co-signature" class="signature-pad"></canvas>
                             <button type="button" class="clear-sig-btn" onclick="clearSignature('co-signature')"><i class="fa-solid fa-eraser"></i> Clear</button>
                         </div>
 
-                        <button type="button" class="btn" style="width: 100%; background: linear-gradient(135deg, var(--success), #2e7d32);" onclick="processCheckout()">
+                        <button type="button" class="btn" style="width: 100%; background: var(--success);" onclick="processCheckout()">
                             <i class="fa-solid fa-clipboard-check"></i> Finish & Print Bill
                         </button>
                     </div>
@@ -1222,7 +1208,6 @@
             if(e.target.closest('button') || e.target.closest('.nav-item') || e.target.closest('.room-box')) triggerVibration();
         });
 
-        // 10. Custom Context Menu (Created via JS)
         document.addEventListener('contextmenu', function(e) {
             if(e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') return;
             if (e.target.closest('.app-container') || e.target.closest('.auth-wrapper')) {
@@ -1237,7 +1222,6 @@
             
             const menu = document.createElement('div');
             menu.className = 'custom-context-menu';
-            // Adjust position so it doesn't go off screen
             const adjustedX = Math.min(x, window.innerWidth - 220);
             const adjustedY = Math.min(y, window.innerHeight - 200);
             menu.style.left = adjustedX + 'px';
@@ -1250,7 +1234,7 @@
                 <div class="context-menu-item" onclick="document.querySelector('.main-content').scrollTo(0,0)">
                     <i class="fa-solid fa-arrow-up"></i> Back to Top
                 </div>
-                <div class="context-menu-item" onclick="showAlert('Hotel Bengal Management System v3.0<br>Designed for maximum efficiency.')">
+                <div class="context-menu-item" onclick="showCustomDialog('System Info', 'Hotel Bengal Management System v3.0<br>Designed for offline-first efficiency.')">
                     <i class="fa-solid fa-circle-info"></i> About System
                 </div>
             `;
@@ -1292,24 +1276,11 @@
         };
 
         // -----------------------------------
-        // 4. CUSTOM DIALOGS
+        // 3. CUSTOM DIALOGS
         // -----------------------------------
         function showCustomDialog(title, msg, type = 'alert', icon = 'fa-circle-info') {
             return new Promise((resolve) => {
                 const overlay = document.getElementById('modal-confirm');
-                if(type === 'prompt') {
-                    document.getElementById('modal-prompt').classList.add('active');
-                    document.getElementById('prompt-title').innerHTML = title;
-                    document.getElementById('prompt-message').innerHTML = msg;
-                    const input = document.getElementById('prompt-input');
-                    input.value = ''; input.focus();
-                    const btnContainer = document.getElementById('prompt-buttons');
-                    btnContainer.innerHTML = `<button class="btn btn-secondary" id="cd-cancel" style="flex:1;">Cancel</button><button class="btn btn-highlight" id="cd-ok" style="flex:1;">Submit</button>`;
-                    document.getElementById('cd-cancel').onclick = () => { document.getElementById('modal-prompt').classList.remove('active'); resolve(null); };
-                    document.getElementById('cd-ok').onclick = () => { document.getElementById('modal-prompt').classList.remove('active'); resolve(input.value); };
-                    return;
-                }
-
                 document.getElementById('confirm-title').innerHTML = title;
                 document.getElementById('confirm-message').innerHTML = msg;
                 document.getElementById('confirm-icon').className = `fa-solid ${icon} text-highlight`;
@@ -1321,19 +1292,21 @@
                     btnContainer.innerHTML = `<button class="btn btn-highlight w-100" style="flex:1;">OK</button>`;
                     btnContainer.querySelector('button').onclick = () => closeAndResolve(true);
                 } else if(type === 'confirm') {
-                    btnContainer.innerHTML = `<button class="btn btn-secondary" id="cd-cancel" style="flex:1;">Cancel</button><button class="btn" style="background:var(--success); flex:1;" id="cd-ok">Confirm</button>`;
+                    btnContainer.innerHTML = `<button class="btn btn-secondary" id="cd-cancel" style="flex:1;">No</button><button class="btn" style="background:var(--danger); flex:1;" id="cd-ok">Yes</button>`;
                     document.getElementById('cd-cancel').onclick = () => closeAndResolve(false);
                     document.getElementById('cd-ok').onclick = () => closeAndResolve(true);
+                } else if (type === 'prompt') {
+                    btnContainer.innerHTML = `<input type="text" id="cd-input" placeholder="Type here..." style="margin-bottom:1rem"><div class="flex-row w-100"><button class="btn btn-secondary" id="cd-cancel" style="flex:1;">Cancel</button><button class="btn" style="background:var(--danger); flex:1;" id="cd-ok">Confirm</button></div>`;
+                    const input = btnContainer.querySelector('#cd-input');
+                    document.getElementById('cd-cancel').onclick = () => closeAndResolve(null);
+                    document.getElementById('cd-ok').onclick = () => closeAndResolve(input.value);
                 }
                 overlay.classList.add('active');
             });
         }
-        const showAlert = (msg) => showCustomDialog('Notice', msg, 'alert');
-        const showConfirmDialog = (msg) => showCustomDialog('Confirm Action', msg, 'confirm', 'fa-circle-question');
-        const showPromptDialog = (msg) => showCustomDialog('Input Required', msg, 'prompt', 'fa-triangle-exclamation');
 
         // -----------------------------------
-        // 3. CORE LOGIC
+        // 4. CORE LOGIC
         // -----------------------------------
         window.onload = async () => {
             checkPWA();
@@ -1367,12 +1340,11 @@
                 await IDB.set('bengal_rooms', appState.rooms);
                 await IDB.set('bengal_history', appState.history);
                 await IDB.set('bengal_requests', appState.requests);
-            } catch(e) { showAlert("Failed to save data locally."); }
+            } catch(e) { showToast("Failed to save data locally.", "error"); }
         }
 
         function generateInitialRooms() {
             appState.rooms = {};
-            // Room numbering from 001 to 115 explicitly
             for (let i = 1; i <= HOTEL.totalRooms; i++) {
                 const roomNum = String(i).padStart(3, '0');
                 appState.rooms[roomNum] = { id: roomNum, floor: Math.ceil(i / 23), status: 'available', bookingData: null };
@@ -1380,28 +1352,47 @@
             IDB.set('bengal_rooms', appState.rooms);
         }
 
-        // 5. PWA Banner
+        // PWA Install Prompt
         let deferredPrompt;
         function checkPWA() {
-            if(localStorage.getItem('install_banner_dismissed') === 'true') return;
+            const dismissed = localStorage.getItem('installBannerDismissed');
+            if(dismissed && (Date.now() - parseInt(dismissed) < 7 * 24 * 60 * 60 * 1000)) return;
+            
             window.addEventListener('beforeinstallprompt', (e) => {
                 e.preventDefault(); deferredPrompt = e;
-                setTimeout(() => { document.getElementById('install-banner').classList.remove('d-none'); }, 3000);
+                setTimeout(() => {
+                    const banner = document.createElement('div');
+                    banner.className = 'install-banner';
+                    banner.innerHTML = `
+                        <div class="flex-row" style="align-items: center; gap: 0.8rem;">
+                            <div style="background: var(--primary); width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                                <i class="fa-solid fa-hotel" style="color: white;"></i>
+                            </div>
+                            <div style="flex: 1;">
+                                <strong style="color: white; font-size: 0.95rem;">Hotel Bengal App</strong>
+                                <p style="font-size: 0.7rem; color: var(--text-muted); margin: 0;">Install for quick offline access</p>
+                            </div>
+                            <button onclick="installApp()" class="install-btn">Install</button>
+                            <button onclick="dismissInstall(this)" style="background:none; border:none; color:white; padding:0.5rem; font-size:1.2rem; cursor:pointer;">×</button>
+                        </div>
+                    `;
+                    document.body.appendChild(banner);
+                }, 2000);
             });
         }
         function installApp() {
             if (deferredPrompt) {
                 deferredPrompt.prompt();
                 deferredPrompt.userChoice.then((result) => {
-                    if (result.outcome === 'accepted') showToast('App installed successfully!', 'success');
-                    deferredPrompt = null;
-                    document.getElementById('install-banner').classList.add('d-none');
+                    if (result.outcome === 'accepted') showToast('App installed!', 'success');
                 });
+                deferredPrompt = null;
             }
+            dismissInstall(document.querySelector('.install-banner button'));
         }
-        function dismissInstall() {
-            document.getElementById('install-banner').classList.add('d-none');
-            localStorage.setItem('install_banner_dismissed', 'true');
+        function dismissInstall(btn) {
+            if(btn) btn.closest('.install-banner').remove();
+            localStorage.setItem('installBannerDismissed', Date.now().toString());
         }
 
         function checkAuth() {
@@ -1446,21 +1437,8 @@
         }
 
         // -----------------------------------
-        // 6. DASHBOARD
+        // 5. DASHBOARD
         // -----------------------------------
-        function animateValue(id, start, end, duration) {
-            const obj = document.getElementById(id);
-            if(!obj || start === end) { if(obj) obj.innerHTML = end; return; }
-            let startTimestamp = null;
-            const step = (timestamp) => {
-                if (!startTimestamp) startTimestamp = timestamp;
-                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-                obj.innerHTML = Math.floor(progress * (end - start) + start);
-                if (progress < 1) window.requestAnimationFrame(step);
-            };
-            window.requestAnimationFrame(step);
-        }
-
         function renderDashboard() {
             const grid = document.getElementById('room-grid');
             grid.innerHTML = '';
@@ -1469,29 +1447,30 @@
             const floorFilt = document.getElementById('filter-floor').value;
             const statFilt = document.getElementById('filter-status').value;
 
-            let available = 0, booked = 0, pending = 0, idx = 0;
+            let available = 0, booked = 0, idx = 0;
 
-            Object.values(appState.rooms).forEach(room => {
+            // Sort keys to ensure 001 to 115 order
+            Object.keys(appState.rooms).sort().forEach(roomId => {
+                const room = appState.rooms[roomId];
                 if (room.status === 'available') available++;
                 if (room.status === 'booked') booked++;
-                if (room.status === 'pending') pending++;
 
-                // Search matching with zero padding handling natively done if user types '001' or '1'
                 if (search && !(room.id.includes(search) || parseInt(room.id, 10).toString().includes(search))) return;
                 if (floorFilt !== 'all' && String(room.floor) !== floorFilt) return;
                 if (statFilt !== 'all' && room.status !== statFilt) return;
 
                 const div = document.createElement('div');
                 div.className = `room-box ${room.status}`;
-                div.style.animationDelay = `${idx * 0.03}s`;
+                div.style.animationDelay = `${idx * 0.02}s`;
                 div.onclick = () => openRoomModal(room.id);
                 
                 let icon = 'fa-door-open';
-                let statusText = 'Free (खाली)';
+                let statusText = 'Free';
                 let statusClass = 'status-free';
                 
-                if(room.status === 'booked') { icon = 'fa-bed'; statusText = 'Occupied (भरा हुआ)'; statusClass = 'status-occupied'; }
-                if(room.status === 'pending') { icon = 'fa-clock'; statusText = 'Pending (लंबित)'; statusClass = 'status-pending'; }
+                if(room.status === 'booked') { icon = 'fa-bed'; statusText = 'Occupied'; statusClass = 'status-occupied'; }
+                if(room.status === 'pending') { icon = 'fa-clock'; statusText = 'Pending'; statusClass = 'status-pending'; }
+                if(room.status === 'upcoming') { icon = 'fa-calendar-day'; statusText = 'Upcoming'; statusClass = 'status-upcoming'; }
                 
                 div.innerHTML = `
                     <div class="room-number">Room ${room.id}</div>
@@ -1503,8 +1482,28 @@
                 idx++;
             });
 
-            animateValue('stat-available', parseInt(document.getElementById('stat-available').innerText)||0, available, 800);
-            animateValue('stat-booked', parseInt(document.getElementById('stat-booked').innerText)||0, booked, 800);
+            document.getElementById('stat-available').innerText = available;
+            document.getElementById('stat-booked').innerText = booked;
+        }
+
+        function toggleAdvanceBooking() {
+            const type = document.getElementById('ci-booking-type').value;
+            const advanceContainer = document.getElementById('advance-date-container');
+            const autoDate = document.getElementById('ci-date-auto');
+            
+            if (type === 'advance') {
+                advanceContainer.classList.remove('d-none');
+                document.getElementById('ci-planned-date').required = true;
+                autoDate.value = "TBD";
+            } else {
+                advanceContainer.classList.add('d-none');
+                document.getElementById('ci-planned-date').required = false;
+                const now = new Date();
+                const formatter = new Intl.DateTimeFormat('en-IN', {day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit', hour12:true});
+                autoDate.value = formatter.format(now);
+                autoDate.dataset.iso = now.toISOString();
+            }
+            calcDue();
         }
 
         function openRoomModal(roomId) {
@@ -1512,8 +1511,10 @@
             const room = appState.rooms[roomId];
             document.getElementById('modal-room').classList.add('active');
             
-            let displayStatus = room.status === 'available' ? 'FREE' : (room.status === 'booked' ? 'OCCUPIED' : 'PENDING');
-            let statusClass = room.status === 'available' ? 'status-free' : (room.status === 'booked' ? 'status-occupied' : 'status-pending');
+            let displayStatus = room.status.toUpperCase();
+            if(room.status === 'available') displayStatus = 'FREE';
+            if(room.status === 'booked') displayStatus = 'OCCUPIED';
+            let statusClass = `status-${room.status === 'available' ? 'free' : (room.status === 'booked' ? 'occupied' : room.status)}`;
             
             document.getElementById('modal-room-title').innerHTML = `Room ${roomId} <span class="status-badge ${statusClass}" style="margin:0 0 0 10px;">${displayStatus}</span>`;
 
@@ -1523,19 +1524,16 @@
                 document.getElementById('form-checkin').classList.remove('d-none');
                 document.getElementById('form-manage').classList.add('d-none');
                 
-                // Format current datetime for datetime-local
-                const now = new Date();
-                now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
-                document.getElementById('ci-date-auto').value = now.toISOString().slice(0, 16);
-                
+                document.getElementById('checkin-submit-form').reset();
+                toggleAdvanceBooking(); // Reset type state
+
                 const tmrw = new Date(); tmrw.setDate(tmrw.getDate() + 1);
                 document.getElementById('ci-checkout').value = tmrw.toISOString().split('T')[0];
-                
-                document.getElementById('checkin-submit-form').reset();
-                document.getElementById('ci-date-auto').value = now.toISOString().slice(0, 16);
+                document.getElementById('ci-planned-date').value = tmrw.toISOString().split('T')[0];
                 
                 switchTab(document.querySelector('#form-checkin .tab-btn'), 'tab-guest'); 
                 generateRoomQR(roomId);
+                
                 setTimeout(() => initSignaturePad('ci-signature'), 100);
 
             } else {
@@ -1545,22 +1543,27 @@
                 const data = room.bookingData;
                 document.getElementById('m-name').innerText = data.name;
                 document.getElementById('m-phone').innerHTML = `<i class="fa-solid fa-phone"></i> ${data.phone}`;
-                document.getElementById('m-ci-date').innerText = new Date(data.checkIn).toLocaleString('en-IN', {day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit'});
+                
+                document.getElementById('m-arr-lbl').innerText = room.status === 'upcoming' ? 'Planned Arrival' : 'Arrival Date';
+                document.getElementById('m-ci-date').innerText = new Date(data.checkIn).toLocaleString('en-IN', {day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit', hour12:true});
                 document.getElementById('m-co-date').innerText = new Date(data.expectedOut).toLocaleDateString('en-IN');
                 document.getElementById('m-advance').innerText = data.advance;
 
+                document.getElementById('m-pending-actions').classList.add('d-none');
+                document.getElementById('m-upcoming-actions').classList.add('d-none');
+                document.getElementById('m-checkout-tab-btn').style.display = 'flex';
+
                 if(room.status === 'pending') {
                     document.getElementById('m-pending-actions').classList.remove('d-none');
-                    document.querySelector('#form-manage .tabs').children[1].style.display = 'none'; // hide checkout tab
-                } else {
-                    document.getElementById('m-pending-actions').classList.add('d-none');
-                    document.querySelector('#form-manage .tabs').children[1].style.display = 'flex';
+                    document.getElementById('m-checkout-tab-btn').style.display = 'none';
+                } else if (room.status === 'upcoming') {
+                    document.getElementById('m-upcoming-actions').classList.remove('d-none');
                 }
 
                 const mGrid = document.getElementById('m-images-grid'); mGrid.innerHTML = '';
                 if(data.images && data.images.length > 0) {
                     data.images.forEach(img => { mGrid.innerHTML += `<div class="img-preview-box"><img src="${img}" onclick="window.open('${img}')"></div>`; });
-                } else mGrid.innerHTML = '<p class="text-muted"><i class="fa-solid fa-folder-open"></i> No documents.</p>';
+                } else mGrid.innerHTML = '<p class="text-muted"><i class="fa-solid fa-folder-open"></i> No documents attached.</p>';
 
                 calcCheckout(data);
                 switchTab(document.querySelector('#form-manage .tab-btn'), 'tab-m-info');
@@ -1570,67 +1573,171 @@
 
         function closeModal(id) { document.getElementById(id).classList.remove('active'); if(id === 'modal-camera') closeCameraLogic(); }
 
-        // 7. Signature Pad
+        // -----------------------------------
+        // 6. TOUCH OPTIMIZED SIGNATURE PAD
+        // -----------------------------------
         function initSignaturePad(canvasId) {
-            const canvas = document.getElementById(canvasId); if (!canvas) return;
+            const canvas = document.getElementById(canvasId); 
+            if (!canvas) return;
+            
+            // Set dimensions explicitly to avoid retina blurring and touch offset issues
+            const rect = canvas.parentElement.getBoundingClientRect();
+            const width = rect.width > 0 ? rect.width : 800;
+            const height = 200; 
+
+            canvas.width = width * 2;
+            canvas.height = height * 2;
+            canvas.style.width = '100%';
+            canvas.style.height = height + 'px';
+
             const ctx = canvas.getContext('2d');
-            ctx.clearRect(0, 0, canvas.width, canvas.height); ctx.beginPath();
-            ctx.strokeStyle = '#A04747'; ctx.lineWidth = 4; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+            ctx.scale(2, 2);
+            ctx.clearRect(0, 0, width, height); 
+            ctx.beginPath();
+            
+            ctx.strokeStyle = '#A04747'; 
+            ctx.lineWidth = 2; 
+            ctx.lineCap = 'round'; 
+            ctx.lineJoin = 'round';
+
+            // Draw guide line
+            ctx.fillStyle = 'rgba(0,0,0,0.1)';
+            ctx.fillRect(20, height - 30, width - 40, 2);
             
             if(!sigPads[canvasId]) {
                 sigPads[canvasId] = { isDrawing: false, hasData: false };
+                
                 const getCoords = (evt) => {
-                    const rect = canvas.getBoundingClientRect();
-                    const scaleX = canvas.width / rect.width, scaleY = canvas.height / rect.height;
+                    const currentRect = canvas.getBoundingClientRect();
                     let cX = evt.clientX, cY = evt.clientY;
-                    if (evt.touches) { cX = evt.touches[0].clientX; cY = evt.touches[0].clientY; }
-                    return { x: (cX - rect.left) * scaleX, y: (cY - rect.top) * scaleY };
+                    if (evt.touches && evt.touches.length > 0) { cX = evt.touches[0].clientX; cY = evt.touches[0].clientY; }
+                    return { x: cX - currentRect.left, y: cY - currentRect.top };
                 };
-                const startPos = (e) => { e.preventDefault(); sigPads[canvasId].isDrawing = true; const p = getCoords(e); ctx.beginPath(); ctx.moveTo(p.x, p.y); };
-                const endPos = (e) => { if (e) e.preventDefault(); sigPads[canvasId].isDrawing = false; ctx.beginPath(); };
-                const draw = (e) => {
-                    if(!sigPads[canvasId].isDrawing) return; e.preventDefault(); const p = getCoords(e);
-                    requestAnimationFrame(() => { ctx.lineTo(p.x, p.y); ctx.stroke(); ctx.beginPath(); ctx.moveTo(p.x, p.y); sigPads[canvasId].hasData = true; });
-                };
-                canvas.addEventListener('mousedown', startPos); canvas.addEventListener('mouseup', endPos); canvas.addEventListener('mousemove', draw); canvas.addEventListener('mouseleave', endPos);
-                canvas.addEventListener('touchstart', startPos, {passive: false}); canvas.addEventListener('touchend', endPos, {passive: false}); canvas.addEventListener('touchmove', draw, {passive: false});
-            } else sigPads[canvasId].hasData = false;
-        }
-        function clearSignature(c) { const cv = document.getElementById(c), ctx = cv.getContext('2d'); ctx.clearRect(0,0,cv.width,cv.height); ctx.beginPath(); if(sigPads[c]) sigPads[c].hasData=false; }
-        function getSignatureData(c) { return (!sigPads[c] || !sigPads[c].hasData) ? null : document.getElementById(c).toDataURL('image/png'); }
 
-        // CHECK-IN & CHECKOUT
+                const startPos = (e) => { 
+                    e.preventDefault(); 
+                    sigPads[canvasId].isDrawing = true; 
+                    const p = getCoords(e); 
+                    ctx.beginPath(); ctx.moveTo(p.x, p.y); 
+                };
+                
+                const endPos = (e) => { 
+                    if (e) e.preventDefault(); 
+                    sigPads[canvasId].isDrawing = false; 
+                    ctx.beginPath(); 
+                };
+                
+                const draw = (e) => {
+                    if(!sigPads[canvasId].isDrawing) return; 
+                    e.preventDefault(); 
+                    const p = getCoords(e);
+                    requestAnimationFrame(() => { 
+                        ctx.lineTo(p.x, p.y); ctx.stroke(); 
+                        ctx.beginPath(); ctx.moveTo(p.x, p.y); 
+                        sigPads[canvasId].hasData = true; 
+                    });
+                };
+
+                canvas.addEventListener('mousedown', startPos, {passive: false}); 
+                canvas.addEventListener('mouseup', endPos, {passive: false}); 
+                canvas.addEventListener('mousemove', draw, {passive: false}); 
+                canvas.addEventListener('mouseleave', endPos, {passive: false});
+                
+                canvas.addEventListener('touchstart', startPos, {passive: false}); 
+                canvas.addEventListener('touchend', endPos, {passive: false}); 
+                canvas.addEventListener('touchmove', draw, {passive: false});
+            } else {
+                sigPads[canvasId].hasData = false;
+            }
+        }
+
+        function clearSignature(c) { 
+            const cv = document.getElementById(c);
+            initSignaturePad(c); // reinit completely clears and redraws guide
+            if(sigPads[c]) sigPads[c].hasData = false; 
+        }
+
+        function getSignatureData(c) { 
+            return (!sigPads[c] || !sigPads[c].hasData) ? null : document.getElementById(c).toDataURL('image/png'); 
+        }
+
+        // -----------------------------------
+        // 7. CHECK-IN & CHECKOUT
+        // -----------------------------------
         function calcDue() {
             const rent = parseFloat(document.getElementById('ci-rent').value) || 0, adv = parseFloat(document.getElementById('ci-advance').value) || 0;
-            const ciVal = document.getElementById('ci-date-auto').value, coVal = document.getElementById('ci-checkout').value;
-            const ci = ciVal ? new Date(ciVal) : new Date(), co = coVal ? new Date(coVal) : null;
+            const type = document.getElementById('ci-booking-type').value;
+            
+            let ciDate;
+            if(type === 'advance') {
+                ciDate = new Date(document.getElementById('ci-planned-date').value);
+            } else {
+                ciDate = new Date(document.getElementById('ci-date-auto').dataset.iso);
+            }
+            
+            const coDate = new Date(document.getElementById('ci-checkout').value);
             let days = 1;
-            if(co && co > ci) { days = Math.ceil(Math.abs(co - ci) / (1000 * 60 * 60 * 24)); if(days===0) days=1; }
+            
+            if(coDate && ciDate && coDate > ciDate) { 
+                days = Math.ceil(Math.abs(coDate - ciDate) / (1000 * 60 * 60 * 24)); 
+                if(days === 0) days = 1; 
+            }
+            
             const total = rent * days, due = total - adv;
-            document.getElementById('ci-total-calc').innerText = `₹${total}`; document.getElementById('ci-due-calc').innerText = `₹${due}`;
+            document.getElementById('ci-total-calc').innerText = `₹${total}`; 
+            document.getElementById('ci-due-calc').innerText = `₹${due}`;
             return { total, due, days };
         }
 
         async function submitCheckin() {
             const name = document.getElementById('ci-name').value, phone = document.getElementById('ci-phone').value;
-            const ciVal = document.getElementById('ci-date-auto').value, coVal = document.getElementById('ci-checkout').value;
+            const type = document.getElementById('ci-booking-type').value;
             
-            if(!name || !phone || !ciVal || !coVal) { showAlert("Please fill required fields."); return; }
-            const ciDate = new Date(ciVal), coDate = new Date(coVal);
-            if(coDate <= ciDate) { showAlert("Check-out date must be after Arrival."); return; }
+            if(!name || !phone) { showToast("Please fill required fields.", "error"); return; }
+            
+            let ciIso;
+            if (type === 'advance') {
+                const planDate = document.getElementById('ci-planned-date').value;
+                if(!planDate) { showToast("Planned check-in date required", "error"); return; }
+                ciIso = new Date(planDate).toISOString();
+            } else {
+                ciIso = document.getElementById('ci-date-auto').dataset.iso;
+            }
+
+            const coVal = document.getElementById('ci-checkout').value;
+            if(!coVal) { showToast("Checkout date required", "error"); return; }
+
+            const ciDate = new Date(ciIso), coDate = new Date(coVal);
+            if(coDate <= ciDate) { showToast("Check-out date must be after Arrival.", "error"); return; }
             
             const sigData = getSignatureData('ci-signature');
-            if(!sigData) { showAlert("Guest signature required."); switchTab(document.querySelectorAll('#form-checkin .tab-btn')[2], 'tab-payment'); return; }
+            if(!sigData) { showToast("Guest signature required.", "error"); switchTab(document.querySelectorAll('#form-checkin .tab-btn')[2], 'tab-payment'); return; }
 
             const calc = calcDue();
-            appState.rooms[currentEditingRoom].status = 'booked';
-            appState.rooms[currentEditingRoom].bookingData = {
+            const room = appState.rooms[currentEditingRoom];
+            
+            room.status = type === 'advance' ? 'upcoming' : 'booked';
+            room.bookingData = {
                 id: 'BKG-' + Date.now(), name, phone, members: document.getElementById('ci-members').value,
                 checkIn: ciDate.toISOString(), expectedOut: coDate.toISOString(), idType: document.getElementById('ci-id-type').value, idNum: document.getElementById('ci-id-num').value,
                 rent: document.getElementById('ci-rent').value, advance: document.getElementById('ci-advance').value, totalEst: calc.total, images: [...tempImages], signatureCi: sigData
             };
-            await saveData(); closeModal('modal-room'); renderDashboard(); showToast(`Room ${currentEditingRoom} Booked!`);
+            
+            await saveData(); closeModal('modal-room'); renderDashboard(); 
+            showToast(`Room ${currentEditingRoom} ${type === 'advance' ? 'Reserved' : 'Booked'}!`);
             confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+        }
+
+        async function checkInUpcomingBooking() {
+            if(await showCustomDialog("Confirm", "Check-in this guest now?", "confirm")) {
+                const room = appState.rooms[currentEditingRoom];
+                room.status = 'booked';
+                room.bookingData.checkIn = new Date().toISOString(); // Update to actual IN time
+                await saveData();
+                closeModal('modal-room');
+                renderDashboard();
+                showToast(`Guest Checked-in successfully`);
+            }
         }
 
         function calcCheckout(data) {
@@ -1641,17 +1748,19 @@
         }
 
         async function processCheckout() {
-            const sigData = getSignatureData('co-signature'); if(!sigData) { showAlert("Final signature required."); return; }
-            if(!(await showConfirmDialog("Are you sure you want to finish checkout?"))) return;
+            const sigData = getSignatureData('co-signature'); if(!sigData) { showToast("Final signature required.", "error"); return; }
+            if(!(await showCustomDialog("Confirm Action", `Are you sure you want to finish checkout for Room ${currentEditingRoom}?`, "confirm"))) return;
 
             const room = appState.rooms[currentEditingRoom], data = room.bookingData, calc = calcCheckout(data);
             const bkg = { ...data, checkOut: new Date().toISOString(), actualDays: calc.days, finalTotal: calc.total, amountPaid: calc.total, payMode: document.getElementById('co-pay-mode').value, txnId: document.getElementById('co-txn').value, signatureCo: sigData, roomId: currentEditingRoom };
             
             appState.history.unshift(bkg); room.status = 'available'; room.bookingData = null;
-            await saveData(); generateReceiptPDF(bkg); closeModal('modal-room'); renderDashboard(); renderHistory(); showToast(`Checkout complete for Room ${currentEditingRoom}`);
+            await saveData(); generateReceiptPDF(bkg); closeModal('modal-room'); renderDashboard(); renderHistory(); showToast(`Checkout complete!`);
         }
 
-        // Image / Camera (Minified for brevity)
+        // -----------------------------------
+        // 8. MEDIA & FILES
+        // -----------------------------------
         function openCameraModal(ctx) { if(tempImages.length>=5){showToast("Max 5 images","error");return;} targetImageContext=ctx; document.getElementById('modal-camera').classList.add('active'); switchTab(document.querySelector('#modal-camera .tab-btn'),'tab-cam-live'); startCamera(); }
         function closeCameraLogic() { if(videoStream){videoStream.getTracks().forEach(t=>t.stop());videoStream=null;} }
         async function startCamera() { try { videoStream = await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}}); document.getElementById('video-element').srcObject = videoStream; } catch(e){showToast("Camera error. Use file upload.","error"); switchTab(document.querySelectorAll('#modal-camera .tab-btn')[1],'tab-cam-file');} }
@@ -1661,34 +1770,56 @@
         function removeTempImage(i) { tempImages.splice(i,1); renderImageUploader(); }
         function renderImageUploader() { const g=document.getElementById('ci-images-grid'); g.innerHTML=''; tempImages.forEach((b,i)=>g.innerHTML+=`<div class="img-preview-box"><img src="${b}"><button type="button" class="remove-img-btn" onclick="removeTempImage(${i})"><i class="fa-solid fa-trash-can"></i></button></div>`); if(tempImages.length<5)g.innerHTML+=`<div class="img-preview-box" onclick="openCameraModal('ci-images')"><i class="fa-solid fa-camera text-highlight" style="font-size:2rem;"></i><span style="font-size:0.7rem;margin-top:5px">Add Photo</span></div>`; }
 
-        // QR Code - Exactly specified colors and structure
+        // -----------------------------------
+        // 9. QR CODE
+        // -----------------------------------
         function generateRoomQR(roomId) {
-            const c = document.getElementById('room-qr-container'); Array.from(c.children).forEach(ch=>{if(!ch.classList.contains('qr-corner'))ch.remove();});
+            const c = document.getElementById('room-qr-container'); 
+            Array.from(c.children).forEach(ch=>{if(!ch.classList.contains('qr-corner'))ch.remove();});
             currentQR = new QRCode(c, { text: `${window.location.origin}${window.location.pathname}?mode=customer&room=${roomId}`, width: 220, height: 220, colorDark: "#000000", colorLight: "#ffffff", correctLevel: QRCode.CorrectLevel.H });
         }
         function downloadQR() {
-            const c=document.getElementById('room-qr-container'), img=c.querySelector('img'), cv=c.querySelector('canvas'); let d=null;
-            if(img&&img.src&&img.src.startsWith('data:image'))d=img.src; else if(cv)d=cv.toDataURL('image/png');
-            if(d){const a=document.createElement('a');a.href=d;a.download=`HOTEL_BENGAL_Room_${currentEditingRoom}_QR.png`;document.body.appendChild(a);a.click();document.body.removeChild(a);showToast("QR Downloaded");}
+            const c = document.getElementById('room-qr-container'), img = c.querySelector('img'), cv = c.querySelector('canvas'); 
+            let d = null;
+            if (img && img.src && img.src.startsWith('data:image')) d = img.src; 
+            else if (cv) d = cv.toDataURL('image/png', 1.0);
+            
+            if (d) {
+                const a = document.createElement('a');
+                a.href = d;
+                a.download = `Hotel_Bengal_Room_${currentEditingRoom}_QR.png`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                showToast("QR Code Downloaded Successfully", "success");
+            } else {
+                showToast("Could not extract QR image", "error");
+            }
         }
 
-        // History & Admin
+        // -----------------------------------
+        // 10. HISTORY & ADMIN
+        // -----------------------------------
         function renderHistory() {
             const tb=document.getElementById('history-tbody'), s=document.getElementById('search-history').value.toLowerCase(); tb.innerHTML='';
-            if(appState.history.length===0){tb.innerHTML=`<tr><td colspan="7"><div class="empty-state"><i class="fa-solid fa-box-open"></i><p>No past bookings.</p></div></td></tr>`;return;}
+            if(appState.history.length===0){tb.innerHTML=`<tr><td colspan="7"><div class="empty-state"><i class="fa-solid fa-clock-rotate-left"></i><p>No past bookings yet.</p></div></td></tr>`;return;}
             appState.history.forEach((b,i)=>{ if(s&&!b.name.toLowerCase().includes(s)&&!b.roomId.includes(s))return; tb.innerHTML+=`<tr><td>${new Date(b.checkOut).toLocaleDateString()}</td><td><strong class="text-highlight">${b.roomId}</strong></td><td>${b.name}</td><td>${new Date(b.checkIn).toLocaleDateString()}</td><td>${new Date(b.checkOut).toLocaleDateString()}</td><td>₹${b.finalTotal}</td><td><button class="btn btn-secondary" onclick="reprintPDF(${i})" title="Reprint Bill"><i class="fa-solid fa-file-pdf"></i></button></td></tr>`; });
         }
         window.reprintPDF = i => generateReceiptPDF(appState.history[i]);
+        
         document.getElementById('btn-factory-reset').onclick = async () => {
-            const res = await showPromptDialog("WARNING: Erase all data? Type 'CONFIRM' to proceed.");
+            const res = await showCustomDialog("Delete All Data", "WARNING: This erases all local data permanently. Type 'CONFIRM' to proceed.", "prompt");
             if(res === 'CONFIRM') { appState.history=[]; appState.requests=[]; generateInitialRooms(); location.reload(); }
         };
+        
         document.getElementById('btn-export-data').onclick = () => {
             const url = URL.createObjectURL(new Blob([JSON.stringify({rooms:appState.rooms,history:appState.history,requests:appState.requests,date:new Date().toISOString()})], {type:'application/json'}));
             const a=document.createElement('a');a.href=url;a.download=`Backup_${Date.now()}.json`;document.body.appendChild(a);a.click();document.body.removeChild(a);showToast("Backup Exported");
         };
 
-        // CUSTOMER PORTAL
+        // -----------------------------------
+        // 11. CUSTOMER PORTAL
+        // -----------------------------------
         let cRoomId = null;
         async function initCustomerPortal(roomId) {
             cRoomId = roomId && roomId !== 'null' ? roomId : null;
@@ -1715,7 +1846,7 @@
                 e.preventDefault(); showLoading();
                 const name = document.getElementById('cb-name').value, phone = document.getElementById('cb-phone').value;
                 const ci = new Date(document.getElementById('cb-checkin').value), co = new Date(document.getElementById('cb-checkout').value);
-                if(co <= ci) { showAlert("Check-out must be after Arrival."); hideLoading(); return; }
+                if(co <= ci) { showToast("Check-out must be after Arrival.", "error"); hideLoading(); return; }
                 
                 const roomSel = document.getElementById('booking-room-num').innerText.replace('Room ', '');
                 appState.rooms[roomSel].status = 'pending';
@@ -1760,13 +1891,14 @@
         function renderCustomerRooms() {
             const grid = document.getElementById('customer-room-list'); if(!grid) return; grid.innerHTML = '';
             let hasRooms = false;
-            Object.values(appState.rooms).forEach(r => {
+            Object.keys(appState.rooms).sort().forEach(rId => {
+                const r = appState.rooms[rId];
                 if(r.status === 'available') {
                     hasRooms = true;
-                    grid.innerHTML += `<div class="room-box status-free" style="padding:1rem" onclick="openCustomerBookForm('${r.id}')"><div class="room-number" style="font-size:1.3rem">Room ${r.id}</div><div class="room-floor">Floor ${r.floor}</div><button class="btn btn-secondary mt-1" style="width:100%; font-size:0.8rem; min-height:30px">Book</button></div>`;
+                    grid.innerHTML += `<div class="room-box status-free" style="padding:1rem" onclick="openCustomerBookForm('${r.id}')"><div class="room-number" style="font-size:1.3rem">Room ${r.id}</div><div class="room-floor">Floor ${r.floor}</div><button class="btn mt-1" style="width:100%; font-size:0.8rem; min-height:30px">Book</button></div>`;
                 }
             });
-            if(!hasRooms) grid.innerHTML = `<p class="text-muted w-100 text-center"><i class="fa-solid fa-bed"></i> All rooms are currently occupied or pending.</p>`;
+            if(!hasRooms) grid.innerHTML = `<p class="text-muted w-100 text-center" style="grid-column: 1/-1;"><i class="fa-solid fa-bed" style="font-size:2rem;margin-bottom:1rem;display:block"></i> All rooms are currently occupied.</p>`;
         }
         
         window.openCustomerBookForm = (rId) => {
@@ -1779,18 +1911,16 @@
 
         function renderCustomerActivity() {
             const list = document.getElementById('customer-activity-list'); if(!list) return; list.innerHTML = '';
-            // Get requests related to the room OR self bookings
             const myReqs = appState.requests.filter(r => r.roomId === cRoomId || r.type === 'booking').sort((a,b)=>b.id-a.id);
-            if(myReqs.length===0) { list.innerHTML = `<p class="text-muted"><i class="fa-solid fa-ghost"></i> No recent records.</p>`; return; }
+            if(myReqs.length===0) { list.innerHTML = `<div class="empty-state"><i class="fa-solid fa-folder-open"></i><p>No recent activity found.</p></div>`; return; }
             
             let showedNotification = false;
 
             myReqs.forEach(r => {
                 let color = r.status.includes('pending') ? 'var(--pending)' : (r.status.includes('reject') || r.status.includes('cancel') ? 'var(--danger)' : 'var(--success)');
                 let icon = r.status.includes('pending') ? 'fa-clock' : (r.status.includes('reject') || r.status.includes('cancel') ? 'fa-xmark' : 'fa-check');
-                let cancelBtn = r.status.includes('pending') ? `<button class="btn btn-secondary mt-1" style="padding:0.2rem 0.5rem; font-size:0.7rem; min-height: 24px;" onclick="cancelCustomerRequest(${r.id})"><i class="fa-solid fa-ban"></i> Cancel Request</button>` : '';
+                let cancelBtn = r.status.includes('pending') ? `<button class="btn btn-secondary mt-1" style="padding:0.2rem 0.5rem; font-size:0.7rem; min-height: 24px;" onclick="cancelCustomerRequest(${r.id})"><i class="fa-solid fa-ban"></i> Cancel</button>` : '';
                 
-                // Show notification for newly approved/rejected booking
                 if(r.type === 'booking' && !r.status.includes('pending') && !r.notified) {
                     if(!showedNotification) {
                         const notif = document.getElementById('customer-notification');
@@ -1800,7 +1930,7 @@
                         notif.classList.remove('d-none');
                         showedNotification = true;
                     }
-                    r.notified = true; // Mark to not show again locally
+                    r.notified = true; 
                     IDB.set('bengal_requests', appState.requests);
                 }
 
@@ -1809,7 +1939,7 @@
         }
 
         window.cancelCustomerRequest = async (id) => {
-            if(await showConfirmDialog("Are you sure you want to cancel this request?")) {
+            if(await showCustomDialog("Confirm", "Are you sure you want to cancel this request?", "confirm")) {
                 const req = appState.requests.find(x=>x.id===id);
                 if(req) {
                     req.status = 'cancelled';
@@ -1824,7 +1954,9 @@
             }
         };
 
-        // MANAGER POLLING & REQUESTS
+        // -----------------------------------
+        // 12. MANAGER REQUESTS
+        // -----------------------------------
         async function pollRequests(isManual = false) {
             if(localStorage.getItem('bengal_auth') !== 'true') return;
             if(isManual) showLoading();
@@ -1833,9 +1965,9 @@
                 if(reqs.length !== appState.requests.length || isManual) {
                     const diff = reqs.length - appState.requests.length;
                     appState.requests = reqs;
-                    if(diff > 0 && !isManual) { showToast("New Guest Need!", "warning"); triggerVibration([200, 100]); try { document.getElementById('bell-sound').play(); } catch(e){} }
+                    if(diff > 0 && !isManual) { showToast("New Guest Request!", "warning"); triggerVibration([200, 100]); try { document.getElementById('bell-sound').play(); } catch(e){} }
                     updateRequestBadge(); if(!document.getElementById('view-requests').classList.contains('d-none')) renderRequests();
-                    renderDashboard(); // refresh pendings
+                    renderDashboard(); 
                 }
             } catch(e) {}
             if(isManual) { hideLoading(); showToast("Synchronized"); }
@@ -1844,7 +1976,7 @@
         function updateRequestBadge() {
             const pending = appState.requests.filter(r => r.status.includes('pending')).length;
             const badge = document.getElementById('req-badge');
-            if(pending > 0) { badge.innerText = pending; badge.classList.remove('d-none'); badge.style.animation = 'pulse-yellow 1s infinite'; } 
+            if(pending > 0) { badge.innerText = pending; badge.classList.remove('d-none'); } 
             else badge.classList.add('d-none');
         }
 
@@ -1858,14 +1990,14 @@
                 if(r.type === 'booking') {
                     hasBkg=true;
                     bkgTb.innerHTML += r.status === 'pending_booking' ? `${tr}<td>${r.bkgData.name}</td><td>${r.bkgData.phone}</td><td style="font-size:0.8rem">${new Date(r.bkgData.checkIn).toLocaleDateString()} - ${new Date(r.bkgData.expectedOut).toLocaleDateString()}</td><td><button class="btn" style="background:var(--success);padding:0.3rem;min-height:30px" onclick="manageBookingFromTable(${r.id}, true)"><i class="fa-solid fa-check"></i></button> <button class="btn" style="background:var(--danger);padding:0.3rem;min-height:30px" onclick="manageBookingFromTable(${r.id}, false)"><i class="fa-solid fa-xmark"></i></button></td></tr>` : 
-                    `${tr}<td>${r.bkgData.name}</td><td colspan="2"><span class="status-badge ${r.status==='approved'?'status-occupied':(r.status==='cancelled'?'status-free':'status-free')}">${r.status.toUpperCase()}</span></td><td>-</td></tr>`;
+                    `${tr}<td>${r.bkgData.name}</td><td colspan="2"><span class="status-badge status-${r.status==='approved'?'occupied':'free'}">${r.status.toUpperCase()}</span></td><td>-</td></tr>`;
                 } else {
                     hasReq=true;
-                    reqTb.innerHTML += `${tr}<td>${r.category}</td><td>${r.message}</td><td><span class="status-badge ${r.status === 'pending' ? 'status-pending' : 'status-free'}">${r.status.toUpperCase()}</span></td><td>${r.status === 'pending' ? `<button class="btn btn-secondary" onclick="markRequestDone(${r.id})" style="padding: 0.3rem 0.6rem; min-height:30px;"><i class="fa-solid fa-check"></i> Task Complete</button>` : `<i class="fa-solid fa-check-double text-success"></i>`}</td></tr>`;
+                    reqTb.innerHTML += `${tr}<td>${r.category}</td><td>${r.message}</td><td><span class="status-badge status-${r.status === 'pending' ? 'pending' : 'free'}">${r.status.toUpperCase()}</span></td><td>${r.status === 'pending' ? `<button class="btn btn-secondary" onclick="markRequestDone(${r.id})" style="padding: 0.3rem 0.6rem; min-height:30px;"><i class="fa-solid fa-check"></i> Complete</button>` : `<i class="fa-solid fa-check-double text-success"></i>`}</td></tr>`;
                 }
             });
-            if(!hasReq) reqTb.innerHTML = `<tr><td colspan="6" class="text-center text-muted">No service requests.</td></tr>`;
-            if(!hasBkg) bkgTb.innerHTML = `<tr><td colspan="6" class="text-center text-muted">No booking requests.</td></tr>`;
+            if(!hasReq) reqTb.innerHTML = `<tr><td colspan="6"><div class="empty-state" style="padding:1rem"><i class="fa-solid fa-mug-hot"></i><p>No service requests pending.</p></div></td></tr>`;
+            if(!hasBkg) bkgTb.innerHTML = `<tr><td colspan="6"><div class="empty-state" style="padding:1rem"><i class="fa-solid fa-calendar-check"></i><p>No booking requests pending.</p></div></td></tr>`;
             updateRequestBadge();
         }
 
@@ -1875,14 +2007,14 @@
             const r = appState.requests.find(x=>x.id===id);
             if(!r) return;
             if(isApprove) {
-                if(appState.rooms[r.roomId].status === 'booked') { showAlert("Room already occupied!"); return; }
+                if(appState.rooms[r.roomId].status === 'booked' || appState.rooms[r.roomId].status === 'upcoming') { showToast("Room occupied!", "error"); return; }
                 appState.rooms[r.roomId].status = 'booked';
                 appState.rooms[r.roomId].bookingData.id = 'BKG-'+Date.now();
                 r.status = 'approved'; showToast("Booking Approved"); confetti(); renderDashboard();
             } else { 
                 appState.rooms[r.roomId].status = 'available';
                 appState.rooms[r.roomId].bookingData = null;
-                r.status = 'rejected'; showToast("Booking Rejected", "error"); renderDashboard();
+                r.status = 'rejected'; showToast("Booking Rejected"); renderDashboard();
             }
             await saveData(); renderRequests();
         };
@@ -1893,7 +2025,7 @@
             closeModal('modal-room');
         };
 
-        // Utility PDF Generate (minimized block)
+        // PDF Generation
         function generateReceiptPDF(bkg) {
             const { jsPDF } = window.jspdf; const doc = new jsPDF();
             doc.setFillColor(160,71,71); doc.rect(0,0,210,30,'F'); doc.setTextColor(255,255,255); doc.setFontSize(22); doc.setFont("helvetica","bold"); doc.text("HOTEL BENGAL",105,15,{align:"center"}); doc.setFontSize(10); doc.setFont("helvetica","normal"); doc.text(HOTEL.address,105,22,{align:"center"});
@@ -1901,7 +2033,7 @@
             doc.setFontSize(11); let y=60; const l=20, r=120;
             doc.text(`Invoice No: ${bkg.id}`,l,y); doc.text(`Date: ${new Date().toLocaleDateString()}`,r,y); y+=10; doc.text(`Guest: ${bkg.name}`,l,y); doc.text(`Room: ${bkg.roomId}`,r,y); y+=10; doc.text(`Phone: ${bkg.phone}`,l,y); y+=15;
             doc.line(20,y,190,y); y+=10; doc.text(`Arrival: ${new Date(bkg.checkIn).toLocaleString()}`,l,y); y+=8; doc.text(`Departure: ${new Date(bkg.checkOut).toLocaleString()}`,l,y); y+=8; doc.text(`Days Stayed: ${bkg.actualDays}`,l,y); y+=15; doc.line(20,y,190,y); y+=10;
-            doc.setFont("helvetica","bold"); doc.text("Payment Summary",l,y); y+=10; doc.setFont("helvetica","normal"); doc.text(`Rate/Night: Rs. ${bkg.rent||1500}`,l,y); doc.text(`Total Charges: Rs. ${bkg.finalTotal}`,r,y); y+=8; doc.text(`Advance: Rs. ${bkg.advance}`,r,y); y+=15;
+            doc.setFont("helvetica","bold"); doc.text("Payment Summary",l,y); y+=10; doc.setFont("helvetica","normal"); doc.text(`Rate/Night: Rs. ${bkg.rent||1500}`,l,y); doc.text(`Total Charges: Rs. ${bkg.finalTotal}`,r,y); y+=8; doc.text(`Deposit Paid: Rs. ${bkg.advance}`,r,y); y+=15;
             doc.setFont("helvetica","bold"); doc.text("Collected:",l,y); doc.text(`Rs. ${Math.max(0,bkg.finalTotal-bkg.advance)}`,r,y); y+=15; doc.setFont("helvetica","normal"); doc.text(`Method: ${bkg.payMode||'N/A'} ${bkg.txnId?'('+bkg.txnId+')':''}`,l,y); y+=30;
             if(bkg.signatureCo)try{doc.addImage(bkg.signatureCo,'PNG',120,y-15,60,20);}catch(e){} doc.line(120,y+5,180,y+5); doc.text("Guest Signature",135,y+10); doc.text("Authorized Signatory",20,y+10); doc.line(20,y+5,70,y+5); doc.save(`Invoice_${bkg.id}.pdf`);
         }
@@ -1917,7 +2049,7 @@
             const cont = document.getElementById('toast-container'); const toast = document.createElement('div'); toast.className = `toast ${type}`;
             const icon = type === 'success' ? 'fa-circle-check' : (type === 'warning' ? 'fa-bell' : 'fa-circle-exclamation');
             toast.innerHTML = `<i class="fa-solid ${icon}"></i> <span>${msg}</span>`; cont.appendChild(toast);
-            setTimeout(() => { toast.style.animation = 'slideInRight 0.3s reverse forwards'; setTimeout(() => toast.remove(), 300); }, 3000);
+            setTimeout(() => { toast.style.animation = 'slideInRight 0.3s ease-out forwards reverse'; setTimeout(() => toast.remove(), 300); }, 3000);
         }
     </script>
 </body>
