@@ -15,8 +15,8 @@
 
     <!-- External Libraries (Allowed CDNs) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
     <style>
         /* -----------------------------------
@@ -587,9 +587,9 @@
     <!-- ==========================================
          AUTH VIEW
     ========================================== -->
-    <div id="auth-view" class="auth-wrapper noise-bg">
+    <div id="auth-view" class="auth-wrapper d-none noise-bg">
         <div class="auth-card card">
-            <h1 class="text-highlight" style="font-size: clamp(2rem, 5vw, 2.5rem); letter-spacing: 3px; margin-bottom: 0.5rem;">HOTEL BENGAL</h1>
+            <h1 class="text-highlight hotel-name-display" style="font-size: clamp(2rem, 5vw, 2.5rem); letter-spacing: 3px; margin-bottom: 0.5rem;">HOTEL BENGAL</h1>
             <p style="color: var(--secondary); margin-bottom: 2rem;">Management Access Only</p>
             
             <form id="login-form">
@@ -611,6 +611,9 @@
                     <i class="fa-solid fa-right-to-bracket"></i> Access System
                 </button>
             </form>
+            <button class="btn btn-secondary w-100 mt-1" onclick="hideLoginScreen()">
+                <i class="fa-solid fa-arrow-left"></i> Back to Public Site
+            </button>
             <p class="mt-2" style="font-size: 0.8rem; color: var(--text-muted);"><i class="fa-solid fa-shield-halved"></i> Master Device Setup / Offline First</p>
         </div>
     </div>
@@ -618,12 +621,13 @@
     <!-- ==========================================
          CUSTOMER PORTAL (QR VIEW / SELF BOOKING)
     ========================================== -->
-    <div id="customer-view" class="auth-wrapper d-none noise-bg" style="justify-content: flex-start; padding-top: env(safe-area-inset-top, 1rem); padding-bottom: 80px;">
+    <div id="customer-view" class="auth-wrapper noise-bg" style="justify-content: flex-start; padding-top: env(safe-area-inset-top, 1rem); padding-bottom: 80px;">
         <div class="auth-card card" style="margin-top: 1rem; max-width: 600px; width: 100%; padding: 2rem 1.5rem; border: none; background: transparent; box-shadow: none;">
             
             <div class="card text-center mb-2" style="background: var(--bg-surface);">
-                <h1 class="text-highlight" style="font-size: 1.8rem;">HOTEL BENGAL</h1>
-                <p style="color: var(--secondary);">Guest Services</p>
+                <h1 class="text-highlight hotel-name-display" style="font-size: 1.8rem;">HOTEL BENGAL</h1>
+                <p style="color: var(--secondary); font-size: 0.85rem;" class="hotel-addr-display">23, Itkhola Rd, Nabapally, Tarapur, Silchar, Assam</p>
+                <p style="color: var(--text-main); margin-top: 0.5rem; font-weight: 500;">Guest Services Portal</p>
             </div>
             
             <!-- HOME TAB: Service Request -->
@@ -761,8 +765,8 @@
             <button class="btn btn-secondary" onclick="showCustomerSection('c-tab-activity')" id="btn-c-activity">
                 <i class="fa-solid fa-list"></i> My Records
             </button>
-            <button class="btn" onclick="window.location.href = window.location.pathname;" style="background: var(--danger); color: white;">
-                <i class="fa-solid fa-right-from-bracket"></i> Exit
+            <button class="btn" onclick="showLoginScreen()" style="background: var(--bg-surface); color: var(--secondary); border: 1px solid var(--secondary);">
+                <i class="fa-solid fa-shield-halved"></i> Admin
             </button>
         </div>
     </div>
@@ -775,8 +779,8 @@
         <!-- Sidebar Navigation -->
         <nav class="sidebar noise-bg">
             <div class="sidebar-header">
-                <h1>HOTEL BENGAL</h1>
-                <p>Silchar, Assam</p>
+                <h1 class="hotel-name-display">HOTEL BENGAL</h1>
+                <p>Management</p>
             </div>
             <div class="nav-links">
                 <a class="nav-item active" data-target="view-dashboard" title="All Rooms">
@@ -877,7 +881,13 @@
 
             <!-- VIEW: PAST BOOKINGS -->
             <div id="view-history" class="view-section d-none">
-                <h2 style="font-size: 1.8rem; margin-bottom: 1.5rem;"><i class="fa-solid fa-clock-rotate-left text-secondary"></i> Past Bookings</h2>
+                <div class="flex-row" style="justify-content: space-between; margin-bottom: 1.5rem;">
+                    <h2 style="font-size: 1.8rem;"><i class="fa-solid fa-clock-rotate-left text-secondary"></i> Past Bookings</h2>
+                    <div class="flex-row" style="gap: 0.5rem;">
+                        <button class="btn btn-secondary" onclick="printHistoryTable()"><i class="fa-solid fa-print"></i> Print List</button>
+                        <button class="btn btn-highlight" onclick="exportHistoryPDFList()"><i class="fa-solid fa-file-pdf"></i> Download PDF List</button>
+                    </div>
+                </div>
                 <div class="flex-row" style="margin-bottom: 1rem;">
                     <div class="input-with-icon" style="max-width: 350px; margin: 0; width: 100%;">
                         <i class="fa-solid fa-magnifying-glass"></i>
@@ -908,17 +918,18 @@
                     </div>
                 </div>
                 <div class="card mt-2 noise-bg">
-                    <h3 class="text-highlight" style="margin-bottom: 1rem;"><i class="fa-solid fa-building-user"></i> Hotel Details</h3>
+                    <h3 class="text-highlight" style="margin-bottom: 1rem;"><i class="fa-solid fa-building-user"></i> Hotel Details (Public)</h3>
                     <div class="flex-row">
                         <div class="flex-col" style="flex: 1;">
                             <label>Hotel Name</label>
-                            <input type="text" value="HOTEL BENGAL" disabled>
+                            <input type="text" id="admin-hotel-name" value="HOTEL BENGAL">
                         </div>
                         <div class="flex-col" style="flex: 2;">
                             <label>Address</label>
-                            <input type="text" value="23, Itkhola Rd, Nabapally, Tarapur, Silchar, Assam, 788001" disabled>
+                            <input type="text" id="admin-hotel-address" value="23, Itkhola Rd, Nabapally, Tarapur, Silchar, Assam, 788001">
                         </div>
                     </div>
+                    <button class="btn btn-highlight mt-1" onclick="saveHotelConfig()"><i class="fa-solid fa-floppy-disk"></i> Save Hotel Details</button>
                 </div>
             </div>
 
@@ -986,7 +997,7 @@
                                     <label>Arrival Time</label>
                                     <div class="input-with-icon">
                                         <i class="fa-solid fa-calendar-check text-success"></i>
-                                        <input type="text" id="ci-date-auto" class="custom-date-auto" readonly data-iso="" style="color:white !important;">
+                                        <input type="datetime-local" id="ci-date-auto" class="custom-date-auto" onchange="calcDue()" required>
                                     </div>
                                 </div>
                                 <div class="flex-col" style="flex:1;">
@@ -1029,18 +1040,18 @@
                         <div id="tab-payment" class="tab-content">
                             <div class="flex-row" style="margin-bottom: 1rem;">
                                 <div class="flex-col" style="flex:1;">
-                                    <label>Room Rate Per Night (₹)</label>
-                                    <input type="number" id="ci-rent" required value="1500" oninput="calcDue()">
+                                    <label>Room Rate Per Day (₹)</label>
+                                    <input type="number" id="ci-rent" required value="" placeholder="e.g. 1500" oninput="calcDue()">
                                 </div>
                                 <div class="flex-col" style="flex:1;">
                                     <label>Deposit Paid (₹)</label>
-                                    <input type="number" id="ci-advance" required value="0" oninput="calcDue()">
+                                    <input type="number" id="ci-advance" required value="" placeholder="e.g. 500" oninput="calcDue()">
                                 </div>
                             </div>
                             <div class="card" style="margin-bottom: 1.5rem; background: rgba(0,0,0,0.4); border-color: rgba(255,255,255,0.1);">
                                 <div class="flex-row" style="justify-content: space-between;">
-                                    <span>Total Stay Cost Est: <strong id="ci-total-calc" class="text-highlight">₹1500</strong></span>
-                                    <span>Balance Due: <strong id="ci-due-calc" class="text-primary" style="font-size: 1.2rem;">₹1500</strong></span>
+                                    <span>Total Stay Cost Est: <strong id="ci-total-calc" class="text-highlight">₹0</strong></span>
+                                    <span>Balance Due: <strong id="ci-due-calc" class="text-primary" style="font-size: 1.2rem;">₹0</strong></span>
                                 </div>
                             </div>
 
@@ -1157,7 +1168,7 @@
         <div class="modal-content" style="max-width: 500px; background: #1a1a1a;">
             <div class="modal-header">
                 <h2>Add Document/Photo</h2>
-                <button class="modal-close" onclick="closeCameraModal()"><i class="fa-solid fa-xmark"></i></button>
+                <button class="modal-close" onclick="closeModal('modal-camera')"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <div class="modal-body text-center">
                 <div class="tabs" style="justify-content: center;">
@@ -1310,21 +1321,68 @@
         // -----------------------------------
         window.onload = async () => {
             checkPWA();
+            loadHotelConfig();
+            
+            showLoading();
+            await loadData();
+            hideLoading();
+            
             const urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.get('mode') === 'customer') {
-                await loadData();
-                initCustomerPortal(urlParams.get('room'));
-            } else if (urlParams.get('mode') === 'booking') {
-                await loadData();
-                initCustomerPortal(null);
-                showCustomerSection('c-tab-rooms');
+            const isManagerLogged = localStorage.getItem('bengal_auth') === 'true';
+
+            if (isManagerLogged && !urlParams.has('mode')) {
+                // Admin dashboard
+                document.getElementById('auth-view').classList.add('d-none');
+                document.getElementById('customer-view').classList.add('d-none');
+                document.getElementById('app-shell').classList.remove('d-none');
+                initApp();
             } else {
-                showLoading();
-                await loadData();
-                hideLoading();
-                checkAuth();
+                // Public Website / Customer Portal Default
+                document.getElementById('auth-view').classList.add('d-none');
+                document.getElementById('app-shell').classList.add('d-none');
+                
+                const roomId = urlParams.get('room');
+                initCustomerPortal(roomId);
+                
+                if (urlParams.get('mode') === 'booking' || !roomId) {
+                    showCustomerSection('c-tab-rooms');
+                }
             }
         };
+        
+        function showLoginScreen() {
+            document.getElementById('customer-view').classList.add('d-none');
+            document.getElementById('auth-view').classList.remove('d-none');
+        }
+
+        function hideLoginScreen() {
+            document.getElementById('auth-view').classList.add('d-none');
+            document.getElementById('customer-view').classList.remove('d-none');
+        }
+
+        function loadHotelConfig() {
+            const stored = localStorage.getItem('hotel_config');
+            if(stored) {
+                try {
+                    const parsed = JSON.parse(stored);
+                    HOTEL.name = parsed.name || HOTEL.name;
+                    HOTEL.address = parsed.address || HOTEL.address;
+                } catch(e){}
+            }
+            document.querySelectorAll('.hotel-name-display').forEach(el => el.innerText = HOTEL.name);
+            document.querySelectorAll('.hotel-addr-display').forEach(el => el.innerText = HOTEL.address);
+            document.getElementById('admin-hotel-name').value = HOTEL.name;
+            document.getElementById('admin-hotel-address').value = HOTEL.address;
+        }
+
+        function saveHotelConfig() {
+            const name = document.getElementById('admin-hotel-name').value;
+            const addr = document.getElementById('admin-hotel-address').value;
+            HOTEL.name = name; HOTEL.address = addr;
+            localStorage.setItem('hotel_config', JSON.stringify({name: name, address: addr}));
+            loadHotelConfig();
+            showToast("Hotel Details Updated Successfully");
+        }
 
         async function loadData() {
             try {
@@ -1494,14 +1552,14 @@
             if (type === 'advance') {
                 advanceContainer.classList.remove('d-none');
                 document.getElementById('ci-planned-date').required = true;
-                autoDate.value = "TBD";
+                autoDate.value = "";
             } else {
                 advanceContainer.classList.add('d-none');
                 document.getElementById('ci-planned-date').required = false;
+                // Set default datetime-local format YYYY-MM-DDThh:mm
                 const now = new Date();
-                const formatter = new Intl.DateTimeFormat('en-IN', {day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit', hour12:true});
-                autoDate.value = formatter.format(now);
-                autoDate.dataset.iso = now.toISOString();
+                const tzoffset = now.getTimezoneOffset() * 60000;
+                autoDate.value = (new Date(Date.now() - tzoffset)).toISOString().slice(0, 16);
             }
             calcDue();
         }
@@ -1665,20 +1723,23 @@
         // 7. CHECK-IN & CHECKOUT
         // -----------------------------------
         function calcDue() {
-            const rent = parseFloat(document.getElementById('ci-rent').value) || 0, adv = parseFloat(document.getElementById('ci-advance').value) || 0;
+            const rent = parseFloat(document.getElementById('ci-rent').value) || 0;
+            const adv = parseFloat(document.getElementById('ci-advance').value) || 0;
             const type = document.getElementById('ci-booking-type').value;
             
             let ciDate;
             if(type === 'advance') {
-                ciDate = new Date(document.getElementById('ci-planned-date').value);
+                const pDate = document.getElementById('ci-planned-date').value;
+                ciDate = pDate ? new Date(pDate) : new Date();
             } else {
-                ciDate = new Date(document.getElementById('ci-date-auto').dataset.iso);
+                const autoDate = document.getElementById('ci-date-auto').value;
+                ciDate = autoDate ? new Date(autoDate) : new Date();
             }
             
             const coDate = new Date(document.getElementById('ci-checkout').value);
             let days = 1;
             
-            if(coDate && ciDate && coDate > ciDate) { 
+            if(coDate && ciDate && !isNaN(coDate.getTime()) && !isNaN(ciDate.getTime()) && coDate > ciDate) { 
                 days = Math.ceil(Math.abs(coDate - ciDate) / (1000 * 60 * 60 * 24)); 
                 if(days === 0) days = 1; 
             }
@@ -1701,7 +1762,9 @@
                 if(!planDate) { showToast("Planned check-in date required", "error"); return; }
                 ciIso = new Date(planDate).toISOString();
             } else {
-                ciIso = document.getElementById('ci-date-auto').dataset.iso;
+                const autoDate = document.getElementById('ci-date-auto').value;
+                if(!autoDate) { showToast("Arrival time required", "error"); return; }
+                ciIso = new Date(autoDate).toISOString();
             }
 
             const coVal = document.getElementById('ci-checkout').value;
@@ -1720,12 +1783,11 @@
             room.bookingData = {
                 id: 'BKG-' + Date.now(), name, phone, members: document.getElementById('ci-members').value,
                 checkIn: ciDate.toISOString(), expectedOut: coDate.toISOString(), idType: document.getElementById('ci-id-type').value, idNum: document.getElementById('ci-id-num').value,
-                rent: document.getElementById('ci-rent').value, advance: document.getElementById('ci-advance').value, totalEst: calc.total, images: [...tempImages], signatureCi: sigData
+                rent: document.getElementById('ci-rent').value || 0, advance: document.getElementById('ci-advance').value || 0, totalEst: calc.total, images: [...tempImages], signatureCi: sigData
             };
             
             await saveData(); closeModal('modal-room'); renderDashboard(); 
             showToast(`Room ${currentEditingRoom} ${type === 'advance' ? 'Reserved' : 'Booked'}!`);
-            confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
         }
 
         async function checkInUpcomingBooking() {
@@ -1749,7 +1811,9 @@
 
         async function processCheckout() {
             const sigData = getSignatureData('co-signature'); if(!sigData) { showToast("Final signature required.", "error"); return; }
-            if(!(await showCustomDialog("Confirm Action", `Are you sure you want to finish checkout for Room ${currentEditingRoom}?`, "confirm"))) return;
+            
+            const confirmAction = await showCustomDialog("Confirm Action", `Are you sure you want to finish checkout for Room ${currentEditingRoom}?`, "confirm");
+            if (!confirmAction) return;
 
             const room = appState.rooms[currentEditingRoom], data = room.bookingData, calc = calcCheckout(data);
             const bkg = { ...data, checkOut: new Date().toISOString(), actualDays: calc.days, finalTotal: calc.total, amountPaid: calc.total, payMode: document.getElementById('co-pay-mode').value, txnId: document.getElementById('co-txn').value, signatureCo: sigData, roomId: currentEditingRoom };
@@ -1807,150 +1871,86 @@
         }
         window.reprintPDF = i => generateReceiptPDF(appState.history[i]);
         
+        function printHistoryTable() {
+            let printWin = window.open('', '', 'width=900,height=700');
+            let html = `<html><head><title>Booking History List</title><style>
+                body { font-family: Arial, sans-serif; padding: 20px; color: #333; }
+                table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 14px; }
+                th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+                th { background-color: #f5f5f5; color: #000; font-weight: bold; }
+                h2 { text-align: center; color: #000; border-bottom: 2px solid #ddd; padding-bottom: 10px; }
+                .text-right { text-align: right; }
+            </style></head><body>`;
+            html += `<h2>${HOTEL.name} - Past Bookings Register</h2>`;
+            html += `<table><thead><tr><th>#</th><th>Room</th><th>Guest Name</th><th>Phone</th><th>Arrival Date</th><th>Departure Date</th><th class="text-right">Total Cost</th></tr></thead><tbody>`;
+            
+            if(appState.history.length === 0) {
+                html += `<tr><td colspan="7" style="text-align:center;">No past bookings found.</td></tr>`;
+            } else {
+                appState.history.forEach((b, index) => {
+                    html += `<tr>
+                        <td>${index + 1}</td>
+                        <td>${b.roomId}</td>
+                        <td>${b.name}</td>
+                        <td>${b.phone}</td>
+                        <td>${new Date(b.checkIn).toLocaleDateString()}</td>
+                        <td>${new Date(b.checkOut).toLocaleDateString()}</td>
+                        <td class="text-right">Rs. ${b.finalTotal}</td>
+                    </tr>`;
+                });
+            }
+            
+            html += `</tbody></table></body></html>`;
+            printWin.document.write(html);
+            printWin.document.close();
+            printWin.focus();
+            setTimeout(() => { printWin.print(); }, 500); // Small delay to ensure render
+        }
+
+        function exportHistoryPDFList() {
+            if(!appState.history.length) { showToast("No history to export", "error"); return; }
+            
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('p', 'pt', 'a4');
+            
+            doc.setFontSize(18);
+            doc.setTextColor(40, 40, 40);
+            doc.text(`${HOTEL.name} - Booking History Register`, 40, 40);
+            doc.setFontSize(10);
+            doc.setTextColor(100, 100, 100);
+            doc.text(`Generated on: ${new Date().toLocaleString()}`, 40, 55);
+            
+            const body = appState.history.map((b, i) => [
+                i+1, 
+                b.roomId, 
+                b.name, 
+                b.phone, 
+                new Date(b.checkIn).toLocaleDateString(), 
+                new Date(b.checkOut).toLocaleDateString(), 
+                `Rs. ${b.finalTotal}`
+            ]);
+
+            doc.autoTable({
+                startY: 70,
+                head: [['#', 'Room', 'Name', 'Phone', 'Check-In', 'Check-Out', 'Total Cost']],
+                body: body,
+                theme: 'grid',
+                styles: { fontSize: 9, cellPadding: 6 },
+                headStyles: { fillColor: [160, 71, 71], textColor: [255, 255, 255] },
+                alternateRowStyles: { fillColor: [245, 245, 245] }
+            });
+            
+            doc.save(`${HOTEL.name.replace(/\s+/g, '_')}_History_List.pdf`);
+            showToast("PDF Exported Successfully");
+        }
+        
         document.getElementById('btn-factory-reset').onclick = async () => {
             const res = await showCustomDialog("Delete All Data", "WARNING: This erases all local data permanently. Type 'CONFIRM' to proceed.", "prompt");
-            if(res === 'CONFIRM') { appState.history=[]; appState.requests=[]; generateInitialRooms(); location.reload(); }
-        };
-        
-        document.getElementById('btn-export-data').onclick = () => {
-            const url = URL.createObjectURL(new Blob([JSON.stringify({rooms:appState.rooms,history:appState.history,requests:appState.requests,date:new Date().toISOString()})], {type:'application/json'}));
-            const a=document.createElement('a');a.href=url;a.download=`Backup_${Date.now()}.json`;document.body.appendChild(a);a.click();document.body.removeChild(a);showToast("Backup Exported");
-        };
-
-        // -----------------------------------
-        // 11. CUSTOMER PORTAL
-        // -----------------------------------
-        let cRoomId = null;
-        async function initCustomerPortal(roomId) {
-            cRoomId = roomId && roomId !== 'null' ? roomId : null;
-            document.getElementById('auth-view').classList.add('d-none'); document.getElementById('customer-view').classList.remove('d-none');
-            
-            if(cRoomId && appState.rooms[cRoomId]) {
-                document.getElementById('guest-room-context').classList.remove('d-none');
-                document.getElementById('guest-room-display').innerText = `Room ${cRoomId}`;
-                document.getElementById('guest-request-form').classList.remove('d-none');
-                showCustomerSection('c-tab-home');
-            } else {
-                showCustomerSection('c-tab-rooms');
-            }
-
-            document.getElementById('guest-request-form').onsubmit = async(e) => {
-                e.preventDefault(); showLoading();
-                appState.requests.push({ id: Date.now(), roomId: cRoomId, category: document.getElementById('guest-req-category').value, message: document.getElementById('guest-req-msg').value, time: new Date().toISOString(), status: 'pending', type: 'service' });
-                await IDB.set('bengal_requests', appState.requests);
-                document.getElementById('guest-request-form').classList.add('d-none'); document.getElementById('guest-req-success').classList.remove('d-none');
-                hideLoading(); triggerVibration(); renderCustomerActivity();
-            };
-
-            document.getElementById('customer-booking-form').onsubmit = async(e) => {
-                e.preventDefault(); showLoading();
-                const name = document.getElementById('cb-name').value, phone = document.getElementById('cb-phone').value;
-                const ci = new Date(document.getElementById('cb-checkin').value), co = new Date(document.getElementById('cb-checkout').value);
-                if(co <= ci) { showToast("Check-out must be after Arrival.", "error"); hideLoading(); return; }
-                
-                const roomSel = document.getElementById('booking-room-num').innerText.replace('Room ', '');
-                appState.rooms[roomSel].status = 'pending';
-                appState.rooms[roomSel].bookingData = { name, phone, checkIn: ci.toISOString(), expectedOut: co.toISOString(), idType: document.getElementById('cb-id-type').value, idNum: document.getElementById('cb-id-num').value, advance: 0, rent: 1500, totalEst: 1500, images: [] };
-
-                appState.requests.push({ id: Date.now(), roomId: roomSel, category: "Booking Request", message: `Name: ${name}, Ph: ${phone}, IN: ${ci.toLocaleDateString()}, OUT: ${co.toLocaleDateString()}`, time: new Date().toISOString(), status: 'pending_booking', type: 'booking', bkgData: appState.rooms[roomSel].bookingData });
-                await saveData();
-                
-                document.getElementById('customer-booking-form-container').classList.add('d-none');
-                document.getElementById('booking-success').classList.remove('d-none');
-                hideLoading(); showToast("Booking Request Sent!"); triggerVibration();
-                renderCustomerActivity();
-            };
-            
-            renderCustomerActivity();
-            setInterval(async () => { await loadData(); renderCustomerRooms(); renderCustomerActivity(); }, 5000);
-        }
-
-        window.showCustomerSection = (targetId) => {
-            document.querySelectorAll('#customer-view .tab-content').forEach(c => c.classList.remove('active'));
-            document.getElementById(targetId).classList.add('active');
-            
-            document.querySelectorAll('#customer-bottom-bar .btn').forEach(b => b.classList.add('btn-secondary'));
-            document.querySelectorAll('#customer-bottom-bar .btn').forEach(b => b.classList.remove('active'));
-            
-            if(targetId === 'c-tab-home') { document.getElementById('btn-c-home').classList.remove('btn-secondary'); document.getElementById('btn-c-home').classList.add('active'); }
-            if(targetId === 'c-tab-rooms') { document.getElementById('btn-c-rooms').classList.remove('btn-secondary'); document.getElementById('btn-c-rooms').classList.add('active'); renderCustomerRooms(); }
-            if(targetId === 'c-tab-activity') { document.getElementById('btn-c-activity').classList.remove('btn-secondary'); document.getElementById('btn-c-activity').classList.add('active'); renderCustomerActivity(); }
-        }
-
-        window.resetRequestForm = () => {
-            document.getElementById('guest-request-form').reset();
-            document.getElementById('guest-request-form').classList.remove('d-none');
-            document.getElementById('guest-req-success').classList.add('d-none');
-        };
-
-        window.cancelCustomerBooking = () => {
-            document.getElementById('customer-booking-form-container').classList.add('d-none');
-            document.getElementById('customer-room-list').classList.remove('d-none');
-        }
-
-        function renderCustomerRooms() {
-            const grid = document.getElementById('customer-room-list'); if(!grid) return; grid.innerHTML = '';
-            let hasRooms = false;
-            Object.keys(appState.rooms).sort().forEach(rId => {
-                const r = appState.rooms[rId];
-                if(r.status === 'available') {
-                    hasRooms = true;
-                    grid.innerHTML += `<div class="room-box status-free" style="padding:1rem" onclick="openCustomerBookForm('${r.id}')"><div class="room-number" style="font-size:1.3rem">Room ${r.id}</div><div class="room-floor">Floor ${r.floor}</div><button class="btn mt-1" style="width:100%; font-size:0.8rem; min-height:30px">Book</button></div>`;
-                }
-            });
-            if(!hasRooms) grid.innerHTML = `<p class="text-muted w-100 text-center" style="grid-column: 1/-1;"><i class="fa-solid fa-bed" style="font-size:2rem;margin-bottom:1rem;display:block"></i> All rooms are currently occupied.</p>`;
-        }
-        
-        window.openCustomerBookForm = (rId) => {
-            document.getElementById('customer-room-list').classList.add('d-none');
-            document.getElementById('booking-success').classList.add('d-none');
-            document.getElementById('customer-booking-form-container').classList.remove('d-none');
-            document.getElementById('booking-room-num').innerText = `Room ${rId}`;
-            document.getElementById('customer-booking-form').reset();
-        };
-
-        function renderCustomerActivity() {
-            const list = document.getElementById('customer-activity-list'); if(!list) return; list.innerHTML = '';
-            const myReqs = appState.requests.filter(r => r.roomId === cRoomId || r.type === 'booking').sort((a,b)=>b.id-a.id);
-            if(myReqs.length===0) { list.innerHTML = `<div class="empty-state"><i class="fa-solid fa-folder-open"></i><p>No recent activity found.</p></div>`; return; }
-            
-            let showedNotification = false;
-
-            myReqs.forEach(r => {
-                let color = r.status.includes('pending') ? 'var(--pending)' : (r.status.includes('reject') || r.status.includes('cancel') ? 'var(--danger)' : 'var(--success)');
-                let icon = r.status.includes('pending') ? 'fa-clock' : (r.status.includes('reject') || r.status.includes('cancel') ? 'fa-xmark' : 'fa-check');
-                let cancelBtn = r.status.includes('pending') ? `<button class="btn btn-secondary mt-1" style="padding:0.2rem 0.5rem; font-size:0.7rem; min-height: 24px;" onclick="cancelCustomerRequest(${r.id})"><i class="fa-solid fa-ban"></i> Cancel</button>` : '';
-                
-                if(r.type === 'booking' && !r.status.includes('pending') && !r.notified) {
-                    if(!showedNotification) {
-                        const notif = document.getElementById('customer-notification');
-                        document.getElementById('notif-title').innerText = r.status === 'approved' ? 'Booking Confirmed!' : 'Booking Rejected';
-                        document.getElementById('notif-msg').innerText = r.status === 'approved' ? `Your booking for Room ${r.roomId} is confirmed.` : `Sorry, your booking for Room ${r.roomId} could not be confirmed.`;
-                        notif.querySelector('.card').style.borderLeftColor = r.status === 'approved' ? 'var(--success)' : 'var(--danger)';
-                        notif.classList.remove('d-none');
-                        showedNotification = true;
-                    }
-                    r.notified = true; 
-                    IDB.set('bengal_requests', appState.requests);
-                }
-
-                list.innerHTML += `<div class="card noise-bg mb-1" style="border-left: 4px solid ${color}"><div class="flex-row" style="justify-content:space-between"><strong>${r.category} (${r.roomId})</strong><span style="color:${color}"><i class="fa-solid ${icon}"></i> ${r.status.replace('_',' ').toUpperCase()}</span></div><p class="text-muted mt-1" style="font-size:0.8rem">${r.message}</p>${cancelBtn}</div>`;
-            });
-        }
-
-        window.cancelCustomerRequest = async (id) => {
-            if(await showCustomDialog("Confirm", "Are you sure you want to cancel this request?", "confirm")) {
-                const req = appState.requests.find(x=>x.id===id);
-                if(req) {
-                    req.status = 'cancelled';
-                    if(req.type === 'booking' && appState.rooms[req.roomId].status === 'pending') {
-                        appState.rooms[req.roomId].status = 'available';
-                        appState.rooms[req.roomId].bookingData = null;
-                    }
-                    await saveData();
-                    renderCustomerActivity();
-                    showToast("Request Cancelled");
-                }
+            if(res === 'CONFIRM') { 
+                appState.history=[]; appState.requests=[]; 
+                localStorage.removeItem('hotel_config');
+                generateInitialRooms(); 
+                location.reload(); 
             }
         };
 
@@ -2010,7 +2010,7 @@
                 if(appState.rooms[r.roomId].status === 'booked' || appState.rooms[r.roomId].status === 'upcoming') { showToast("Room occupied!", "error"); return; }
                 appState.rooms[r.roomId].status = 'booked';
                 appState.rooms[r.roomId].bookingData.id = 'BKG-'+Date.now();
-                r.status = 'approved'; showToast("Booking Approved"); confetti(); renderDashboard();
+                r.status = 'approved'; showToast("Booking Approved"); renderDashboard();
             } else { 
                 appState.rooms[r.roomId].status = 'available';
                 appState.rooms[r.roomId].bookingData = null;
