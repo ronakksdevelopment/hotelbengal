@@ -12,14 +12,10 @@
     <!-- External Fonts & Icons -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- Flatpickr (Custom Calendar) CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/dark.css">
 
     <!-- External Libraries (Allowed CDNs) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
     <style>
@@ -39,6 +35,7 @@
             --success: #4CAF50;
             --danger: #A04747;
             --warning: #D8A25E;
+            --pending: #D8A25E;
             
             --card-bg: rgba(255, 255, 255, 0.05);
             --card-border: rgba(216, 162, 94, 0.2);
@@ -62,9 +59,9 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        /* 10c. Text Selection */
-        ::selection { background: var(--primary); color: #ffffff; }
-        ::-moz-selection { background: var(--primary); color: #ffffff; }
+        /* Override ALL browser defaults for text selection */
+        *::selection { background: rgba(160, 71, 71, 0.5) !important; color: white !important; }
+        *::-moz-selection { background: rgba(160, 71, 71, 0.5) !important; color: white !important; }
 
         body {
             background-color: var(--bg-main);
@@ -72,24 +69,27 @@
             min-height: 100vh;
             display: flex;
             flex-direction: column;
-            overflow: hidden; /* Main scroll handled in main-content */
+            overflow-x: hidden;
             padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
         }
 
-        /* 10f. Scrollbar */
+        img { max-width: 100%; height: auto; }
+        p, h1, h2, h3, h4, h5, h6, span, div { word-break: break-word; }
+
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: var(--bg-main); }
         ::-webkit-scrollbar-thumb { background: var(--secondary); border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: var(--highlight); }
 
         /* -----------------------------------
-           📱 LAYOUTS & RESPONSIVENESS
+           📱 LAYOUTS & CONTAINERS
         ----------------------------------- */
         .app-container {
             display: flex;
             height: 100vh;
             width: 100vw;
             overflow: hidden;
+            contain: layout style paint;
         }
 
         .sidebar {
@@ -129,7 +129,7 @@
             transition: var(--transition);
             cursor: pointer;
             border-left: 4px solid transparent;
-            min-height: 44px;
+            min-height: 44px; /* Minimum touch target */
         }
 
         .nav-item i { width: 24px; text-align: center; color: white; }
@@ -147,7 +147,11 @@
             scroll-behavior: smooth;
             padding: 2rem;
             position: relative;
+            contain: layout style paint;
         }
+
+        .view-section { animation: fadeSlideIn 0.4s ease-out; }
+        @keyframes fadeSlideIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
         /* -----------------------------------
            COMPONENTS
@@ -168,13 +172,13 @@
             position: relative;
         }
 
-        /* 10h. Button Active States */
+        /* Button Ripple Effect */
         .btn {
             background: linear-gradient(135deg, var(--primary), #8a3a3a);
             color: white;
             border: none;
             padding: 0.8rem 1.5rem;
-            min-height: 44px;
+            min-height: 44px; /* Mobile touch optimization */
             border-radius: var(--radius-md);
             font-weight: 600;
             cursor: pointer;
@@ -186,7 +190,16 @@
             font-size: 0.9rem;
             box-shadow: 0 4px 15px rgba(160, 71, 71, 0.2);
             outline: none;
+            position: relative;
+            overflow: hidden;
         }
+        .btn::after {
+            content: ''; position: absolute; top: 50%; left: 50%; width: 0; height: 0;
+            border-radius: 50%; background: rgba(255, 255, 255, 0.3); transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+        .btn:active::after { width: 300px; height: 300px; transition: 0s; }
+
         .btn i { color: white; }
         .btn:hover { background: linear-gradient(135deg, #b85454, #A04747); transform: translateY(-2px); box-shadow: var(--shadow-soft); }
         .btn:active { transform: scale(0.96); box-shadow: none; transition: 0.1s; }
@@ -194,13 +207,13 @@
         
         .btn-secondary { background: transparent; border: 1px solid var(--secondary); color: var(--secondary); box-shadow: none; }
         .btn-secondary i { color: var(--secondary); }
-        .btn-secondary:hover { background: rgba(216, 162, 94, 0.1); color: var(--highlight); }
+        .btn-secondary:hover { background: rgba(216, 162, 94, 0.2); color: var(--highlight); }
         
         .btn-highlight { background: linear-gradient(135deg, var(--highlight), #d4c466); color: var(--bg-main); box-shadow: 0 4px 15px rgba(238, 223, 122, 0.2); }
         .btn-highlight i { color: var(--bg-main); }
         .btn-highlight:hover { background: linear-gradient(135deg, #ffeaa7, var(--highlight)); }
 
-        /* 10d. Focus States & Disabled */
+        /* Inputs & Form Controls - Min 48px height, 16px font to prevent iOS zoom */
         input, select, textarea {
             width: 100%;
             background: rgba(0, 0, 0, 0.2);
@@ -211,7 +224,7 @@
             border-radius: var(--radius-md);
             outline: none;
             transition: var(--transition);
-            font-size: 0.95rem;
+            font-size: 16px; 
             margin-bottom: 1rem;
         }
         input:focus-visible, select:focus-visible, textarea:focus-visible { 
@@ -222,20 +235,41 @@
         input:disabled, select:disabled, textarea:disabled, input[readonly] {
             opacity: 0.6; background: rgba(0,0,0,0.3); cursor: not-allowed; color: var(--text-muted);
         }
-        /* Except Flatpickr readonly inputs which need to look active */
-        input.flatpickr-input[readonly] { opacity: 1; cursor: pointer; color: white; background: rgba(0, 0, 0, 0.3); }
 
-        /* 10b. Select Dropdowns */
+        /* Custom Theme for Dropdowns (Select) */
         select {
-            appearance: none;
-            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23D8A25E%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
-            background-repeat: no-repeat, repeat;
-            background-position: right 1em top 50%, 0 0;
-            background-size: .65em auto, 100%;
+            background-color: rgba(0, 0, 0, 0.3) !important;
+            color: white !important;
+            border: 1px solid var(--card-border) !important;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23D8A25E' d='M6 8L1 3h10z'/%3E%3C/svg%3E") !important;
+            background-repeat: no-repeat !important;
+            background-position: right 1rem center !important;
+            -webkit-appearance: none !important;
+            -moz-appearance: none !important;
+            appearance: none !important;
         }
-        select option { background: var(--bg-surface); color: white; }
+        select option { background-color: var(--bg-surface) !important; color: white !important; padding: 1rem !important; }
+        select option:hover, select option:focus, select option:active, select option:checked { background: var(--primary) !important; color: white !important; }
 
-        .input-with-icon { position: relative; display: flex; align-items: center; margin-bottom: 1rem; }
+        /* Theme-Based Calendar / Date Picker */
+        input[type="date"], input[type="datetime-local"] {
+            color-scheme: dark; background-color: rgba(0, 0, 0, 0.3) !important;
+            border: 1px solid var(--card-border) !important; color: white !important;
+            font-family: 'Poppins', sans-serif !important; padding: 0.8rem 1rem; border-radius: var(--radius-md);
+        }
+        /* Custom calendar icon color - Invert/Adjust to white/gold */
+        input[type="date"]::-webkit-calendar-picker-indicator, input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+            filter: invert(1) brightness(2); cursor: pointer; opacity: 1; background-color: transparent;
+        }
+        input[type="date"]::-webkit-datetime-edit-fields-wrapper, input[type="date"]::-webkit-datetime-edit-text, input[type="date"]::-webkit-datetime-edit-day-field, input[type="date"]::-webkit-datetime-edit-month-field, input[type="date"]::-webkit-datetime-edit-year-field { color: white; }
+        ::-webkit-calendar-picker { background-color: var(--bg-surface); border: 1px solid var(--card-border); border-radius: var(--radius-md); }
+        input.custom-date-auto { color-scheme: dark; background: rgba(0, 0, 0, 0.3); border: 1px dashed var(--card-border); color: var(--success) !important; font-weight: 500; min-height: 48px; }
+        input.custom-date-auto::-webkit-calendar-picker-indicator { filter: invert(0.8) sepia(1) saturate(5) hue-rotate(30deg); cursor: pointer; opacity: 0.8; }
+
+        /* Icons */
+        .fa-calendar, .fa-calendar-check, .fa-calendar-xmark, .fa-calendar-days, .fa-calendar-week { color: var(--secondary) !important; }
+        
+        .input-with-icon { position: relative; display: flex; align-items: center; margin-bottom: 1rem; width: 100%; }
         .input-with-icon i { position: absolute; left: 1rem; color: var(--secondary); font-size: 1.1rem; pointer-events: none;}
         .input-with-icon input { padding-left: 3rem; margin-bottom: 0; background: rgba(0, 0, 0, 0.3); }
         .clickable-icon { pointer-events: all !important; cursor: pointer; padding: 10px; }
@@ -248,33 +282,40 @@
         .bg-green { background: rgba(76, 175, 80, 0.2); color: var(--success); }
         .bg-red { background: rgba(160, 71, 71, 0.2); color: var(--danger); }
 
-        /* Room Grid & Staggered Animation */
+        /* Room Grid & Hover Effects */
         .room-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 1.2rem; }
         .room-box {
             background: var(--card-bg); border: 1px solid var(--card-border); border-radius: var(--radius-md);
-            padding: 1.5rem 1rem; text-align: center; cursor: pointer; transition: var(--transition);
+            padding: 1.5rem 1rem; text-align: center; cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             position: relative; overflow: hidden; z-index: 1; opacity: 0;
             animation: fadeInCard 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
         }
         @keyframes fadeInCard { from { opacity: 0; transform: translateY(20px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
         
-        .room-box:hover { transform: translateY(-5px) scale(1.02); box-shadow: var(--shadow-soft); border-color: var(--highlight); }
-        .room-box:active { transform: scale(0.97); }
+        .room-box:hover { transform: translateY(-8px) scale(1.03); box-shadow: 0 15px 40px rgba(216, 162, 94, 0.2); border-color: var(--highlight); z-index: 10; }
+        .room-box:active { transform: scale(0.97); transition: 0.1s; }
         .room-number { font-size: 1.8rem; font-weight: 700; color: var(--highlight); margin-bottom: 0.2rem; }
         .room-floor { font-size: 0.8rem; color: var(--text-muted); }
         
+        /* Status Badge Animations */
         .status-badge { display: inline-block; padding: 0.4rem 0.8rem; border-radius: var(--radius-full); font-size: 0.75rem; font-weight: 600; margin-top: 0.5rem; letter-spacing: 0.5px; }
         
         @keyframes pulse-green { 0% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.4); } 70% { box-shadow: 0 0 0 8px rgba(76, 175, 80, 0); } 100% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0); } }
-        @keyframes pulse-gold { 0% { box-shadow: 0 0 0 0 rgba(216, 162, 94, 0.4); } 70% { box-shadow: 0 0 0 8px rgba(216, 162, 94, 0); } 100% { box-shadow: 0 0 0 0 rgba(216, 162, 94, 0); } }
+        @keyframes pulse-yellow { 0% { box-shadow: 0 0 0 0 rgba(216, 162, 94, 0.4); } 70% { box-shadow: 0 0 0 8px rgba(216, 162, 94, 0); } 100% { box-shadow: 0 0 0 0 rgba(216, 162, 94, 0); } }
+        @keyframes statusGlow { 0%, 100% { box-shadow: 0 0 5px currentColor; } 50% { box-shadow: 0 0 20px currentColor, 0 0 40px currentColor; } }
         
-        .status-free { background: var(--success); color: white; animation: pulse-green 2s infinite; }
-        .status-occupied { background: var(--primary); color: white; }
+        .status-free { background: var(--success); color: white; animation: pulse-green 2s infinite, statusGlow 2s infinite; }
+        .status-occupied { background: var(--primary); color: white; animation: statusGlow 2s infinite; box-shadow: 0 0 15px rgba(160, 71, 71, 0.5); }
+        .status-pending { background: var(--pending) !important; color: #000000 !important; animation: pulse-yellow 2s infinite; font-weight: bold; }
         
         .room-box.booked { border-bottom: 4px solid var(--primary); }
         .room-box.available { border-bottom: 4px solid var(--success); }
+        .room-box.pending { border-bottom: 4px solid var(--pending); }
+        
         .room-box.available i { color: var(--success); opacity: 0.5; position: absolute; right: -10px; bottom: -10px; font-size: 4rem; z-index: -1; transition: 0.3s; }
         .room-box.booked i { color: var(--primary); opacity: 0.2; position: absolute; right: -10px; bottom: -10px; font-size: 4rem; z-index: -1; }
+        .room-box.pending i { color: var(--pending); opacity: 0.3; position: absolute; right: -10px; bottom: -10px; font-size: 4rem; z-index: -1; }
         .room-box:hover i { transform: scale(1.1); opacity: 0.4; }
 
         /* Custom Dialogs & Modals */
@@ -339,48 +380,41 @@
         #capture-btn { width: 64px; height: 64px; border-radius: 50%; background: var(--primary); border: 4px solid white; cursor: pointer; transition: 0.2s; box-shadow: 0 0 15px rgba(0,0,0,0.5); }
         #capture-btn:active { transform: scale(0.9); background: white; }
 
-        /* 7. QR Code Configuration & Styling (FIXED: Solid Borders + Corners) */
+        /* QR Code Configuration & Styling - Solid Red Border with Corners */
         .qr-wrapper { 
-            position: relative; background: #ffffff; padding: 1.5rem; 
-            display: inline-block; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            border: 4px solid #A04747;
-            border-right-color: #000000;
-            margin: 20px;
+            position: relative; background: #ffffff; padding: 1.8rem; border-radius: 8px; 
+            display: inline-block; border: 5px solid #ff0000 !important; margin: 1rem 0; 
+            box-shadow: 0 10px 30px rgba(255,0,0,0.3);
         }
-        .qr-corner { position: absolute; width: 20px; height: 20px; border: 4px solid; z-index: 2; background: white; }
-        .qr-tl { top: -12px; left: -12px; border-color: #A04747; }
-        .qr-tr { top: -12px; right: -12px; border-color: #000000; }
-        .qr-bl { bottom: -12px; left: -12px; border-color: #000000; }
-        .qr-br { bottom: -12px; right: -12px; border-color: #A04747; }
+        .qr-corner { position: absolute; width: 20px; height: 20px; z-index: 2; pointer-events: none; border: 4px solid; }
+        .qr-tl { top: -5px; left: -5px; border-color: #ff0000 #000000 #000000 #ff0000; border-radius: 3px 0 0 0; }
+        .qr-tr { top: -5px; right: -5px; border-color: #ff0000 #ff0000 #000000 #000000; border-radius: 0 3px 0 0; }
+        .qr-bl { bottom: -5px; left: -5px; border-color: #000000 #000000 #ff0000 #ff0000; border-radius: 0 0 0 3px; }
+        .qr-br { bottom: -5px; right: -5px; border-color: #000000 #ff0000 #ff0000 #000000; border-radius: 0 0 3px 0; }
         .qr-wrapper img, .qr-wrapper canvas { display: block; margin: 0 auto; }
         
-        /* 10e. Custom Context Menu */
-        .context-menu {
+        /* Custom Context Menu */
+        .custom-context-menu {
             position: fixed; background: var(--bg-surface); border: 1px solid var(--card-border); border-radius: var(--radius-md);
-            box-shadow: var(--shadow-soft); z-index: 10000; width: 220px; padding: 0.5rem; opacity: 0; pointer-events: none;
-            transform: scale(0.9); transform-origin: top left; transition: 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            padding: 0.5rem; z-index: 9999; box-shadow: 0 10px 40px rgba(0,0,0,0.5); min-width: 200px;
+            animation: fadeInCard 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-        .context-menu.active { opacity: 1; pointer-events: all; transform: scale(1); }
-        .context-item { padding: 0.8rem 1rem; display: flex; align-items: center; gap: 10px; cursor: pointer; border-radius: 8px; transition: 0.2s; color: white; }
-        .context-item:hover { background: var(--card-bg); color: var(--highlight); }
-        .context-item i { color: var(--secondary); width: 20px; text-align: center;}
+        .context-menu-item {
+            padding: 0.8rem 1rem; cursor: pointer; border-radius: 8px; transition: 0.2s;
+            display: flex; align-items: center; gap: 0.8rem; color: var(--text-main); font-size: 0.9rem;
+        }
+        .context-menu-item:hover { background: rgba(216, 162, 94, 0.2); color: var(--highlight); }
+        .context-menu-item i { color: var(--secondary); width: 20px; text-align: center; }
 
-        /* Flatpickr Dark Theme Overrides */
-        .flatpickr-calendar { background: var(--bg-surface) !important; border: 1px solid var(--card-border) !important; box-shadow: var(--shadow-soft) !important; font-family: 'Poppins', sans-serif !important;}
-        .flatpickr-day.selected { background: var(--primary) !important; border-color: var(--primary) !important; }
-        .flatpickr-day.today { border-color: var(--secondary) !important; color: var(--highlight) !important; }
-        .flatpickr-current-month .flatpickr-monthDropdown-months, .flatpickr-current-month input.cur-year { color: white !important; }
-        .flatpickr-month { fill: white !important; color: white !important; }
-        
-        /* 5. Install Banner Animation */
-        #install-banner {
-            position: fixed; top: 10px; left: 50%; transform: translateX(-50%) translateY(-150%);
-            z-index: 9999; background: linear-gradient(135deg, var(--primary), #6a1a1a); color: white; padding: 12px 20px; 
-            border-radius: 30px; display: flex; align-items: center; gap: 12px; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5); cursor: pointer; transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            border: 1px solid rgba(255,255,255,0.2);
+        /* Install Banner Animation */
+        .install-banner {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 5000; padding: 0.8rem;
+            background: var(--bg-surface); border-bottom: 1px solid var(--card-border);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3); animation: slideDown 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            backdrop-filter: blur(10px);
         }
-        #install-banner.show { transform: translateX(-50%) translateY(0); }
+        @keyframes slideDown { from { transform: translateY(-100%); } to { transform: translateY(0); } }
+        .install-banner-content { max-width: 600px; margin: 0 auto; }
 
         /* Auth Screen */
         .auth-wrapper {
@@ -406,6 +440,12 @@
         }
         .toast.success { border-left-color: var(--success); }
         .toast.error { border-left-color: #ff3b30; }
+
+        .notification-popup {
+            position: fixed; top: 20px; right: 20px; z-index: 9999;
+            animation: slideInRight 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            max-width: 350px; width: 100%;
+        }
 
         .loading-overlay {
             position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 9999;
@@ -433,98 +473,138 @@
         .empty-state i { font-size: 3rem; color: rgba(255,255,255,0.1); margin-bottom: 1rem; animation: bounce 2s infinite; }
         @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
 
+        /* Customer Bottom Navigation Bar */
+        .customer-bottom-bar {
+            position: fixed; bottom: 0; left: 0; right: 0;
+            background: var(--bg-surface); border-top: 1px solid var(--card-border);
+            display: flex; justify-content: space-around; padding: 0.5rem;
+            z-index: 1000; padding-bottom: env(safe-area-inset-bottom, 0.5rem);
+            backdrop-filter: blur(10px);
+        }
+        .customer-bottom-bar .btn { flex: 1; margin: 0 0.2rem; font-size: 0.7rem; padding: 0.5rem; flex-direction: column; gap: 4px; min-height: 50px; border: none; }
+        .customer-bottom-bar .btn i { font-size: 1.2rem; }
+
         /* -----------------------------------
            📱 RESPONSIVE DESIGN ALL DEVICES
         ----------------------------------- */
         
-        /* Mobile Portrait (< 480px) */
-        @media (max-width: 480px) {
+        /* Small Mobile (< 400px) */
+        @media (max-width: 400px) {
+            .room-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 0.6rem !important; }
+            .room-number { font-size: 1.2rem !important; }
+            .stats-row { grid-template-columns: 1fr; gap: 0.8rem; }
+            .flex-row > * { flex: 100%; } 
+        }
+
+        /* Medium Mobile (401px to 768px) */
+        @media (max-width: 768px) {
             .app-container { flex-direction: column; }
             .sidebar { 
-                width: 100%; flex-direction: row; justify-content: space-between; align-items: center; padding: 0.5rem; 
-                border-right: none; border-bottom: 1px solid var(--card-border); z-index: 100;
-                background: rgba(30,28,28,0.98); backdrop-filter: blur(10px); height: auto; flex-shrink: 0;
+                position: fixed; bottom: 0; left: 0; right: 0; height: 75px;
+                flex-direction: row; justify-content: space-around; 
+                background: rgba(30,28,28,0.98); backdrop-filter: blur(10px);
+                border-right: none; border-top: 1px solid var(--card-border); z-index: 1000;
+                padding: 0; padding-bottom: env(safe-area-inset-bottom, 0); width: 100%;
             }
-            .sidebar-header { padding: 0.5rem; border: none; text-align: left; }
-            .sidebar-header h1 { font-size: 1.1rem; margin: 0; }
-            .sidebar-header p { display: none; }
-            
-            .nav-links { display: flex; overflow-x: auto; padding: 0; gap: 0.2rem; flex: 1; justify-content: flex-end; }
-            .nav-item { padding: 0.5rem; border: none; flex-direction: column; gap: 4px; justify-content: center; min-width: 60px; border-radius: 8px; }
+            .sidebar-header { display: none; }
+            .nav-links { display: flex; flex-direction: row; width: 100%; justify-content: space-around; padding: 0; overflow: visible; align-items: center;}
+            .nav-item { flex: 1; flex-direction: column; padding: 0.5rem 0; min-height: 75px; gap: 4px; border: none !important; border-top: 3px solid transparent !important; justify-content: center; }
+            .nav-item.active { background: linear-gradient(0deg, rgba(160, 71, 71, 0.2) 0%, transparent 100%); border-top-color: var(--primary) !important; border-left: none !important; }
             .nav-item i { font-size: 1.2rem; }
             .nav-item span { font-size: 0.6rem; display: block; text-align: center; } 
-            .nav-item.active { background: rgba(216, 162, 94, 0.1); border: none; }
             
-            .main-content { padding: 1rem; flex: 1; overflow-y: auto;}
+            .main-content { padding: 1rem; flex: 1; overflow-y: auto; padding-bottom: calc(90px + env(safe-area-inset-bottom, 0));}
             .grid-header { flex-direction: column; align-items: stretch; gap: 0.5rem; }
-            .stats-row { grid-template-columns: 1fr 1fr; gap: 0.8rem; }
             .stat-card { flex-direction: column; text-align: center; padding: 1rem; }
             
-            .modal-content { height: 100vh; max-height: 100vh; border-radius: 0; transform: translateY(100%); }
+            .modal-content { height: 100vh; max-height: 100vh; border-radius: 0; transform: translateY(100%); width: 100vw;}
             .modal-overlay.active .modal-content { transform: translateY(0); }
+            .modal-overlay { padding: 0; }
             
-            /* Room Grid for Mobile Portrait - 2 columns */
-            .room-grid { grid-template-columns: repeat(2, 1fr); gap: 0.8rem; }
-            .room-number { font-size: 1.4rem; }
-            
-            .flex-row > * { flex: 100%; } 
-            .toast-container { bottom: env(safe-area-inset-bottom, 10px); left: 10px; right: 10px; }
+            .room-grid { grid-template-columns: repeat(3, 1fr); }
+            .toast-container { bottom: calc(85px + env(safe-area-inset-bottom, 0)); left: 10px; right: 10px; }
             .toast { width: 100%; box-sizing: border-box; }
         }
 
-        /* Mobile Landscape ( < 900px and landscape ) */
-        @media (max-width: 900px) and (orientation: landscape) {
-            .app-container { flex-direction: row; }
-            .sidebar { width: 80px; }
-            .sidebar-header h1, .sidebar-header p, .nav-item span { display: none; }
-            .nav-item { justify-content: center; padding: 1.5rem 0; }
-            .nav-item i { font-size: 1.5rem; }
-            .main-content { padding: 1rem; }
-            .room-grid { grid-template-columns: repeat(3, 1fr); }
-            #camera-container { max-width: 60%; }
-        }
-
-        /* Tablet Portrait (481px to 1024px) */
-        @media (min-width: 481px) and (max-width: 1024px) and (orientation: portrait) {
+        /* Tablet Portrait (769px to 1024px) */
+        @media (min-width: 769px) and (max-width: 1024px) and (orientation: portrait) {
             .app-container { flex-direction: column; }
             .sidebar { width: 100%; flex-direction: row; height: auto; flex-shrink: 0;}
             .sidebar-header { border-right: 1px solid var(--card-border); border-bottom: none; }
             .nav-links { display: flex; flex-direction: row; padding: 0; overflow-x: auto; align-items: center; }
             .nav-item { border-left: none; border-bottom: 4px solid transparent; flex: 1; justify-content: center; }
             .nav-item.active { border-bottom-color: var(--primary); background: rgba(255,255,255,0.05); border-left: none;}
-            .room-grid { grid-template-columns: repeat(3, 1fr); }
+            .room-grid { grid-template-columns: repeat(4, 1fr); }
         }
 
-        /* Desktop & Large Tablet Landscape ( > 1024px ) handled by base CSS */
+        /* Mobile/Tablet Landscape (< 1024px) */
+        @media (max-width: 1024px) and (orientation: landscape) {
+            .app-container { flex-direction: row; }
+            .sidebar { width: 90px; height: 100vh; position: relative; border-right: 1px solid var(--card-border); border-top: none; }
+            .sidebar-header h1, .sidebar-header p, .nav-item span { display: none; }
+            .nav-links { flex-direction: column; justify-content: flex-start; }
+            .nav-item { flex-direction: row; justify-content: center; padding: 1.5rem 0; min-height: 60px; border-top: none !important; border-left: 4px solid transparent !important;}
+            .nav-item.active { border-left-color: var(--primary) !important; background: linear-gradient(90deg, rgba(160, 71, 71, 0.2) 0%, transparent 100%); }
+            .nav-item i { font-size: 1.5rem; }
+            .main-content { padding: 1rem; padding-bottom: 1rem; }
+            .room-grid { grid-template-columns: repeat(4, 1fr); }
+            #camera-container { max-width: 60%; }
+        }
+
+        /* Desktop (> 1025px) handled by base CSS */
+        @media (min-width: 1025px) {
+            .room-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+        }
     </style>
 </head>
 <body>
 
     <!-- 5. Install App Banner -->
-    <div id="install-banner">
-        <i class="fa-solid fa-download"></i>
-        <span>Install Hotel Bengal App for quick access</span>
-        <button id="btn-install" class="btn btn-highlight" style="min-height:30px; padding: 0.3rem 1rem;">Install</button>
-        <button onclick="dismissInstall()" style="background: none; border: none; color: white; font-size: 1.2rem; margin-left: auto; cursor: pointer; outline:none;"><i class="fa-solid fa-xmark"></i></button>
+    <div id="install-banner" class="install-banner d-none">
+        <div class="install-banner-content">
+            <div class="flex-row" style="align-items: center; gap: 0.8rem; flex-wrap: nowrap;">
+                <div style="background: var(--primary); width: 45px; height: 45px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                    <i class="fa-solid fa-hotel" style="font-size: 1.2rem; color: white;"></i>
+                </div>
+                <div style="flex: 1;">
+                    <strong style="color: white; font-size: 1rem;">Hotel Bengal</strong>
+                    <p style="font-size: 0.7rem; color: var(--text-muted); margin: 0;">Install for quick access</p>
+                </div>
+                <button onclick="installApp()" class="btn" style="padding: 0.5rem 1rem; min-height: 36px; background: var(--highlight); color: var(--bg-main); font-size: 0.8rem; flex-shrink: 0;">
+                    <i class="fa-solid fa-download" style="color: var(--bg-main);"></i> Install
+                </button>
+                <button onclick="dismissInstall()" style="background: none; border: none; color: var(--text-muted); padding: 0.5rem; cursor: pointer; flex-shrink: 0; outline:none;">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+        </div>
     </div>
 
-    <!-- 10e. Custom Context Menu -->
-    <div id="custom-context-menu" class="context-menu">
-        <div class="context-item" onclick="location.reload()"><i class="fa-solid fa-rotate-right"></i> Refresh System</div>
-        <div class="context-item" onclick="document.querySelector('[data-target=\'view-admin\']').click()"><i class="fa-solid fa-gear"></i> Settings</div>
-        <div class="context-item" onclick="document.querySelector('.main-content').scrollTo(0,0)"><i class="fa-solid fa-arrow-up"></i> Back to Top</div>
-        <div class="context-item" onclick="showAlert('Hotel Bengal Management System v2.0<br>Designed for maximum efficiency.')"><i class="fa-solid fa-circle-info"></i> About</div>
+    <!-- Custom Dialog Overlays (Replaces alert, prompt, confirm) -->
+    <div id="modal-confirm" class="modal-overlay" style="z-index: 10000;">
+        <div class="modal-content" style="max-width: 400px; padding: 0;">
+            <div class="modal-header">
+                <h3 id="confirm-title">Confirmation</h3>
+                <button class="modal-close" onclick="closeModal('modal-confirm')"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body text-center">
+                <i id="confirm-icon" class="fa-solid fa-circle-question text-highlight" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+                <p id="confirm-message" style="margin-bottom: 1.5rem; font-size: 1.1rem;"></p>
+                <div class="flex-row mt-1" id="confirm-buttons"></div>
+            </div>
+        </div>
     </div>
 
-    <!-- 4. Custom Dialog Overlays -->
-    <div id="custom-dialog-overlay" class="modal-overlay" style="z-index: 10000;">
-        <div class="modal-content dialog-box card noise-bg" id="custom-dialog-box">
-            <div id="dialog-icon" class="dialog-icon"><i class="fa-solid fa-circle-exclamation"></i></div>
-            <h3 id="dialog-title" class="text-highlight mb-1">Notice</h3>
-            <p id="dialog-msg" class="text-muted mb-1">Message here</p>
-            <input type="text" id="dialog-input" class="d-none" placeholder="Type here...">
-            <div class="flex-row mt-1" id="dialog-buttons">
-                <!-- Injected dynamically -->
+    <div id="modal-prompt" class="modal-overlay" style="z-index: 10000;">
+        <div class="modal-content" style="max-width: 400px; padding: 0;">
+            <div class="modal-header">
+                <h3 id="prompt-title">Input Required</h3>
+                <button class="modal-close" onclick="closeModal('modal-prompt')"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body">
+                <p id="prompt-message" style="margin-bottom: 1rem;"></p>
+                <input type="text" id="prompt-input" placeholder="Type here...">
+                <div class="flex-row mt-1" id="prompt-buttons"></div>
             </div>
         </div>
     </div>
@@ -533,6 +613,15 @@
     <div id="loading-overlay" class="loading-overlay">
         <div class="spinner"></div>
         <p class="mt-1 font-weight-bold" style="color: var(--highlight);">Processing...</p>
+    </div>
+
+    <!-- Customer Notification Popup -->
+    <div id="customer-notification" class="notification-popup d-none">
+        <div class="card" style="border-left: 4px solid var(--success); background: rgba(76,175,80,0.1); backdrop-filter: blur(10px);">
+            <h4 id="notif-title" style="color: white; margin-bottom: 0.5rem;">Booking Confirmed!</h4>
+            <p id="notif-msg" style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1rem;">Your room has been booked successfully.</p>
+            <button class="btn btn-secondary" style="width: 100%; min-height: 36px; padding: 0.5rem;" onclick="document.getElementById('customer-notification').classList.add('d-none')">OK</button>
+        </div>
     </div>
 
     <!-- ==========================================
@@ -567,110 +656,151 @@
     </div>
 
     <!-- ==========================================
-         CUSTOMER PORTAL (QR VIEW)
+         CUSTOMER PORTAL (QR VIEW / SELF BOOKING)
     ========================================== -->
-    <div id="customer-view" class="auth-wrapper d-none noise-bg" style="justify-content: flex-start; padding-top: env(safe-area-inset-top, 1rem);">
-        <div class="auth-card card" style="margin-top: 1rem; max-width: 600px; padding: 2rem 1.5rem;">
-            <h1 class="text-highlight" style="font-size: 1.8rem;">HOTEL BENGAL</h1>
-            <p style="color: var(--secondary);">Guest Services</p>
+    <div id="customer-view" class="auth-wrapper d-none noise-bg" style="justify-content: flex-start; padding-top: env(safe-area-inset-top, 1rem); padding-bottom: 80px;">
+        <div class="auth-card card" style="margin-top: 1rem; max-width: 600px; width: 100%; padding: 2rem 1.5rem; border: none; background: transparent; box-shadow: none;">
             
-            <!-- Customer Tabs -->
-            <div class="tabs" style="justify-content: center; margin-top: 1rem;">
-                <button class="tab-btn active" onclick="switchTab(this, 'c-tab-home')"><i class="fa-solid fa-house"></i> Home</button>
-                <button class="tab-btn" onclick="switchTab(this, 'c-tab-requests')"><i class="fa-solid fa-bell"></i> My Requests</button>
+            <div class="card text-center mb-2" style="background: var(--bg-surface);">
+                <h1 class="text-highlight" style="font-size: 1.8rem;">HOTEL BENGAL</h1>
+                <p style="color: var(--secondary);">Guest Services</p>
             </div>
-
-            <!-- HOME TAB: Service Request or Booking -->
-            <div id="c-tab-home" class="tab-content active">
-                <div id="guest-room-context" class="d-none" style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: var(--radius-md); margin: 1rem 0; border: 1px dashed var(--card-border);">
-                    <h2 id="guest-room-display" class="text-highlight">Room ---</h2>
+            
+            <!-- HOME TAB: Service Request -->
+            <div id="c-tab-home" class="tab-content active text-left">
+                <div id="guest-room-context" class="d-none" style="background: rgba(0,0,0,0.3); padding: 1.5rem; border-radius: var(--radius-md); margin-bottom: 1.5rem; border: 1px dashed var(--card-border);">
+                    <h2 id="guest-room-display" class="text-highlight mb-1" style="font-size: 2rem;">Room ---</h2>
                     <p>Welcome. Request room services below.</p>
                 </div>
                 
                 <!-- Service Form -->
-                <form id="guest-request-form" class="d-none" style="text-align: left;">
-                    <label>Service Category</label>
+                <form id="guest-request-form" class="d-none">
+                    <label>Choose Service Type...</label>
                     <select id="guest-req-category" required>
-                        <option value="">Select Service...</option>
-                        <option value="Housekeeping">Housekeeping / Cleaning</option>
+                        <option value="">Choose Service Type...</option>
+                        <option value="Housekeeping">Room Cleaning</option>
                         <option value="Room Service">Room Service (Food/Drinks)</option>
-                        <option value="Maintenance">Maintenance / Repair</option>
-                        <option value="Front Desk">Front Desk / Concierge</option>
+                        <option value="Maintenance">Repair Work</option>
+                        <option value="Front Desk">Reception Help</option>
                         <option value="Other">Other Request</option>
                     </select>
                     <label>Details</label>
                     <textarea id="guest-req-msg" rows="3" placeholder="Please specify your request..." required></textarea>
                     <button type="submit" class="btn btn-highlight" style="width: 100%;">
-                        <i class="fa-solid fa-paper-plane"></i> Send Message
+                        <i class="fa-solid fa-paper-plane"></i> Send to Front Desk
                     </button>
                 </form>
 
-                <!-- Booking Options (If no room scanned) -->
-                <div id="guest-booking-section">
-                    <h3 class="text-highlight mb-1 text-left"><i class="fa-solid fa-bed"></i> Available Rooms for Booking</h3>
-                    <div id="customer-rooms-grid" class="room-grid" style="grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));">
-                        <!-- Injected via JS -->
-                    </div>
-                </div>
-                
-                <!-- Success State -->
-                <div id="guest-req-success" class="d-none mt-2 card" style="background: rgba(76, 175, 80, 0.1); border-color: var(--success);">
-                    <i class="fa-solid fa-circle-check text-success" style="font-size: 3rem; margin-bottom: 1rem; display: block; animation: pulse-green 2s infinite; border-radius: 50%;"></i>
+                <!-- Success State (Service) -->
+                <div id="guest-req-success" class="d-none mt-2 card text-center" style="background: rgba(76, 175, 80, 0.1); border-color: var(--success);">
+                    <i class="fa-solid fa-circle-check text-success" style="font-size: 3rem; margin-bottom: 1rem; display: inline-block; animation: pulse-green 2s infinite; border-radius: 50%;"></i>
                     <h3 style="color: var(--success);">Sent Successfully</h3>
                     <p style="font-size: 0.9rem; margin-top: 0.5rem;" id="success-msg-desc">Our staff has been notified.</p>
-                    <div class="flex-row mt-1" style="justify-content: center;">
-                        <button onclick="resetCustomerForm()" class="btn btn-secondary"><i class="fa-solid fa-rotate-right"></i> Send Another Request</button>
-                        <button onclick="goCustomerHome()" class="btn"><i class="fa-solid fa-house"></i> Go to Home</button>
+                    <div id="another-request-section" class="mt-2 text-center">
+                        <button class="btn btn-secondary w-100" onclick="resetRequestForm()">
+                            <i class="fa-solid fa-plus"></i> New Request
+                        </button>
                     </div>
                 </div>
             </div>
 
-            <!-- REQUESTS TAB -->
-            <div id="c-tab-requests" class="tab-content text-left">
+            <!-- ROOMS TAB: Booking -->
+            <div id="c-tab-rooms" class="tab-content text-left">
+                <h3 style="margin-bottom: 1rem;"><i class="fa-solid fa-door-open text-success"></i> Available Rooms</h3>
+                <div id="customer-room-list" class="room-grid" style="grid-template-columns: repeat(2, 1fr);">
+                    <!-- Available rooms injected here -->
+                </div>
+
+                <!-- Booking Form -->
+                <div id="customer-booking-form-container" class="card d-none noise-bg">
+                    <h3 class="text-highlight mb-1">Booking Request - <span id="booking-room-num">Room ---</span></h3>
+                    <form id="customer-booking-form">
+                        <div class="flex-col">
+                            <label>Your Full Name *</label>
+                            <input type="text" id="cb-name" required placeholder="Enter your name">
+                        </div>
+                        <div class="flex-row">
+                            <div class="flex-col" style="flex:1;">
+                                <label>Phone Number *</label>
+                                <input type="tel" id="cb-phone" required placeholder="10 digits" maxlength="10" pattern="[0-9]{10}">
+                            </div>
+                            <div class="flex-col" style="flex:1;">
+                                <label>Members</label>
+                                <input type="number" id="cb-members" value="1" min="1" max="10">
+                            </div>
+                        </div>
+                        <div class="flex-row">
+                            <div class="flex-col" style="flex:1">
+                                <label>Arrival Date</label>
+                                <div class="input-with-icon">
+                                    <i class="fa-solid fa-calendar-days text-success"></i>
+                                    <input type="date" id="cb-checkin" required>
+                                </div>
+                            </div>
+                            <div class="flex-col" style="flex:1">
+                                <label>Check-out Date</label>
+                                <div class="input-with-icon">
+                                    <i class="fa-solid fa-calendar-days text-danger"></i>
+                                    <input type="date" id="cb-checkout" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex-row">
+                            <div class="flex-col" style="flex:1;">
+                                <label>Identity Document Type</label>
+                                <select id="cb-id-type">
+                                    <option value="Aadhaar">Aadhaar Card</option>
+                                    <option value="PAN">PAN Card</option>
+                                    <option value="VoterID">Voter ID</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                            <div class="flex-col" style="flex:1;">
+                                <label>Document Number</label>
+                                <input type="text" id="cb-id-num" placeholder="Document number">
+                            </div>
+                        </div>
+                        <div class="flex-row mt-1">
+                            <button type="button" class="btn btn-secondary" style="flex:1" onclick="cancelCustomerBooking()">Cancel</button>
+                            <button type="submit" class="btn btn-highlight" style="flex:2"><i class="fa-solid fa-paper-plane"></i> Send Request</button>
+                        </div>
+                        <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 1rem; text-align: center;">
+                            <i class="fa-solid fa-circle-info"></i> Management will confirm your booking shortly.
+                        </p>
+                    </form>
+                </div>
+                
+                <!-- Booking Success Message -->
+                <div id="booking-success" class="card d-none mt-2 text-center" style="border-color: var(--success);">
+                    <i class="fa-solid fa-circle-check text-success" style="font-size: 3rem; animation: pulse-green 2s infinite; border-radius: 50%;"></i>
+                    <h3 style="color: var(--success); margin: 1rem 0;">Booking Request Sent!</h3>
+                    <p>Room will show as <span class="status-badge status-pending">PENDING</span> until confirmed.</p>
+                </div>
+            </div>
+
+            <!-- ACTIVITY TAB -->
+            <div id="c-tab-activity" class="tab-content text-left">
                 <h3 class="text-secondary mb-1">Your Recent Activity</h3>
                 <div id="customer-activity-list" class="flex-col">
                     <!-- Injected via JS -->
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- Customer Booking Modal -->
-    <div id="modal-customer-book" class="modal-overlay">
-        <div class="modal-content" style="max-width: 500px;">
-            <div class="modal-header">
-                <h2>Book Room <span id="cb-room-display" class="text-highlight"></span></h2>
-                <button class="modal-close" onclick="closeModal('modal-customer-book')"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            <div class="modal-body text-left">
-                <form id="customer-booking-form">
-                    <div class="flex-col">
-                        <label>Full Name *</label>
-                        <input type="text" id="cb-name" required placeholder="Your full name">
-                    </div>
-                    <div class="flex-col">
-                        <label>Phone Number *</label>
-                        <input type="tel" id="cb-phone" required placeholder="10 digit number" maxlength="10" pattern="[0-9]{10}">
-                    </div>
-                    <div class="flex-row">
-                        <div class="flex-col" style="flex:1">
-                            <label>Check-in Date</label>
-                            <div class="input-with-icon">
-                                <i class="fa-solid fa-calendar-days text-success clickable-icon"></i>
-                                <input type="text" id="cb-checkin" class="flatpickr-input" required placeholder="Select date" readonly="readonly">
-                            </div>
-                        </div>
-                        <div class="flex-col" style="flex:1">
-                            <label>Checkout Date</label>
-                            <div class="input-with-icon">
-                                <i class="fa-solid fa-calendar-days text-danger clickable-icon"></i>
-                                <input type="text" id="cb-checkout" class="flatpickr-input" required placeholder="Select date" readonly="readonly">
-                            </div>
-                        </div>
-                    </div>
-                    <button type="submit" class="btn btn-highlight" style="width: 100%; margin-top: 1rem;"><i class="fa-solid fa-paper-plane"></i> Submit Booking Request</button>
-                </form>
-            </div>
+        <!-- Customer Bottom Navigation Bar -->
+        <div class="customer-bottom-bar" id="customer-bottom-bar">
+            <button class="btn btn-secondary" onclick="showCustomerSection('c-tab-home')" id="btn-c-home">
+                <i class="fa-solid fa-house"></i> Services
+            </button>
+            <button class="btn btn-secondary" onclick="showCustomerSection('c-tab-rooms')" id="btn-c-rooms">
+                <i class="fa-solid fa-door-open"></i> Book Room
+            </button>
+            <button class="btn btn-secondary" onclick="showCustomerSection('c-tab-activity')" id="btn-c-activity">
+                <i class="fa-solid fa-list"></i> My Records
+            </button>
+            <button class="btn" onclick="window.location.href = window.location.pathname;" style="background: var(--danger); color: white;">
+                <i class="fa-solid fa-right-from-bracket"></i> Exit
+            </button>
         </div>
     </div>
 
@@ -686,21 +816,21 @@
                 <p>Silchar, Assam</p>
             </div>
             <div class="nav-links">
-                <a class="nav-item active" data-target="view-dashboard" title="Room Overview">
-                    <i class="fa-solid fa-table-cells-large"></i> <span>Room Dashboard</span>
+                <a class="nav-item active" data-target="view-dashboard" title="All Rooms">
+                    <i class="fa-solid fa-table-cells-large"></i> <span>All Rooms</span>
                 </a>
-                <a class="nav-item" data-target="view-requests" title="Customer Messages">
-                    <i class="fa-solid fa-bell"></i> <span>Customer Messages</span>
+                <a class="nav-item" data-target="view-requests" title="Guest Needs">
+                    <i class="fa-solid fa-bell"></i> <span>Guest Needs</span>
                     <span id="req-badge" class="d-none" style="background: var(--danger); padding: 2px 6px; border-radius: 10px; font-size: 0.7rem; margin-left: auto; font-weight: bold;">0</span>
                 </a>
-                <a class="nav-item" data-target="view-history" title="Past Bookings">
-                    <i class="fa-solid fa-clock-rotate-left"></i> <span>Past Bookings</span>
+                <a class="nav-item" data-target="view-history" title="Records">
+                    <i class="fa-solid fa-clock-rotate-left"></i> <span>Records</span>
                 </a>
-                <a class="nav-item" data-target="view-admin" title="Settings & Admin">
-                    <i class="fa-solid fa-gear"></i> <span>Settings & Admin</span>
+                <a class="nav-item" data-target="view-admin" title="Settings & Tools">
+                    <i class="fa-solid fa-gear"></i> <span>Settings & Tools</span>
                 </a>
-                <a class="nav-item" id="btn-logout" style="margin-top: auto;" title="Logout">
-                    <i class="fa-solid fa-right-from-bracket"></i> <span>Logout</span>
+                <a class="nav-item" id="btn-logout" style="margin-top: auto;" title="Sign Out">
+                    <i class="fa-solid fa-right-from-bracket"></i> <span>Sign Out</span>
                 </a>
             </div>
         </nav>
@@ -712,8 +842,8 @@
             <div id="view-dashboard" class="view-section">
                 <div class="grid-header">
                     <div>
-                        <h2 style="font-size: 1.8rem; margin-bottom: 0.5rem;"><i class="fa-solid fa-building text-secondary"></i> Live Room Status</h2>
-                        <p class="text-muted">Manage check-ins, check-outs, and room statuses.</p>
+                        <h2 style="font-size: 1.8rem; margin-bottom: 0.5rem;"><i class="fa-solid fa-building text-secondary"></i> All Rooms</h2>
+                        <p class="text-muted">Manage guest arrivals, departures, and room availability.</p>
                     </div>
                     <div class="flex-row" style="gap: 0.5rem;">
                         <div class="input-with-icon" style="margin: 0; flex: 2;">
@@ -732,6 +862,7 @@
                             <option value="all">All Status</option>
                             <option value="available">Free (खाली)</option>
                             <option value="booked">Occupied (भरा हुआ)</option>
+                            <option value="pending">Pending (लंबित)</option>
                         </select>
                     </div>
                 </div>
@@ -759,7 +890,7 @@
             <!-- VIEW: CUSTOMER MESSAGES -->
             <div id="view-requests" class="view-section d-none">
                 <div class="flex-row" style="justify-content: space-between; margin-bottom: 1.5rem;">
-                    <h2 style="font-size: 1.8rem;"><i class="fa-solid fa-bell-concierge text-secondary"></i> New Customer Messages</h2>
+                    <h2 style="font-size: 1.8rem;"><i class="fa-solid fa-bell-concierge text-secondary"></i> Guest Needs</h2>
                     <button class="btn btn-secondary" onclick="pollRequests(true)"><i class="fa-solid fa-rotate-right"></i> Refresh</button>
                 </div>
                 
@@ -782,7 +913,7 @@
 
             <!-- VIEW: HISTORY -->
             <div id="view-history" class="view-section d-none">
-                <h2 style="font-size: 1.8rem; margin-bottom: 1.5rem;"><i class="fa-solid fa-clock-rotate-left text-secondary"></i> Past Bookings</h2>
+                <h2 style="font-size: 1.8rem; margin-bottom: 1.5rem;"><i class="fa-solid fa-clock-rotate-left text-secondary"></i> Records</h2>
                 <div class="flex-row" style="margin-bottom: 1rem;">
                     <div class="input-with-icon" style="max-width: 350px; margin: 0; width: 100%;">
                         <i class="fa-solid fa-magnifying-glass"></i>
@@ -791,7 +922,7 @@
                 </div>
                 <div class="card table-responsive noise-bg">
                     <table id="history-table">
-                        <thead><tr><th>Date Out</th><th>Room</th><th>Guest Name</th><th>Check-in</th><th>Check-out</th><th>Total</th><th>Receipt</th></tr></thead>
+                        <thead><tr><th>Date Out</th><th>Room</th><th>Guest Name</th><th>Arrival Date</th><th>Departure Date</th><th>Total</th><th>Bill</th></tr></thead>
                         <tbody id="history-tbody"></tbody>
                     </table>
                 </div>
@@ -799,12 +930,12 @@
 
             <!-- VIEW: ADMIN -->
             <div id="view-admin" class="view-section d-none">
-                <h2 style="font-size: 1.8rem; margin-bottom: 1.5rem;"><i class="fa-solid fa-gear text-secondary"></i> Settings & Admin</h2>
+                <h2 style="font-size: 1.8rem; margin-bottom: 1.5rem;"><i class="fa-solid fa-gear text-secondary"></i> Settings & Tools</h2>
                 <div class="stats-row">
                     <div class="card noise-bg">
                         <h3 class="text-highlight mb-1"><i class="fa-solid fa-database"></i> Data Settings</h3>
                         <p class="text-muted mb-1" style="font-size: 0.9rem; margin-bottom: 1rem;">Erase all local bookings, rooms, and photos.</p>
-                        <button id="btn-factory-reset" class="btn" style="background: linear-gradient(135deg, var(--danger), #6a1a1a); width: 100%;"><i class="fa-solid fa-triangle-exclamation"></i> Reset All Data</button>
+                        <button id="btn-factory-reset" class="btn" style="background: linear-gradient(135deg, var(--danger), #6a1a1a); width: 100%;"><i class="fa-solid fa-triangle-exclamation"></i> ⚠ Reset All Data</button>
                     </div>
                     <div class="card noise-bg">
                         <h3 class="text-highlight mb-1"><i class="fa-solid fa-file-export"></i> Backup Data</h3>
@@ -845,10 +976,10 @@
                 <!-- Check-in Form -->
                 <div id="form-checkin" class="d-none">
                     <div class="tabs">
-                        <button class="tab-btn active" onclick="switchTab(this, 'tab-guest')"><i class="fa-solid fa-user-plus"></i> Guest Info</button>
-                        <button class="tab-btn" onclick="switchTab(this, 'tab-docs')"><i class="fa-solid fa-id-card"></i> Docs</button>
-                        <button class="tab-btn" onclick="switchTab(this, 'tab-payment')"><i class="fa-solid fa-file-signature"></i> Payment</button>
-                        <button class="tab-btn" onclick="switchTab(this, 'tab-qr')"><i class="fa-solid fa-qrcode"></i> Room QR</button>
+                        <button class="tab-btn active" onclick="switchTab(this, 'tab-guest')"><i class="fa-solid fa-user-plus"></i> Guest Details</button>
+                        <button class="tab-btn" onclick="switchTab(this, 'tab-docs')"><i class="fa-solid fa-id-card"></i> Documents / ID</button>
+                        <button class="tab-btn" onclick="switchTab(this, 'tab-payment')"><i class="fa-solid fa-file-signature"></i> Payment & Signature</button>
+                        <button class="tab-btn" onclick="switchTab(this, 'tab-qr')"><i class="fa-solid fa-qrcode"></i> Room Scanner</button>
                     </div>
 
                     <form id="checkin-submit-form">
@@ -869,17 +1000,17 @@
                             </div>
                             <div class="flex-row">
                                 <div class="flex-col" style="flex:1;">
-                                    <label>Check-in Date/Time *</label>
+                                    <label>Arrival Date & Time *</label>
                                     <div class="input-with-icon">
-                                        <i class="fa-solid fa-calendar-check text-success clickable-icon"></i>
-                                        <input type="text" id="ci-date-auto" class="flatpickr-input flatpickr-time" required style="color: var(--success); font-weight: 500;" readonly="readonly">
+                                        <i class="fa-solid fa-calendar-check"></i>
+                                        <input type="datetime-local" id="ci-date-auto" class="custom-date-auto" required onchange="calcDue()">
                                     </div>
                                 </div>
                                 <div class="flex-col" style="flex:1;">
-                                    <label>Expected Checkout Date *</label>
+                                    <label>Check-out Date *</label>
                                     <div class="input-with-icon">
-                                        <i class="fa-solid fa-calendar-xmark text-danger clickable-icon"></i>
-                                        <input type="text" id="ci-checkout" class="flatpickr-input" required placeholder="Select date" readonly="readonly">
+                                        <i class="fa-solid fa-calendar-xmark"></i>
+                                        <input type="date" id="ci-checkout" required onchange="calcDue()">
                                     </div>
                                 </div>
                             </div>
@@ -888,7 +1019,7 @@
                         <div id="tab-docs" class="tab-content">
                             <div class="flex-row" style="margin-bottom: 1rem;">
                                 <div class="flex-col" style="flex:1;">
-                                    <label>ID Type</label>
+                                    <label>Identity Document Type</label>
                                     <select id="ci-id-type">
                                         <option value="Aadhaar">Aadhaar Card</option>
                                         <option value="PAN">PAN Card</option>
@@ -898,7 +1029,7 @@
                                     </select>
                                 </div>
                                 <div class="flex-col" style="flex:1;">
-                                    <label>ID Number</label>
+                                    <label>Document Number</label>
                                     <input type="text" id="ci-id-num" placeholder="Enter ID number">
                                 </div>
                             </div>
@@ -915,18 +1046,18 @@
                         <div id="tab-payment" class="tab-content">
                             <div class="flex-row" style="margin-bottom: 1rem;">
                                 <div class="flex-col" style="flex:1;">
-                                    <label>Daily Rent Rate (₹)</label>
+                                    <label>Room Rate Per Night (₹)</label>
                                     <input type="number" id="ci-rent" required value="1500" oninput="calcDue()">
                                 </div>
                                 <div class="flex-col" style="flex:1;">
-                                    <label>Advance Paid (₹)</label>
+                                    <label>Advance Amount (₹)</label>
                                     <input type="number" id="ci-advance" required value="0" oninput="calcDue()">
                                 </div>
                             </div>
                             <div class="card" style="margin-bottom: 1.5rem; background: rgba(0,0,0,0.4); border-color: rgba(255,255,255,0.1);">
                                 <div class="flex-row" style="justify-content: space-between;">
-                                    <span>Total Stay Est: <strong id="ci-total-calc" class="text-highlight">₹1500</strong></span>
-                                    <span>Current Due: <strong id="ci-due-calc" class="text-primary" style="font-size: 1.2rem;">₹1500</strong></span>
+                                    <span>Total Room Charges Est: <strong id="ci-total-calc" class="text-highlight">₹1500</strong></span>
+                                    <span>Balance Due: <strong id="ci-due-calc" class="text-primary" style="font-size: 1.2rem;">₹1500</strong></span>
                                 </div>
                             </div>
 
@@ -937,7 +1068,7 @@
                             </div>
 
                             <button type="button" class="btn btn-highlight" style="width: 100%;" onclick="submitCheckin()">
-                                <i class="fa-solid fa-circle-check"></i> Book This Room
+                                <i class="fa-solid fa-circle-check"></i> ✓ Confirm Booking
                             </button>
                         </div>
                         
@@ -960,44 +1091,53 @@
                 <!-- Checkout/Manage Form -->
                 <div id="form-manage" class="d-none">
                      <div class="tabs">
-                        <button class="tab-btn active" onclick="switchTab(this, 'tab-m-info')"><i class="fa-solid fa-circle-info"></i> Booking Info</button>
-                        <button class="tab-btn" onclick="switchTab(this, 'tab-m-checkout')"><i class="fa-solid fa-cash-register"></i> Finish Checkout</button>
+                        <button class="tab-btn active" onclick="switchTab(this, 'tab-m-info')"><i class="fa-solid fa-circle-info"></i> Guest Details</button>
+                        <button class="tab-btn" onclick="switchTab(this, 'tab-m-checkout')"><i class="fa-solid fa-cash-register"></i> Guest Departure</button>
                     </div>
 
                     <div id="tab-m-info" class="tab-content active">
                         <div class="card noise-bg" style="margin-bottom: 1rem;">
-                            <h3 class="text-highlight" id="m-name">Guest Name</h3>
-                            <p class="text-muted" id="m-phone"><i class="fa-solid fa-phone"></i> +91 0000000000</p>
+                            <div class="flex-row" style="justify-content: space-between;">
+                                <div>
+                                    <h3 class="text-highlight" id="m-name">Guest Name</h3>
+                                    <p class="text-muted" id="m-phone"><i class="fa-solid fa-phone"></i> +91 0000000000</p>
+                                </div>
+                                <div id="m-pending-actions" class="d-none">
+                                    <button class="btn" style="background:var(--success); min-height: 36px; padding: 0.5rem;" onclick="manageBookingFromRoom(true)"><i class="fa-solid fa-check"></i> Accept</button>
+                                    <button class="btn" style="background:var(--danger); min-height: 36px; padding: 0.5rem;" onclick="manageBookingFromRoom(false)"><i class="fa-solid fa-xmark"></i> Reject</button>
+                                </div>
+                            </div>
+                            
                             <div class="flex-row" style="margin-top: 1rem; border-top: 1px dashed var(--card-border); padding-top: 1rem;">
-                                <div><small class="text-muted">Check-in</small><br><span id="m-ci-date" style="font-weight: 500;">--</span></div>
-                                <div><small class="text-muted">Expected Out</small><br><span id="m-co-date" style="font-weight: 500;">--</span></div>
-                                <div><small class="text-muted">Advance Paid</small><br><span class="text-success" style="font-weight: bold;">₹<span id="m-advance"></span></span></div>
+                                <div><small class="text-muted">Arrival Date & Time</small><br><span id="m-ci-date" style="font-weight: 500;">--</span></div>
+                                <div><small class="text-muted">Check-out Date</small><br><span id="m-co-date" style="font-weight: 500;">--</span></div>
+                                <div><small class="text-muted">Advance Amount</small><br><span class="text-success" style="font-weight: bold;">₹<span id="m-advance"></span></span></div>
                             </div>
                         </div>
                         
-                        <h4><i class="fa-solid fa-images"></i> Uploaded Documents</h4>
+                        <h4><i class="fa-solid fa-images"></i> Documents / ID</h4>
                         <div class="image-uploader-grid" id="m-images-grid" style="margin-top: 0.5rem;"></div>
                     </div>
 
                     <div id="tab-m-checkout" class="tab-content">
                         <div class="card" style="margin-bottom: 1.5rem; background: rgba(0,0,0,0.4); border-color: rgba(255,255,255,0.1);">
                             <div class="flex-row" style="justify-content: space-between; margin-bottom: 0.5rem;">
-                                <span>Total Days Stayed:</span><strong id="co-days" class="text-highlight">--</strong>
+                                <span>Days Stayed:</span><strong id="co-days" class="text-highlight">--</strong>
                             </div>
                             <div class="flex-row" style="justify-content: space-between; margin-bottom: 0.5rem;">
-                                <span>Total Amount Billable:</span><strong>₹<span id="co-total">--</span></strong>
+                                <span>Total Room Charges:</span><strong>₹<span id="co-total">--</span></strong>
                             </div>
                             <div class="flex-row" style="justify-content: space-between; margin-bottom: 0.5rem;">
-                                <span>Advance Paid:</span><strong class="text-success">- ₹<span id="co-advance">--</span></strong>
+                                <span>Advance Amount:</span><strong class="text-success">- ₹<span id="co-advance">--</span></strong>
                             </div>
                             <div class="flex-row" style="justify-content: space-between; border-top: 1px dashed var(--card-border); padding-top: 0.5rem; margin-top: 0.5rem;">
-                                <span>Final Amount to Collect:</span><strong class="text-primary" style="font-size: 1.4rem;">₹<span id="co-due">--</span></strong>
+                                <span>Balance Due:</span><strong class="text-primary" style="font-size: 1.4rem;">₹<span id="co-due">--</span></strong>
                             </div>
                         </div>
 
                         <div class="flex-row" style="margin-bottom: 1rem;">
                             <div class="flex-col" style="flex:1;">
-                                <label>Payment Mode</label>
+                                <label>Payment Method</label>
                                 <select id="co-pay-mode">
                                     <option value="Cash">Cash</option>
                                     <option value="UPI">UPI / Online</option>
@@ -1005,7 +1145,7 @@
                                 </select>
                             </div>
                             <div class="flex-col" style="flex:1;">
-                                <label>Txn ID (If Online)</label>
+                                <label>Transaction Reference</label>
                                 <input type="text" id="co-txn" placeholder="Optional">
                             </div>
                         </div>
@@ -1017,7 +1157,7 @@
                         </div>
 
                         <button type="button" class="btn" style="width: 100%; background: linear-gradient(135deg, var(--success), #2e7d32);" onclick="processCheckout()">
-                            <i class="fa-solid fa-clipboard-check"></i> Finish & Print Receipt
+                            <i class="fa-solid fa-clipboard-check"></i> Finish & Print Bill
                         </button>
                     </div>
                 </div>
@@ -1080,27 +1220,50 @@
         // Context Menu & Interaction Globals
         document.addEventListener('click', (e) => {
             if(e.target.closest('button') || e.target.closest('.nav-item') || e.target.closest('.room-box')) triggerVibration();
-            document.getElementById('custom-context-menu').classList.remove('active');
         });
 
-        // 10e. Custom Context Menu
-        let touchTimer;
-        const cm = document.getElementById('custom-context-menu');
-        function openContextMenu(x, y) {
-            cm.style.top = `${Math.min(y, window.innerHeight - 200)}px`;
-            cm.style.left = `${Math.min(x, window.innerWidth - 220)}px`;
-            cm.classList.add('active');
+        // 10. Custom Context Menu (Created via JS)
+        document.addEventListener('contextmenu', function(e) {
+            if(e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') return;
+            if (e.target.closest('.app-container') || e.target.closest('.auth-wrapper')) {
+                e.preventDefault();
+                showCustomContextMenu(e.clientX, e.clientY);
+            }
+        });
+
+        function showCustomContextMenu(x, y) {
+            const existing = document.querySelector('.custom-context-menu');
+            if (existing) existing.remove();
+            
+            const menu = document.createElement('div');
+            menu.className = 'custom-context-menu';
+            // Adjust position so it doesn't go off screen
+            const adjustedX = Math.min(x, window.innerWidth - 220);
+            const adjustedY = Math.min(y, window.innerHeight - 200);
+            menu.style.left = adjustedX + 'px';
+            menu.style.top = adjustedY + 'px';
+            
+            menu.innerHTML = `
+                <div class="context-menu-item" onclick="window.location.reload()">
+                    <i class="fa-solid fa-rotate-right"></i> Refresh System
+                </div>
+                <div class="context-menu-item" onclick="document.querySelector('.main-content').scrollTo(0,0)">
+                    <i class="fa-solid fa-arrow-up"></i> Back to Top
+                </div>
+                <div class="context-menu-item" onclick="showAlert('Hotel Bengal Management System v3.0<br>Designed for maximum efficiency.')">
+                    <i class="fa-solid fa-circle-info"></i> About System
+                </div>
+            `;
+            document.body.appendChild(menu);
             triggerVibration(50);
+            
+            setTimeout(() => {
+                document.addEventListener('click', function closeMenu() {
+                    if(menu) menu.remove();
+                    document.removeEventListener('click', closeMenu);
+                });
+            }, 100);
         }
-        window.addEventListener('contextmenu', e => {
-            if(e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
-            e.preventDefault(); openContextMenu(e.clientX, e.clientY);
-        });
-        document.addEventListener('touchstart', (e) => {
-            touchTimer = setTimeout(() => { openContextMenu(e.touches[0].clientX, e.touches[0].clientY); }, 800);
-        });
-        document.addEventListener('touchend', () => clearTimeout(touchTimer));
-        document.addEventListener('touchmove', () => clearTimeout(touchTimer));
 
         // -----------------------------------
         // 2. IDB (IndexedDB Wrapper)
@@ -1133,31 +1296,35 @@
         // -----------------------------------
         function showCustomDialog(title, msg, type = 'alert', icon = 'fa-circle-info') {
             return new Promise((resolve) => {
-                const overlay = document.getElementById('custom-dialog-overlay');
-                document.getElementById('dialog-title').innerHTML = title;
-                document.getElementById('dialog-msg').innerHTML = msg;
-                document.getElementById('dialog-icon').innerHTML = `<i class="fa-solid ${icon}"></i>`;
-                
-                const input = document.getElementById('dialog-input');
-                const btnContainer = document.getElementById('dialog-buttons');
-                input.classList.add('d-none'); input.value = ''; btnContainer.innerHTML = '';
+                const overlay = document.getElementById('modal-confirm');
+                if(type === 'prompt') {
+                    document.getElementById('modal-prompt').classList.add('active');
+                    document.getElementById('prompt-title').innerHTML = title;
+                    document.getElementById('prompt-message').innerHTML = msg;
+                    const input = document.getElementById('prompt-input');
+                    input.value = ''; input.focus();
+                    const btnContainer = document.getElementById('prompt-buttons');
+                    btnContainer.innerHTML = `<button class="btn btn-secondary" id="cd-cancel" style="flex:1;">Cancel</button><button class="btn btn-highlight" id="cd-ok" style="flex:1;">Submit</button>`;
+                    document.getElementById('cd-cancel').onclick = () => { document.getElementById('modal-prompt').classList.remove('active'); resolve(null); };
+                    document.getElementById('cd-ok').onclick = () => { document.getElementById('modal-prompt').classList.remove('active'); resolve(input.value); };
+                    return;
+                }
 
+                document.getElementById('confirm-title').innerHTML = title;
+                document.getElementById('confirm-message').innerHTML = msg;
+                document.getElementById('confirm-icon').className = `fa-solid ${icon} text-highlight`;
+                
+                const btnContainer = document.getElementById('confirm-buttons');
                 const closeAndResolve = (val) => { overlay.classList.remove('active'); resolve(val); };
 
                 if(type === 'alert') {
-                    btnContainer.innerHTML = `<button class="btn btn-highlight w-100">OK</button>`;
+                    btnContainer.innerHTML = `<button class="btn btn-highlight w-100" style="flex:1;">OK</button>`;
                     btnContainer.querySelector('button').onclick = () => closeAndResolve(true);
                 } else if(type === 'confirm') {
-                    btnContainer.innerHTML = `<button class="btn btn-secondary" id="cd-cancel">Cancel</button><button class="btn" style="background:var(--success)" id="cd-ok">Confirm</button>`;
+                    btnContainer.innerHTML = `<button class="btn btn-secondary" id="cd-cancel" style="flex:1;">Cancel</button><button class="btn" style="background:var(--success); flex:1;" id="cd-ok">Confirm</button>`;
                     document.getElementById('cd-cancel').onclick = () => closeAndResolve(false);
                     document.getElementById('cd-ok').onclick = () => closeAndResolve(true);
-                } else if(type === 'prompt') {
-                    input.classList.remove('d-none'); input.focus();
-                    btnContainer.innerHTML = `<button class="btn btn-secondary" id="cd-cancel">Cancel</button><button class="btn" style="background:var(--danger)" id="cd-ok">Submit</button>`;
-                    document.getElementById('cd-cancel').onclick = () => closeAndResolve(null);
-                    document.getElementById('cd-ok').onclick = () => closeAndResolve(input.value);
                 }
-                
                 overlay.classList.add('active');
             });
         }
@@ -1169,12 +1336,15 @@
         // 3. CORE LOGIC
         // -----------------------------------
         window.onload = async () => {
-            initFlatpickrs();
             checkPWA();
             const urlParams = new URLSearchParams(window.location.search);
             if (urlParams.get('mode') === 'customer') {
-                await loadData(); // needed for rooms
+                await loadData();
                 initCustomerPortal(urlParams.get('room'));
+            } else if (urlParams.get('mode') === 'booking') {
+                await loadData();
+                initCustomerPortal(null);
+                showCustomerSection('c-tab-rooms');
             } else {
                 showLoading();
                 await loadData();
@@ -1202,7 +1372,7 @@
 
         function generateInitialRooms() {
             appState.rooms = {};
-            // Start from 001 to 115
+            // Room numbering from 001 to 115 explicitly
             for (let i = 1; i <= HOTEL.totalRooms; i++) {
                 const roomNum = String(i).padStart(3, '0');
                 appState.rooms[roomNum] = { id: roomNum, floor: Math.ceil(i / 23), status: 'available', bookingData: null };
@@ -1210,52 +1380,28 @@
             IDB.set('bengal_rooms', appState.rooms);
         }
 
-        // 8. Custom Calendar Init
-        let fpCheckin, fpCheckout, fpCustomerCheckin, fpCustomerCheckout;
-        function initFlatpickrs() {
-            const fpOptions = { theme: "dark", dateFormat: "d M, Y", minDate: "today" };
-            const timeOptions = { ...fpOptions, enableTime: true, dateFormat: "d M, Y, h:i K" };
-            
-            fpCheckin = flatpickr("#ci-date-auto", timeOptions);
-            fpCheckout = flatpickr("#ci-checkout", fpOptions);
-            
-            fpCustomerCheckin = flatpickr("#cb-checkin", fpOptions);
-            fpCustomerCheckout = flatpickr("#cb-checkout", fpOptions);
-
-            document.querySelectorAll('.fa-calendar-days, .fa-calendar-check, .fa-calendar-xmark').forEach(icon => {
-                icon.addEventListener('click', function() {
-                    const input = this.nextElementSibling;
-                    if(input && input._flatpickr) input._flatpickr.open();
-                });
-            });
-        }
-
         // 5. PWA Banner
         let deferredPrompt;
         function checkPWA() {
-            if(localStorage.getItem('bengal_pwa_dismiss') > Date.now()) return;
+            if(localStorage.getItem('install_banner_dismissed') === 'true') return;
             window.addEventListener('beforeinstallprompt', (e) => {
                 e.preventDefault(); deferredPrompt = e;
-                document.getElementById('install-banner').classList.add('show');
+                setTimeout(() => { document.getElementById('install-banner').classList.remove('d-none'); }, 3000);
             });
-            document.getElementById('btn-install').addEventListener('click', async () => {
-                if(deferredPrompt) {
-                    deferredPrompt.prompt();
-                    const { outcome } = await deferredPrompt.userChoice;
-                    if(outcome === 'accepted') dismissInstall(true);
+        }
+        function installApp() {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((result) => {
+                    if (result.outcome === 'accepted') showToast('App installed successfully!', 'success');
                     deferredPrompt = null;
-                }
-            });
-            // Show for iOS manually if running in browser
-            const isIos = () => { return [ 'iPad Simulator', 'iPhone Simulator', 'iPod Simulator', 'iPad', 'iPhone', 'iPod' ].includes(navigator.platform) || (navigator.userAgent.includes("Mac") && "ontouchend" in document) }
-            if(isIos() && !window.navigator.standalone) {
-                document.getElementById('install-banner').classList.add('show');
-                document.getElementById('btn-install').onclick = () => showAlert("To install on iOS: Tap the 'Share' icon at the bottom of Safari, then tap 'Add to Home Screen'.");
+                    document.getElementById('install-banner').classList.add('d-none');
+                });
             }
         }
-        function dismissInstall(forever = false) {
-            document.getElementById('install-banner').classList.remove('show');
-            localStorage.setItem('bengal_pwa_dismiss', forever ? Date.now() + 31536000000 : Date.now() + 604800000); // 1yr or 7days
+        function dismissInstall() {
+            document.getElementById('install-banner').classList.add('d-none');
+            localStorage.setItem('install_banner_dismissed', 'true');
         }
 
         function checkAuth() {
@@ -1323,29 +1469,34 @@
             const floorFilt = document.getElementById('filter-floor').value;
             const statFilt = document.getElementById('filter-status').value;
 
-            let available = 0, booked = 0, idx = 0;
+            let available = 0, booked = 0, pending = 0, idx = 0;
 
             Object.values(appState.rooms).forEach(room => {
                 if (room.status === 'available') available++;
                 if (room.status === 'booked') booked++;
+                if (room.status === 'pending') pending++;
 
-                if (search && !room.id.includes(search)) return;
+                // Search matching with zero padding handling natively done if user types '001' or '1'
+                if (search && !(room.id.includes(search) || parseInt(room.id, 10).toString().includes(search))) return;
                 if (floorFilt !== 'all' && String(room.floor) !== floorFilt) return;
                 if (statFilt !== 'all' && room.status !== statFilt) return;
 
                 const div = document.createElement('div');
                 div.className = `room-box ${room.status}`;
-                div.style.animationDelay = `${idx * 0.03}s`; // Stagger animation
+                div.style.animationDelay = `${idx * 0.03}s`;
                 div.onclick = () => openRoomModal(room.id);
                 
-                const icon = room.status === 'available' ? 'fa-door-open' : 'fa-bed';
+                let icon = 'fa-door-open';
+                let statusText = 'Free (खाली)';
+                let statusClass = 'status-free';
+                
+                if(room.status === 'booked') { icon = 'fa-bed'; statusText = 'Occupied (भरा हुआ)'; statusClass = 'status-occupied'; }
+                if(room.status === 'pending') { icon = 'fa-clock'; statusText = 'Pending (लंबित)'; statusClass = 'status-pending'; }
                 
                 div.innerHTML = `
-                    <div class="room-number">${room.id}</div>
+                    <div class="room-number">Room ${room.id}</div>
                     <div class="room-floor">Floor ${room.floor}</div>
-                    <div class="status-badge ${room.status === 'available' ? 'status-free' : 'status-occupied'}">
-                        ${room.status === 'available' ? 'Free (खाली)' : 'Occupied (भरा हुआ)'}
-                    </div>
+                    <div class="status-badge ${statusClass}">${statusText}</div>
                     <i class="fa-solid ${icon}"></i>
                 `;
                 grid.appendChild(div);
@@ -1360,7 +1511,11 @@
             currentEditingRoom = roomId;
             const room = appState.rooms[roomId];
             document.getElementById('modal-room').classList.add('active');
-            document.getElementById('modal-room-title').innerHTML = `Room ${roomId} <span class="status-badge ${room.status === 'available' ? 'status-free' : 'status-occupied'}" style="margin:0 0 0 10px;">${room.status === 'available' ? 'FREE' : 'OCCUPIED'}</span>`;
+            
+            let displayStatus = room.status === 'available' ? 'FREE' : (room.status === 'booked' ? 'OCCUPIED' : 'PENDING');
+            let statusClass = room.status === 'available' ? 'status-free' : (room.status === 'booked' ? 'status-occupied' : 'status-pending');
+            
+            document.getElementById('modal-room-title').innerHTML = `Room ${roomId} <span class="status-badge ${statusClass}" style="margin:0 0 0 10px;">${displayStatus}</span>`;
 
             tempImages = []; renderImageUploader();
 
@@ -1368,10 +1523,17 @@
                 document.getElementById('form-checkin').classList.remove('d-none');
                 document.getElementById('form-manage').classList.add('d-none');
                 
-                fpCheckin.setDate(new Date());
-                fpCheckout.setDate(new Date().fp_incr(1));
+                // Format current datetime for datetime-local
+                const now = new Date();
+                now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+                document.getElementById('ci-date-auto').value = now.toISOString().slice(0, 16);
+                
+                const tmrw = new Date(); tmrw.setDate(tmrw.getDate() + 1);
+                document.getElementById('ci-checkout').value = tmrw.toISOString().split('T')[0];
                 
                 document.getElementById('checkin-submit-form').reset();
+                document.getElementById('ci-date-auto').value = now.toISOString().slice(0, 16);
+                
                 switchTab(document.querySelector('#form-checkin .tab-btn'), 'tab-guest'); 
                 generateRoomQR(roomId);
                 setTimeout(() => initSignaturePad('ci-signature'), 100);
@@ -1387,10 +1549,18 @@
                 document.getElementById('m-co-date').innerText = new Date(data.expectedOut).toLocaleDateString('en-IN');
                 document.getElementById('m-advance').innerText = data.advance;
 
+                if(room.status === 'pending') {
+                    document.getElementById('m-pending-actions').classList.remove('d-none');
+                    document.querySelector('#form-manage .tabs').children[1].style.display = 'none'; // hide checkout tab
+                } else {
+                    document.getElementById('m-pending-actions').classList.add('d-none');
+                    document.querySelector('#form-manage .tabs').children[1].style.display = 'flex';
+                }
+
                 const mGrid = document.getElementById('m-images-grid'); mGrid.innerHTML = '';
                 if(data.images && data.images.length > 0) {
                     data.images.forEach(img => { mGrid.innerHTML += `<div class="img-preview-box"><img src="${img}" onclick="window.open('${img}')"></div>`; });
-                } else mGrid.innerHTML = '<p class="text-muted"><i class="fa-solid fa-folder-open"></i> No docs.</p>';
+                } else mGrid.innerHTML = '<p class="text-muted"><i class="fa-solid fa-folder-open"></i> No documents.</p>';
 
                 calcCheckout(data);
                 switchTab(document.querySelector('#form-manage .tab-btn'), 'tab-m-info');
@@ -1432,24 +1602,25 @@
         // CHECK-IN & CHECKOUT
         function calcDue() {
             const rent = parseFloat(document.getElementById('ci-rent').value) || 0, adv = parseFloat(document.getElementById('ci-advance').value) || 0;
-            const ci = fpCheckin.selectedDates[0] || new Date(), co = fpCheckout.selectedDates[0];
+            const ciVal = document.getElementById('ci-date-auto').value, coVal = document.getElementById('ci-checkout').value;
+            const ci = ciVal ? new Date(ciVal) : new Date(), co = coVal ? new Date(coVal) : null;
             let days = 1;
             if(co && co > ci) { days = Math.ceil(Math.abs(co - ci) / (1000 * 60 * 60 * 24)); if(days===0) days=1; }
             const total = rent * days, due = total - adv;
             document.getElementById('ci-total-calc').innerText = `₹${total}`; document.getElementById('ci-due-calc').innerText = `₹${due}`;
             return { total, due, days };
         }
-        document.getElementById('ci-checkout').addEventListener('change', calcDue); document.getElementById('ci-rent').addEventListener('input', calcDue);
 
         async function submitCheckin() {
             const name = document.getElementById('ci-name').value, phone = document.getElementById('ci-phone').value;
-            const ciDate = fpCheckin.selectedDates[0], coDate = fpCheckout.selectedDates[0];
+            const ciVal = document.getElementById('ci-date-auto').value, coVal = document.getElementById('ci-checkout').value;
             
-            if(!name || !phone || !coDate) { showToast("Please fill required fields", "error"); return; }
-            if(coDate <= ciDate) { showToast("Checkout date must be after check-in", "error"); return; }
+            if(!name || !phone || !ciVal || !coVal) { showAlert("Please fill required fields."); return; }
+            const ciDate = new Date(ciVal), coDate = new Date(coVal);
+            if(coDate <= ciDate) { showAlert("Check-out date must be after Arrival."); return; }
             
             const sigData = getSignatureData('ci-signature');
-            if(!sigData) { showToast("Guest signature required", "error"); return; }
+            if(!sigData) { showAlert("Guest signature required."); switchTab(document.querySelectorAll('#form-checkin .tab-btn')[2], 'tab-payment'); return; }
 
             const calc = calcDue();
             appState.rooms[currentEditingRoom].status = 'booked';
@@ -1459,18 +1630,18 @@
                 rent: document.getElementById('ci-rent').value, advance: document.getElementById('ci-advance').value, totalEst: calc.total, images: [...tempImages], signatureCi: sigData
             };
             await saveData(); closeModal('modal-room'); renderDashboard(); showToast(`Room ${currentEditingRoom} Booked!`);
-            confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } }); // Sparkle!
+            confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
         }
 
         function calcCheckout(data) {
             const days = Math.max(1, Math.ceil(Math.abs(new Date() - new Date(data.checkIn)) / 86400000));
-            const total = days * parseFloat(data.rent), adv = parseFloat(data.advance), due = total - adv;
+            const total = days * parseFloat(data.rent||1500), adv = parseFloat(data.advance||0), due = total - adv;
             document.getElementById('co-days').innerText = days; document.getElementById('co-total').innerText = total; document.getElementById('co-advance').innerText = adv; document.getElementById('co-due').innerText = Math.max(0, due);
             return { days, total, adv, due };
         }
 
         async function processCheckout() {
-            const sigData = getSignatureData('co-signature'); if(!sigData) { showToast("Final signature required", "error"); return; }
+            const sigData = getSignatureData('co-signature'); if(!sigData) { showAlert("Final signature required."); return; }
             if(!(await showConfirmDialog("Are you sure you want to finish checkout?"))) return;
 
             const room = appState.rooms[currentEditingRoom], data = room.bookingData, calc = calcCheckout(data);
@@ -1480,7 +1651,7 @@
             await saveData(); generateReceiptPDF(bkg); closeModal('modal-room'); renderDashboard(); renderHistory(); showToast(`Checkout complete for Room ${currentEditingRoom}`);
         }
 
-        // Image / Camera (Minified for brevity, fully functional)
+        // Image / Camera (Minified for brevity)
         function openCameraModal(ctx) { if(tempImages.length>=5){showToast("Max 5 images","error");return;} targetImageContext=ctx; document.getElementById('modal-camera').classList.add('active'); switchTab(document.querySelector('#modal-camera .tab-btn'),'tab-cam-live'); startCamera(); }
         function closeCameraLogic() { if(videoStream){videoStream.getTracks().forEach(t=>t.stop());videoStream=null;} }
         async function startCamera() { try { videoStream = await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}}); document.getElementById('video-element').srcObject = videoStream; } catch(e){showToast("Camera error. Use file upload.","error"); switchTab(document.querySelectorAll('#modal-camera .tab-btn')[1],'tab-cam-file');} }
@@ -1490,7 +1661,7 @@
         function removeTempImage(i) { tempImages.splice(i,1); renderImageUploader(); }
         function renderImageUploader() { const g=document.getElementById('ci-images-grid'); g.innerHTML=''; tempImages.forEach((b,i)=>g.innerHTML+=`<div class="img-preview-box"><img src="${b}"><button type="button" class="remove-img-btn" onclick="removeTempImage(${i})"><i class="fa-solid fa-trash-can"></i></button></div>`); if(tempImages.length<5)g.innerHTML+=`<div class="img-preview-box" onclick="openCameraModal('ci-images')"><i class="fa-solid fa-camera text-highlight" style="font-size:2rem;"></i><span style="font-size:0.7rem;margin-top:5px">Add Photo</span></div>`; }
 
-        // QR Code
+        // QR Code - Exactly specified colors and structure
         function generateRoomQR(roomId) {
             const c = document.getElementById('room-qr-container'); Array.from(c.children).forEach(ch=>{if(!ch.classList.contains('qr-corner'))ch.remove();});
             currentQR = new QRCode(c, { text: `${window.location.origin}${window.location.pathname}?mode=customer&room=${roomId}`, width: 220, height: 220, colorDark: "#000000", colorLight: "#ffffff", correctLevel: QRCode.CorrectLevel.H });
@@ -1505,7 +1676,7 @@
         function renderHistory() {
             const tb=document.getElementById('history-tbody'), s=document.getElementById('search-history').value.toLowerCase(); tb.innerHTML='';
             if(appState.history.length===0){tb.innerHTML=`<tr><td colspan="7"><div class="empty-state"><i class="fa-solid fa-box-open"></i><p>No past bookings.</p></div></td></tr>`;return;}
-            appState.history.forEach((b,i)=>{ if(s&&!b.name.toLowerCase().includes(s)&&!b.roomId.includes(s))return; tb.innerHTML+=`<tr><td>${new Date(b.checkOut).toLocaleDateString()}</td><td><strong class="text-highlight">${b.roomId}</strong></td><td>${b.name}</td><td>${new Date(b.checkIn).toLocaleDateString()}</td><td>${new Date(b.checkOut).toLocaleDateString()}</td><td>₹${b.finalTotal}</td><td><button class="btn btn-secondary" onclick="reprintPDF(${i})" title="Reprint"><i class="fa-solid fa-file-pdf"></i></button></td></tr>`; });
+            appState.history.forEach((b,i)=>{ if(s&&!b.name.toLowerCase().includes(s)&&!b.roomId.includes(s))return; tb.innerHTML+=`<tr><td>${new Date(b.checkOut).toLocaleDateString()}</td><td><strong class="text-highlight">${b.roomId}</strong></td><td>${b.name}</td><td>${new Date(b.checkIn).toLocaleDateString()}</td><td>${new Date(b.checkOut).toLocaleDateString()}</td><td>₹${b.finalTotal}</td><td><button class="btn btn-secondary" onclick="reprintPDF(${i})" title="Reprint Bill"><i class="fa-solid fa-file-pdf"></i></button></td></tr>`; });
         }
         window.reprintPDF = i => generateReceiptPDF(appState.history[i]);
         document.getElementById('btn-factory-reset').onclick = async () => {
@@ -1527,9 +1698,9 @@
                 document.getElementById('guest-room-context').classList.remove('d-none');
                 document.getElementById('guest-room-display').innerText = `Room ${cRoomId}`;
                 document.getElementById('guest-request-form').classList.remove('d-none');
-                document.getElementById('guest-booking-section').classList.add('d-none');
+                showCustomerSection('c-tab-home');
             } else {
-                renderCustomerRooms();
+                showCustomerSection('c-tab-rooms');
             }
 
             document.getElementById('guest-request-form').onsubmit = async(e) => {
@@ -1537,68 +1708,103 @@
                 appState.requests.push({ id: Date.now(), roomId: cRoomId, category: document.getElementById('guest-req-category').value, message: document.getElementById('guest-req-msg').value, time: new Date().toISOString(), status: 'pending', type: 'service' });
                 await IDB.set('bengal_requests', appState.requests);
                 document.getElementById('guest-request-form').classList.add('d-none'); document.getElementById('guest-req-success').classList.remove('d-none');
-                document.getElementById('success-msg-desc').innerText = "Our staff has been notified.";
                 hideLoading(); triggerVibration(); renderCustomerActivity();
             };
 
             document.getElementById('customer-booking-form').onsubmit = async(e) => {
                 e.preventDefault(); showLoading();
-                const name = document.getElementById('cb-name').value, phone = document.getElementById('cb-phone').value, ci = fpCustomerCheckin.selectedDates[0], co = fpCustomerCheckout.selectedDates[0];
-                if(co <= ci) { showAlert("Checkout must be after check-in."); hideLoading(); return; }
+                const name = document.getElementById('cb-name').value, phone = document.getElementById('cb-phone').value;
+                const ci = new Date(document.getElementById('cb-checkin').value), co = new Date(document.getElementById('cb-checkout').value);
+                if(co <= ci) { showAlert("Check-out must be after Arrival."); hideLoading(); return; }
                 
-                appState.requests.push({ id: Date.now(), roomId: document.getElementById('cb-room-display').innerText, category: "Booking Request", message: `Name: ${name}, Ph: ${phone}, IN: ${ci.toLocaleDateString()}, OUT: ${co.toLocaleDateString()}`, time: new Date().toISOString(), status: 'pending_booking', type: 'booking', bkgData: { name, phone, checkIn: ci.toISOString(), expectedOut: co.toISOString() } });
-                await IDB.set('bengal_requests', appState.requests);
-                closeModal('modal-customer-book'); hideLoading(); showToast("Booking Request Sent!");
-                switchTab(document.querySelectorAll('#customer-view .tab-btn')[1], 'c-tab-requests');
+                const roomSel = document.getElementById('booking-room-num').innerText.replace('Room ', '');
+                appState.rooms[roomSel].status = 'pending';
+                appState.rooms[roomSel].bookingData = { name, phone, checkIn: ci.toISOString(), expectedOut: co.toISOString(), idType: document.getElementById('cb-id-type').value, idNum: document.getElementById('cb-id-num').value, advance: 0, rent: 1500, totalEst: 1500, images: [] };
+
+                appState.requests.push({ id: Date.now(), roomId: roomSel, category: "Booking Request", message: `Name: ${name}, Ph: ${phone}, IN: ${ci.toLocaleDateString()}, OUT: ${co.toLocaleDateString()}`, time: new Date().toISOString(), status: 'pending_booking', type: 'booking', bkgData: appState.rooms[roomSel].bookingData });
+                await saveData();
+                
+                document.getElementById('customer-booking-form-container').classList.add('d-none');
+                document.getElementById('booking-success').classList.remove('d-none');
+                hideLoading(); showToast("Booking Request Sent!"); triggerVibration();
                 renderCustomerActivity();
             };
+            
             renderCustomerActivity();
             setInterval(async () => { await loadData(); renderCustomerRooms(); renderCustomerActivity(); }, 5000);
         }
 
-        window.resetCustomerForm = () => {
+        window.showCustomerSection = (targetId) => {
+            document.querySelectorAll('#customer-view .tab-content').forEach(c => c.classList.remove('active'));
+            document.getElementById(targetId).classList.add('active');
+            
+            document.querySelectorAll('#customer-bottom-bar .btn').forEach(b => b.classList.add('btn-secondary'));
+            document.querySelectorAll('#customer-bottom-bar .btn').forEach(b => b.classList.remove('active'));
+            
+            if(targetId === 'c-tab-home') { document.getElementById('btn-c-home').classList.remove('btn-secondary'); document.getElementById('btn-c-home').classList.add('active'); }
+            if(targetId === 'c-tab-rooms') { document.getElementById('btn-c-rooms').classList.remove('btn-secondary'); document.getElementById('btn-c-rooms').classList.add('active'); renderCustomerRooms(); }
+            if(targetId === 'c-tab-activity') { document.getElementById('btn-c-activity').classList.remove('btn-secondary'); document.getElementById('btn-c-activity').classList.add('active'); renderCustomerActivity(); }
+        }
+
+        window.resetRequestForm = () => {
             document.getElementById('guest-request-form').reset();
             document.getElementById('guest-request-form').classList.remove('d-none');
             document.getElementById('guest-req-success').classList.add('d-none');
         };
 
-        window.goCustomerHome = () => {
-            resetCustomerForm();
-            switchTab(document.querySelectorAll('#customer-view .tab-btn')[0], 'c-tab-home');
-            const grid = document.getElementById('guest-booking-section');
-            if(grid && !grid.classList.contains('d-none')) {
-                grid.scrollIntoView({behavior: 'smooth'});
-            }
-        };
+        window.cancelCustomerBooking = () => {
+            document.getElementById('customer-booking-form-container').classList.add('d-none');
+            document.getElementById('customer-room-list').classList.remove('d-none');
+        }
 
         function renderCustomerRooms() {
-            const grid = document.getElementById('customer-rooms-grid'); if(!grid) return; grid.innerHTML = '';
+            const grid = document.getElementById('customer-room-list'); if(!grid) return; grid.innerHTML = '';
             let hasRooms = false;
             Object.values(appState.rooms).forEach(r => {
                 if(r.status === 'available') {
                     hasRooms = true;
-                    grid.innerHTML += `<div class="room-box status-free" style="padding:1rem" onclick="openCustomerBookModal('${r.id}')"><div class="room-number" style="font-size:1.3rem">${r.id}</div><div class="room-floor">Floor ${r.floor}</div><button class="btn btn-secondary mt-1" style="width:100%; font-size:0.8rem; min-height:30px">Book</button></div>`;
+                    grid.innerHTML += `<div class="room-box status-free" style="padding:1rem" onclick="openCustomerBookForm('${r.id}')"><div class="room-number" style="font-size:1.3rem">Room ${r.id}</div><div class="room-floor">Floor ${r.floor}</div><button class="btn btn-secondary mt-1" style="width:100%; font-size:0.8rem; min-height:30px">Book</button></div>`;
                 }
             });
-            if(!hasRooms) grid.innerHTML = `<p class="text-muted w-100">All rooms are occupied.</p>`;
+            if(!hasRooms) grid.innerHTML = `<p class="text-muted w-100 text-center"><i class="fa-solid fa-bed"></i> All rooms are currently occupied or pending.</p>`;
         }
         
-        window.openCustomerBookModal = (rId) => {
-            document.getElementById('cb-room-display').innerText = rId;
+        window.openCustomerBookForm = (rId) => {
+            document.getElementById('customer-room-list').classList.add('d-none');
+            document.getElementById('booking-success').classList.add('d-none');
+            document.getElementById('customer-booking-form-container').classList.remove('d-none');
+            document.getElementById('booking-room-num').innerText = `Room ${rId}`;
             document.getElementById('customer-booking-form').reset();
-            fpCustomerCheckin.setDate(new Date()); fpCustomerCheckout.setDate(new Date().fp_incr(1));
-            document.getElementById('modal-customer-book').classList.add('active');
         };
 
         function renderCustomerActivity() {
             const list = document.getElementById('customer-activity-list'); if(!list) return; list.innerHTML = '';
+            // Get requests related to the room OR self bookings
             const myReqs = appState.requests.filter(r => r.roomId === cRoomId || r.type === 'booking').sort((a,b)=>b.id-a.id);
-            if(myReqs.length===0) { list.innerHTML = `<p class="text-muted"><i class="fa-solid fa-ghost"></i> No recent activity.</p>`; return; }
+            if(myReqs.length===0) { list.innerHTML = `<p class="text-muted"><i class="fa-solid fa-ghost"></i> No recent records.</p>`; return; }
+            
+            let showedNotification = false;
+
             myReqs.forEach(r => {
-                let color = r.status.includes('pending') ? 'var(--warning)' : (r.status.includes('reject') || r.status.includes('cancel') ? 'var(--danger)' : 'var(--success)');
+                let color = r.status.includes('pending') ? 'var(--pending)' : (r.status.includes('reject') || r.status.includes('cancel') ? 'var(--danger)' : 'var(--success)');
                 let icon = r.status.includes('pending') ? 'fa-clock' : (r.status.includes('reject') || r.status.includes('cancel') ? 'fa-xmark' : 'fa-check');
                 let cancelBtn = r.status.includes('pending') ? `<button class="btn btn-secondary mt-1" style="padding:0.2rem 0.5rem; font-size:0.7rem; min-height: 24px;" onclick="cancelCustomerRequest(${r.id})"><i class="fa-solid fa-ban"></i> Cancel Request</button>` : '';
-                list.innerHTML += `<div class="card noise-bg mb-1" style="border-left: 4px solid ${color}"><div class="flex-row" style="justify-content:space-between"><strong>${r.category}</strong><span style="color:${color}"><i class="fa-solid ${icon}"></i> ${r.status.replace('_',' ').toUpperCase()}</span></div><p class="text-muted mt-1" style="font-size:0.8rem">${r.message}</p>${cancelBtn}</div>`;
+                
+                // Show notification for newly approved/rejected booking
+                if(r.type === 'booking' && !r.status.includes('pending') && !r.notified) {
+                    if(!showedNotification) {
+                        const notif = document.getElementById('customer-notification');
+                        document.getElementById('notif-title').innerText = r.status === 'approved' ? 'Booking Confirmed!' : 'Booking Rejected';
+                        document.getElementById('notif-msg').innerText = r.status === 'approved' ? `Your booking for Room ${r.roomId} is confirmed.` : `Sorry, your booking for Room ${r.roomId} could not be confirmed.`;
+                        notif.querySelector('.card').style.borderLeftColor = r.status === 'approved' ? 'var(--success)' : 'var(--danger)';
+                        notif.classList.remove('d-none');
+                        showedNotification = true;
+                    }
+                    r.notified = true; // Mark to not show again locally
+                    IDB.set('bengal_requests', appState.requests);
+                }
+
+                list.innerHTML += `<div class="card noise-bg mb-1" style="border-left: 4px solid ${color}"><div class="flex-row" style="justify-content:space-between"><strong>${r.category} (${r.roomId})</strong><span style="color:${color}"><i class="fa-solid ${icon}"></i> ${r.status.replace('_',' ').toUpperCase()}</span></div><p class="text-muted mt-1" style="font-size:0.8rem">${r.message}</p>${cancelBtn}</div>`;
             });
         }
 
@@ -1607,6 +1813,10 @@
                 const req = appState.requests.find(x=>x.id===id);
                 if(req) {
                     req.status = 'cancelled';
+                    if(req.type === 'booking' && appState.rooms[req.roomId].status === 'pending') {
+                        appState.rooms[req.roomId].status = 'available';
+                        appState.rooms[req.roomId].bookingData = null;
+                    }
                     await saveData();
                     renderCustomerActivity();
                     showToast("Request Cancelled");
@@ -1623,8 +1833,9 @@
                 if(reqs.length !== appState.requests.length || isManual) {
                     const diff = reqs.length - appState.requests.length;
                     appState.requests = reqs;
-                    if(diff > 0 && !isManual) { showToast("New Customer Message!", "warning"); triggerVibration([200, 100]); try { document.getElementById('bell-sound').play(); } catch(e){} }
+                    if(diff > 0 && !isManual) { showToast("New Guest Need!", "warning"); triggerVibration([200, 100]); try { document.getElementById('bell-sound').play(); } catch(e){} }
                     updateRequestBadge(); if(!document.getElementById('view-requests').classList.contains('d-none')) renderRequests();
+                    renderDashboard(); // refresh pendings
                 }
             } catch(e) {}
             if(isManual) { hideLoading(); showToast("Synchronized"); }
@@ -1633,7 +1844,7 @@
         function updateRequestBadge() {
             const pending = appState.requests.filter(r => r.status.includes('pending')).length;
             const badge = document.getElementById('req-badge');
-            if(pending > 0) { badge.innerText = pending; badge.classList.remove('d-none'); badge.style.animation = 'pulse-gold 1s infinite'; } 
+            if(pending > 0) { badge.innerText = pending; badge.classList.remove('d-none'); badge.style.animation = 'pulse-yellow 1s infinite'; } 
             else badge.classList.add('d-none');
         }
 
@@ -1646,11 +1857,11 @@
                 const tr = `<tr><td>${new Date(r.time).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</td><td><strong class="text-highlight">${r.roomId}</strong></td>`;
                 if(r.type === 'booking') {
                     hasBkg=true;
-                    bkgTb.innerHTML += r.status === 'pending_booking' ? `${tr}<td>${r.bkgData.name}</td><td>${r.bkgData.phone}</td><td style="font-size:0.8rem">${new Date(r.bkgData.checkIn).toLocaleDateString()} - ${new Date(r.bkgData.expectedOut).toLocaleDateString()}</td><td><button class="btn" style="background:var(--success);padding:0.3rem;min-height:30px" onclick="manageBooking(${r.id}, true)"><i class="fa-solid fa-check"></i></button> <button class="btn" style="background:var(--danger);padding:0.3rem;min-height:30px" onclick="manageBooking(${r.id}, false)"><i class="fa-solid fa-xmark"></i></button></td></tr>` : 
-                    `${tr}<td>${r.bkgData.name}</td><td colspan="2"><span class="status-badge status-${r.status==='approved'?'free':'occupied'}">${r.status.toUpperCase()}</span></td><td>-</td></tr>`;
+                    bkgTb.innerHTML += r.status === 'pending_booking' ? `${tr}<td>${r.bkgData.name}</td><td>${r.bkgData.phone}</td><td style="font-size:0.8rem">${new Date(r.bkgData.checkIn).toLocaleDateString()} - ${new Date(r.bkgData.expectedOut).toLocaleDateString()}</td><td><button class="btn" style="background:var(--success);padding:0.3rem;min-height:30px" onclick="manageBookingFromTable(${r.id}, true)"><i class="fa-solid fa-check"></i></button> <button class="btn" style="background:var(--danger);padding:0.3rem;min-height:30px" onclick="manageBookingFromTable(${r.id}, false)"><i class="fa-solid fa-xmark"></i></button></td></tr>` : 
+                    `${tr}<td>${r.bkgData.name}</td><td colspan="2"><span class="status-badge ${r.status==='approved'?'status-occupied':(r.status==='cancelled'?'status-free':'status-free')}">${r.status.toUpperCase()}</span></td><td>-</td></tr>`;
                 } else {
                     hasReq=true;
-                    reqTb.innerHTML += `${tr}<td>${r.category}</td><td>${r.message}</td><td><span class="status-badge ${r.status === 'pending' ? 'status-occupied' : 'status-free'}">${r.status.toUpperCase()}</span></td><td>${r.status === 'pending' ? `<button class="btn btn-secondary" onclick="markRequestDone(${r.id})" style="padding: 0.3rem 0.6rem; min-height:30px;"><i class="fa-solid fa-check"></i> Task Complete</button>` : `<i class="fa-solid fa-check-double text-success"></i>`}</td></tr>`;
+                    reqTb.innerHTML += `${tr}<td>${r.category}</td><td>${r.message}</td><td><span class="status-badge ${r.status === 'pending' ? 'status-pending' : 'status-free'}">${r.status.toUpperCase()}</span></td><td>${r.status === 'pending' ? `<button class="btn btn-secondary" onclick="markRequestDone(${r.id})" style="padding: 0.3rem 0.6rem; min-height:30px;"><i class="fa-solid fa-check"></i> Task Complete</button>` : `<i class="fa-solid fa-check-double text-success"></i>`}</td></tr>`;
                 }
             });
             if(!hasReq) reqTb.innerHTML = `<tr><td colspan="6" class="text-center text-muted">No service requests.</td></tr>`;
@@ -1659,16 +1870,27 @@
         }
 
         window.markRequestDone = async (id) => { const r = appState.requests.find(x=>x.id===id); if(r){ r.status='resolved'; await saveData(); renderRequests(); } };
-        window.manageBooking = async (id, isApprove) => {
+        
+        window.manageBookingFromTable = async (id, isApprove) => {
             const r = appState.requests.find(x=>x.id===id);
             if(!r) return;
             if(isApprove) {
-                if(appState.rooms[r.roomId].status !== 'available') { showAlert("Room already occupied!"); return; }
+                if(appState.rooms[r.roomId].status === 'booked') { showAlert("Room already occupied!"); return; }
                 appState.rooms[r.roomId].status = 'booked';
-                appState.rooms[r.roomId].bookingData = { id: 'BKG-'+Date.now(), name: r.bkgData.name, phone: r.bkgData.phone, checkIn: r.bkgData.checkIn, expectedOut: r.bkgData.expectedOut, rent: 1500, advance: 0, totalEst: 1500 };
+                appState.rooms[r.roomId].bookingData.id = 'BKG-'+Date.now();
                 r.status = 'approved'; showToast("Booking Approved"); confetti(); renderDashboard();
-            } else { r.status = 'rejected'; showToast("Booking Rejected", "error"); }
+            } else { 
+                appState.rooms[r.roomId].status = 'available';
+                appState.rooms[r.roomId].bookingData = null;
+                r.status = 'rejected'; showToast("Booking Rejected", "error"); renderDashboard();
+            }
             await saveData(); renderRequests();
+        };
+
+        window.manageBookingFromRoom = async (isApprove) => {
+            const req = appState.requests.find(x => x.roomId === currentEditingRoom && x.status === 'pending_booking');
+            if(req) await manageBookingFromTable(req.id, isApprove);
+            closeModal('modal-room');
         };
 
         // Utility PDF Generate (minimized block)
@@ -1678,9 +1900,9 @@
             doc.setTextColor(0,0,0); doc.setFontSize(16); doc.text("GUEST INVOICE / RECEIPT",105,45,{align:"center"});
             doc.setFontSize(11); let y=60; const l=20, r=120;
             doc.text(`Invoice No: ${bkg.id}`,l,y); doc.text(`Date: ${new Date().toLocaleDateString()}`,r,y); y+=10; doc.text(`Guest: ${bkg.name}`,l,y); doc.text(`Room: ${bkg.roomId}`,r,y); y+=10; doc.text(`Phone: ${bkg.phone}`,l,y); y+=15;
-            doc.line(20,y,190,y); y+=10; doc.text(`Check-in: ${new Date(bkg.checkIn).toLocaleString()}`,l,y); y+=8; doc.text(`Check-out: ${new Date(bkg.checkOut).toLocaleString()}`,l,y); y+=8; doc.text(`Days Stayed: ${bkg.actualDays}`,l,y); y+=15; doc.line(20,y,190,y); y+=10;
-            doc.setFont("helvetica","bold"); doc.text("Payment Summary",l,y); y+=10; doc.setFont("helvetica","normal"); doc.text(`Rent/Day: Rs. ${bkg.rent||1500}`,l,y); doc.text(`Total: Rs. ${bkg.finalTotal}`,r,y); y+=8; doc.text(`Advance: Rs. ${bkg.advance}`,r,y); y+=15;
-            doc.setFont("helvetica","bold"); doc.text("Collected:",l,y); doc.text(`Rs. ${Math.max(0,bkg.finalTotal-bkg.advance)}`,r,y); y+=15; doc.setFont("helvetica","normal"); doc.text(`Mode: ${bkg.payMode||'N/A'} ${bkg.txnId?'('+bkg.txnId+')':''}`,l,y); y+=30;
+            doc.line(20,y,190,y); y+=10; doc.text(`Arrival: ${new Date(bkg.checkIn).toLocaleString()}`,l,y); y+=8; doc.text(`Departure: ${new Date(bkg.checkOut).toLocaleString()}`,l,y); y+=8; doc.text(`Days Stayed: ${bkg.actualDays}`,l,y); y+=15; doc.line(20,y,190,y); y+=10;
+            doc.setFont("helvetica","bold"); doc.text("Payment Summary",l,y); y+=10; doc.setFont("helvetica","normal"); doc.text(`Rate/Night: Rs. ${bkg.rent||1500}`,l,y); doc.text(`Total Charges: Rs. ${bkg.finalTotal}`,r,y); y+=8; doc.text(`Advance: Rs. ${bkg.advance}`,r,y); y+=15;
+            doc.setFont("helvetica","bold"); doc.text("Collected:",l,y); doc.text(`Rs. ${Math.max(0,bkg.finalTotal-bkg.advance)}`,r,y); y+=15; doc.setFont("helvetica","normal"); doc.text(`Method: ${bkg.payMode||'N/A'} ${bkg.txnId?'('+bkg.txnId+')':''}`,l,y); y+=30;
             if(bkg.signatureCo)try{doc.addImage(bkg.signatureCo,'PNG',120,y-15,60,20);}catch(e){} doc.line(120,y+5,180,y+5); doc.text("Guest Signature",135,y+10); doc.text("Authorized Signatory",20,y+10); doc.line(20,y+5,70,y+5); doc.save(`Invoice_${bkg.id}.pdf`);
         }
 
