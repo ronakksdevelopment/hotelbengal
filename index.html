@@ -1,0 +1,1783 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>HOTEL BENGAL | Management System</title>
+
+    <!-- External Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- External Libraries (Allowed CDNs) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+    <style>
+        /* -----------------------------------
+           🎨 UI/UX DESIGN SYSTEM & VARIABLES
+        ----------------------------------- */
+        :root {
+            --bg-main: #343131;
+            --primary: #A04747;
+            --secondary: #D8A25E;
+            --highlight: #EEDF7A;
+            
+            --text-main: #ffffff;
+            --text-muted: #b0a8a8;
+            
+            --success: #4CAF50;
+            --danger: #A04747;
+            --warning: #D8A25E;
+            
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --card-border: rgba(216, 162, 94, 0.2);
+            --glass-bg: rgba(52, 49, 49, 0.85);
+            
+            --radius-md: 12px;
+            --radius-lg: 20px;
+            --radius-full: 50px;
+            
+            --shadow-soft: 0 8px 32px rgba(0, 0, 0, 0.3);
+            --shadow-glow: 0 0 15px rgba(216, 162, 94, 0.3);
+            
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-main); }
+        ::-webkit-scrollbar-thumb { background: var(--secondary); border-radius: 10px; }
+
+        /* -----------------------------------
+           📱 LAYOUTS
+        ----------------------------------- */
+        .app-container {
+            display: flex;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+        }
+
+        .sidebar {
+            width: 260px;
+            background: rgba(0, 0, 0, 0.2);
+            border-right: 1px solid var(--card-border);
+            display: flex;
+            flex-direction: column;
+            transition: var(--transition);
+            z-index: 100;
+        }
+
+        .sidebar-header {
+            padding: 2rem 1.5rem;
+            text-align: center;
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        .sidebar-header h1 {
+            color: var(--highlight);
+            font-size: 1.5rem;
+            letter-spacing: 2px;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .sidebar-header p {
+            color: var(--secondary);
+            font-size: 0.8rem;
+        }
+
+        .nav-links {
+            flex: 1;
+            padding: 1.5rem 0;
+            overflow-y: auto;
+        }
+
+        .nav-item {
+            padding: 1rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: var(--transition);
+            cursor: pointer;
+            border-left: 4px solid transparent;
+        }
+
+        .nav-item:hover {
+            background: var(--card-bg);
+            color: var(--highlight);
+        }
+
+        .nav-item.active {
+            background: linear-gradient(90deg, rgba(160, 71, 71, 0.2) 0%, transparent 100%);
+            color: var(--highlight);
+            border-left-color: var(--primary);
+        }
+
+        .main-content {
+            flex: 1;
+            height: 100vh;
+            overflow-y: auto;
+            padding: 2rem;
+            position: relative;
+        }
+
+        /* -----------------------------------
+           COMPONENTS
+        ----------------------------------- */
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius-md);
+            padding: 1.5rem;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .btn:hover { background: #b85454; transform: translateY(-2px); box-shadow: var(--shadow-soft); }
+        .btn-secondary { background: transparent; border: 1px solid var(--secondary); color: var(--secondary); }
+        .btn-secondary:hover { background: var(--secondary); color: var(--bg-main); }
+        .btn-highlight { background: var(--highlight); color: var(--bg-main); }
+        .btn-highlight:hover { background: #ffeaa7; }
+
+        input, select, textarea {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--card-border);
+            color: white;
+            padding: 1rem;
+            border-radius: var(--radius-md);
+            outline: none;
+            transition: var(--transition);
+            font-size: 0.95rem;
+            margin-bottom: 1rem;
+        }
+
+        input:focus, select:focus, textarea:focus { border-color: var(--highlight); box-shadow: var(--shadow-glow); }
+        
+        .grid-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .stat-icon {
+            width: 50px; height: 50px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.5rem;
+        }
+        .bg-green { background: rgba(76, 175, 80, 0.2); color: var(--success); }
+        .bg-red { background: rgba(160, 71, 71, 0.2); color: var(--danger); }
+        .bg-gold { background: rgba(216, 162, 94, 0.2); color: var(--secondary); }
+
+        /* Room Grid */
+        .room-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 1.2rem;
+        }
+
+        .room-box {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius-md);
+            padding: 1.5rem 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .room-box:hover { transform: translateY(-5px); box-shadow: var(--shadow-soft); border-color: var(--highlight); }
+        .room-number { font-size: 1.8rem; font-weight: 700; color: var(--highlight); margin-bottom: 0.5rem; }
+        .room-floor { font-size: 0.8rem; color: var(--text-muted); }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            border-radius: var(--radius-full);
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-top: 0.5rem;
+        }
+        .status-available { background: var(--success); color: white; }
+        .status-booked { background: var(--primary); color: white; }
+        
+        .room-box.booked { border-bottom: 4px solid var(--primary); }
+        .room-box.available { border-bottom: 4px solid var(--success); }
+
+        /* Modals */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            display: flex; justify-content: center; align-items: center;
+            opacity: 0; pointer-events: none; transition: var(--transition);
+            padding: 1rem;
+        }
+        .modal-overlay.active { opacity: 1; pointer-events: all; }
+        
+        .modal-content {
+            background: var(--bg-main);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius-lg);
+            width: 100%; max-width: 800px; max-height: 90vh;
+            overflow-y: auto;
+            transform: scale(0.95) translateY(20px);
+            transition: var(--transition);
+            position: relative;
+        }
+        .modal-overlay.active .modal-content { transform: scale(1) translateY(0); }
+        
+        .modal-header {
+            padding: 1.5rem; border-bottom: 1px solid var(--card-border);
+            display: flex; justify-content: space-between; align-items: center;
+            position: sticky; top: 0; background: var(--bg-main); z-index: 10;
+        }
+        .modal-body { padding: 1.5rem; }
+        .modal-close { background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer; }
+
+        /* Tabs */
+        .tabs { display: flex; gap: 1rem; border-bottom: 1px solid var(--card-border); margin-bottom: 1.5rem; }
+        .tab-btn {
+            background: none; border: none; color: var(--text-muted);
+            padding: 0.8rem 1rem; cursor: pointer; font-weight: 600;
+            border-bottom: 3px solid transparent; transition: var(--transition);
+        }
+        .tab-btn.active { color: var(--highlight); border-bottom-color: var(--highlight); }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeIn 0.3s forwards; }
+
+        /* Image Uploader System */
+        .image-uploader-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 1rem; margin-bottom: 1rem;
+        }
+        .img-preview-box {
+            width: 100%; aspect-ratio: 1; border-radius: var(--radius-md);
+            border: 2px dashed var(--card-border);
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            cursor: pointer; position: relative; overflow: hidden; background: rgba(0,0,0,0.2);
+        }
+        .img-preview-box img { width: 100%; height: 100%; object-fit: cover; }
+        .img-preview-box:hover { border-color: var(--highlight); color: var(--highlight); }
+        .remove-img-btn {
+            position: absolute; top: 5px; right: 5px; background: rgba(0,0,0,0.7); color: white;
+            border: none; border-radius: 50%; width: 25px; height: 25px; cursor: pointer;
+            display: flex; justify-content: center; align-items: center; font-size: 0.8rem;
+        }
+
+        /* Canvas Signature */
+        .signature-wrapper {
+            border: 1px solid var(--card-border); border-radius: var(--radius-md);
+            background: rgba(255,255,255,0.9); margin-bottom: 1rem; position: relative;
+        }
+        .signature-pad { width: 100%; height: 200px; touch-action: none; border-radius: var(--radius-md); cursor: crosshair; }
+        .clear-sig-btn { position: absolute; top: 10px; right: 10px; padding: 0.3rem 0.8rem; background: var(--bg-main); font-size: 0.8rem; }
+
+        /* Tables */
+        .table-responsive { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; text-align: left; margin-bottom: 1rem; }
+        th, td { padding: 1rem; border-bottom: 1px solid var(--card-border); }
+        th { color: var(--secondary); font-weight: 600; white-space: nowrap; }
+        tr:hover { background: rgba(255,255,255,0.02); }
+
+        /* Camera UI */
+        #camera-container { width: 100%; max-width: 400px; margin: 0 auto; position: relative; border-radius: var(--radius-md); overflow: hidden; }
+        #video-element { width: 100%; background: #000; }
+        .camera-overlay { position: absolute; bottom: 0; left: 0; right: 0; padding: 1rem; background: linear-gradient(transparent, rgba(0,0,0,0.8)); display: flex; justify-content: center; }
+        #capture-btn { width: 60px; height: 60px; border-radius: 50%; background: var(--primary); border: 3px solid white; cursor: pointer; }
+
+        /* QR Code wrapper */
+        .qr-wrapper { background: white; padding: 1.5rem; border-radius: var(--radius-md); display: inline-block; border: 5px solid var(--primary); margin: 1rem 0; }
+        
+        /* Auth Screen */
+        .auth-wrapper {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: var(--bg-main); z-index: 2000;
+            display: flex; justify-content: center; align-items: center; flex-direction: column; padding: 2rem;
+        }
+        .auth-card {
+            background: var(--card-bg); border: 1px solid var(--card-border);
+            padding: 3rem; border-radius: var(--radius-lg); width: 100%; max-width: 450px;
+            box-shadow: var(--shadow-soft); text-align: center;
+        }
+
+        /* Notifications */
+        .toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 3000; display: flex; flex-direction: column; gap: 10px; }
+        .toast {
+            background: var(--card-bg); border-left: 4px solid var(--primary); color: white;
+            padding: 1rem 1.5rem; border-radius: var(--radius-md); box-shadow: var(--shadow-soft);
+            backdrop-filter: blur(10px); animation: slideInRight 0.3s forwards;
+            display: flex; align-items: center; gap: 1rem;
+        }
+        .toast.success { border-left-color: var(--success); }
+
+        /* Utilities & Animations */
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        .d-none { display: none !important; }
+        .flex-row { display: flex; gap: 1rem; align-items: center; }
+        .flex-col { display: flex; flex-direction: column; gap: 0.5rem; }
+        .text-center { text-align: center; }
+        .text-primary { color: var(--primary); }
+        .text-highlight { color: var(--highlight); }
+        .mt-1 { margin-top: 1rem; } .mt-2 { margin-top: 2rem; }
+
+        /* Mobile Adjustments */
+        @media (max-width: 768px) {
+            .app-container { flex-direction: column; }
+            .sidebar { width: 100%; height: auto; flex-direction: row; justify-content: space-between; align-items: center; padding: 0.5rem 1rem; border-right: none; border-bottom: 1px solid var(--card-border); }
+            .sidebar-header { padding: 0; border: none; text-align: left; }
+            .sidebar-header h1 { font-size: 1.2rem; }
+            .sidebar-header p { display: none; }
+            .nav-links { display: flex; overflow-x: auto; padding: 0; gap: 0.5rem; }
+            .nav-item { padding: 0.8rem; border-left: none; border-bottom: 3px solid transparent; }
+            .nav-item span { display: none; } /* Hide text on mobile nav */
+            .nav-item.active { border-bottom-color: var(--primary); border-left: none; background: transparent; }
+            .main-content { padding: 1rem; }
+            .grid-header { flex-direction: column; align-items: stretch; }
+            .stats-row { grid-template-columns: 1fr 1fr; }
+            .modal-content { height: 100vh; max-height: 100vh; border-radius: 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ==========================================
+         AUTH VIEW
+    ========================================== -->
+    <div id="auth-view" class="auth-wrapper">
+        <div class="auth-card">
+            <h1 class="text-highlight" style="font-size: 2.5rem; letter-spacing: 3px; margin-bottom: 0.5rem;">HOTEL BENGAL</h1>
+            <p style="color: var(--secondary); margin-bottom: 2rem;">Authorized Management Personnel Only</p>
+            
+            <form id="login-form">
+                <div class="flex-col" style="text-align: left;">
+                    <label>Username</label>
+                    <input type="text" id="login-user" placeholder="Enter username" required>
+                </div>
+                <div class="flex-col" style="text-align: left;">
+                    <label>Password</label>
+                    <input type="password" id="login-pass" placeholder="Enter password" required>
+                </div>
+                <button type="submit" class="btn btn-highlight" style="width: 100%; margin-top: 1rem; padding: 1rem;">
+                    <i class="fas fa-sign-in-alt"></i> Access System
+                </button>
+            </form>
+            <p class="mt-2" style="font-size: 0.8rem; color: var(--text-muted);">Master Device Setup / Offline First</p>
+        </div>
+    </div>
+
+    <!-- ==========================================
+         CUSTOMER PORTAL (QR VIEW)
+    ========================================== -->
+    <div id="customer-view" class="auth-wrapper d-none" style="justify-content: flex-start; overflow-y: auto;">
+        <div class="auth-card" style="margin-top: 2rem; max-width: 600px;">
+            <h1 class="text-highlight" style="font-size: 2rem;">HOTEL BENGAL</h1>
+            <p style="color: var(--secondary);">Guest Services Portal</p>
+            <div style="background: var(--card-bg); padding: 1rem; border-radius: var(--radius-md); margin: 1.5rem 0;">
+                <h2 id="guest-room-display" class="text-highlight">Room ---</h2>
+                <p>Welcome. How can we assist you today?</p>
+            </div>
+            
+            <form id="guest-request-form" style="text-align: left;">
+                <label>Service Category</label>
+                <select id="guest-req-category" required>
+                    <option value="">Select Service...</option>
+                    <option value="Housekeeping">Housekeeping / Cleaning</option>
+                    <option value="Room Service">Room Service (Food/Drinks)</option>
+                    <option value="Maintenance">Maintenance / Repair</option>
+                    <option value="Front Desk">Front Desk / Concierge</option>
+                    <option value="Other">Other Request</option>
+                </select>
+
+                <label>Details</label>
+                <textarea id="guest-req-msg" rows="4" placeholder="Please specify your request..." required></textarea>
+
+                <button type="submit" class="btn btn-highlight" style="width: 100%; padding: 1rem;">
+                    <i class="fas fa-paper-plane"></i> Send Request to Reception
+                </button>
+            </form>
+            
+            <div id="guest-req-success" class="d-none mt-2" style="background: rgba(76, 175, 80, 0.2); padding: 1.5rem; border-radius: var(--radius-md); border: 1px solid var(--success);">
+                <i class="fas fa-check-circle text-success" style="font-size: 2rem; color: var(--success); margin-bottom: 1rem;"></i>
+                <h3 style="color: var(--success);">Request Sent Successfully</h3>
+                <p style="font-size: 0.9rem; margin-top: 0.5rem;">Our staff has been notified and will attend to your room shortly.</p>
+                <button onclick="location.reload()" class="btn btn-secondary mt-1">Make Another Request</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==========================================
+         MAIN APP SHELL (MANAGEMENT)
+    ========================================== -->
+    <div id="app-shell" class="app-container d-none">
+        
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <h1>HOTEL BENGAL</h1>
+                <p>Silchar, Assam</p>
+            </div>
+            <div class="nav-links">
+                <a class="nav-item active" data-target="view-dashboard">
+                    <i class="fas fa-th-large"></i> <span>Room Matrix</span>
+                </a>
+                <a class="nav-item" data-target="view-requests">
+                    <i class="fas fa-bell"></i> <span>Guest Requests</span>
+                    <span id="req-badge" class="d-none" style="background: var(--primary); padding: 2px 8px; border-radius: 10px; font-size: 0.7rem; margin-left: auto;">0</span>
+                </a>
+                <a class="nav-item" data-target="view-history">
+                    <i class="fas fa-history"></i> <span>Booking History</span>
+                </a>
+                <a class="nav-item" data-target="view-admin">
+                    <i class="fas fa-cog"></i> <span>System Admin</span>
+                </a>
+                <a class="nav-item" id="btn-logout" style="margin-top: auto;">
+                    <i class="fas fa-sign-out-alt"></i> <span>Secure Logout</span>
+                </a>
+            </div>
+        </nav>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            
+            <!-- VIEW: DASHBOARD (ROOM MATRIX) -->
+            <div id="view-dashboard" class="view-section">
+                <div class="grid-header">
+                    <div>
+                        <h2 style="font-size: 1.8rem; margin-bottom: 0.5rem;">Real-time Room Matrix</h2>
+                        <p class="text-muted">Manage check-ins, check-outs, and room statuses.</p>
+                    </div>
+                    <div class="flex-row">
+                        <input type="text" id="search-room" placeholder="Search Room..." style="margin: 0; width: auto;">
+                        <select id="filter-floor" style="margin: 0; width: auto;">
+                            <option value="all">All Floors</option>
+                            <option value="1">Floor 1 (001-023)</option>
+                            <option value="2">Floor 2 (024-046)</option>
+                            <option value="3">Floor 3 (047-069)</option>
+                            <option value="4">Floor 4 (070-092)</option>
+                            <option value="5">Floor 5 (093-115)</option>
+                        </select>
+                        <select id="filter-status" style="margin: 0; width: auto;">
+                            <option value="all">All Status</option>
+                            <option value="available">Available</option>
+                            <option value="booked">Booked</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="stats-row">
+                    <div class="card stat-card">
+                        <div class="stat-icon" style="background: rgba(255,255,255,0.1);"><i class="fas fa-door-open"></i></div>
+                        <div><h3 id="stat-total">115</h3><p class="text-muted" style="font-size:0.8rem;">Total Rooms</p></div>
+                    </div>
+                    <div class="card stat-card">
+                        <div class="stat-icon bg-green"><i class="fas fa-check"></i></div>
+                        <div><h3 id="stat-available">--</h3><p class="text-muted" style="font-size:0.8rem;">Available</p></div>
+                    </div>
+                    <div class="card stat-card">
+                        <div class="stat-icon bg-red"><i class="fas fa-bed"></i></div>
+                        <div><h3 id="stat-booked">--</h3><p class="text-muted" style="font-size:0.8rem;">Booked</p></div>
+                    </div>
+                </div>
+
+                <div id="room-grid" class="room-grid">
+                    <!-- Rooms injected via JS -->
+                </div>
+            </div>
+
+            <!-- VIEW: GUEST REQUESTS -->
+            <div id="view-requests" class="view-section d-none">
+                <h2 style="font-size: 1.8rem; margin-bottom: 1.5rem;">Live Guest Requests</h2>
+                <div class="card table-responsive">
+                    <table id="requests-table">
+                        <thead>
+                            <tr>
+                                <th>Time</th>
+                                <th>Room</th>
+                                <th>Category</th>
+                                <th>Message</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="requests-tbody">
+                            <!-- JS Inject -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- VIEW: HISTORY -->
+            <div id="view-history" class="view-section d-none">
+                <h2 style="font-size: 1.8rem; margin-bottom: 1.5rem;">Booking Archive</h2>
+                <div class="flex-row" style="margin-bottom: 1rem;">
+                    <input type="text" id="search-history" placeholder="Search by Guest Name or Room..." style="max-width: 300px; margin: 0;">
+                </div>
+                <div class="card table-responsive">
+                    <table id="history-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Room</th>
+                                <th>Guest Name</th>
+                                <th>Check-in</th>
+                                <th>Check-out</th>
+                                <th>Amount</th>
+                                <th>Receipt</th>
+                            </tr>
+                        </thead>
+                        <tbody id="history-tbody">
+                            <!-- JS Inject -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- VIEW: ADMIN -->
+            <div id="view-admin" class="view-section d-none">
+                <h2 style="font-size: 1.8rem; margin-bottom: 1.5rem;">System Administration</h2>
+                <div class="stats-row">
+                    <div class="card">
+                        <h3 class="text-highlight mb-1"><i class="fas fa-database"></i> Database Management</h3>
+                        <p class="text-muted mb-1" style="font-size: 0.9rem; margin-bottom: 1rem;">Factory reset will erase all local bookings, rooms, and photos.</p>
+                        <button id="btn-factory-reset" class="btn" style="background: var(--danger);"><i class="fas fa-exclamation-triangle"></i> FACTORY RESET SYSTEM</button>
+                    </div>
+                    <div class="card">
+                        <h3 class="text-highlight mb-1"><i class="fas fa-file-export"></i> Data Export</h3>
+                        <p class="text-muted mb-1" style="font-size: 0.9rem; margin-bottom: 1rem;">Export complete database to JSON for backup.</p>
+                        <button id="btn-export-data" class="btn btn-secondary"><i class="fas fa-download"></i> Download JSON Backup</button>
+                    </div>
+                </div>
+                <div class="card mt-2">
+                    <h3 class="text-highlight" style="margin-bottom: 1rem;">Hotel Configuration</h3>
+                    <div class="flex-row">
+                        <div class="flex-col" style="flex: 1;">
+                            <label>Hotel Name</label>
+                            <input type="text" value="HOTEL BENGAL" disabled>
+                        </div>
+                        <div class="flex-col" style="flex: 2;">
+                            <label>Address</label>
+                            <input type="text" value="23, Itkhola Rd, Nabapally, Tarapur, Silchar, Assam, 788001" disabled>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- ==========================================
+         MODALS
+    ========================================== -->
+    
+    <!-- Room Detail Modal -->
+    <div id="modal-room" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modal-room-title">Room 001 <span class="status-badge status-available">Available</span></h2>
+                <button class="modal-close" onclick="closeModal('modal-room')"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <!-- Check-in Form (For Available Rooms) -->
+                <div id="form-checkin" class="d-none">
+                    <div class="tabs">
+                        <button class="tab-btn active" onclick="switchTab(this, 'tab-guest')">1. Guest Info</button>
+                        <button class="tab-btn" onclick="switchTab(this, 'tab-docs')">2. Documents</button>
+                        <button class="tab-btn" onclick="switchTab(this, 'tab-payment')">3. Payment & Sign</button>
+                        <button class="tab-btn" onclick="switchTab(this, 'tab-qr')"><i class="fas fa-qrcode"></i> Room QR</button>
+                    </div>
+
+                    <form id="checkin-submit-form">
+                        <div id="tab-guest" class="tab-content active">
+                            <div class="flex-col">
+                                <label>Full Name *</label>
+                                <input type="text" id="ci-name" required placeholder="Guest full name">
+                            </div>
+                            <div class="flex-row" style="margin-bottom: 1rem;">
+                                <div class="flex-col" style="flex:1;">
+                                    <label>Phone Number *</label>
+                                    <input type="tel" id="ci-phone" required placeholder="10-digit number">
+                                </div>
+                                <div class="flex-col" style="flex:1;">
+                                    <label>Members</label>
+                                    <input type="number" id="ci-members" value="1" min="1" max="10">
+                                </div>
+                            </div>
+                            <div class="flex-row">
+                                <div class="flex-col" style="flex:1;">
+                                    <label>Auto Check-in Date/Time</label>
+                                    <input type="text" id="ci-date-auto" disabled>
+                                </div>
+                                <div class="flex-col" style="flex:1;">
+                                    <label>Expected Checkout Date *</label>
+                                    <input type="date" id="ci-checkout" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="tab-docs" class="tab-content">
+                            <div class="flex-row" style="margin-bottom: 1rem;">
+                                <div class="flex-col" style="flex:1;">
+                                    <label>ID Type</label>
+                                    <select id="ci-id-type">
+                                        <option value="Aadhaar">Aadhaar Card</option>
+                                        <option value="PAN">PAN Card</option>
+                                        <option value="VoterID">Voter ID</option>
+                                        <option value="Passport">Passport</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                </div>
+                                <div class="flex-col" style="flex:1;">
+                                    <label>ID Number</label>
+                                    <input type="text" id="ci-id-num" placeholder="Enter ID number">
+                                </div>
+                            </div>
+                            
+                            <label>Capture ID Documents & Guest Photo (Max 5)</label>
+                            <div class="image-uploader-grid" id="ci-images-grid">
+                                <!-- Image previews here -->
+                                <div class="img-preview-box" id="ci-add-img-btn" onclick="openCameraModal('ci-images')">
+                                    <i class="fas fa-camera text-highlight" style="font-size: 2rem;"></i>
+                                    <span style="font-size: 0.7rem; margin-top: 5px;">Add Photo</span>
+                                </div>
+                            </div>
+                            <p class="text-muted" style="font-size: 0.8rem;">Click to capture via device camera or upload.</p>
+                        </div>
+
+                        <div id="tab-payment" class="tab-content">
+                            <div class="flex-row" style="margin-bottom: 1rem;">
+                                <div class="flex-col" style="flex:1;">
+                                    <label>Daily Rent Rate (₹)</label>
+                                    <input type="number" id="ci-rent" required value="1500" oninput="calcDue()">
+                                </div>
+                                <div class="flex-col" style="flex:1;">
+                                    <label>Advance Paid (₹)</label>
+                                    <input type="number" id="ci-advance" required value="0" oninput="calcDue()">
+                                </div>
+                            </div>
+                            <div class="card" style="margin-bottom: 1.5rem; background: rgba(0,0,0,0.3);">
+                                <div class="flex-row" style="justify-content: space-between;">
+                                    <span>Estimated Total Stay: <strong id="ci-total-calc" class="text-highlight">₹1500</strong></span>
+                                    <span>Current Due: <strong id="ci-due-calc" class="text-primary" style="font-size: 1.2rem;">₹1500</strong></span>
+                                </div>
+                            </div>
+
+                            <label>Guest Signature</label>
+                            <div class="signature-wrapper">
+                                <canvas id="ci-signature" class="signature-pad"></canvas>
+                                <button type="button" class="btn clear-sig-btn" onclick="clearSignature('ci-signature')">Clear</button>
+                            </div>
+
+                            <button type="button" class="btn btn-highlight" style="width: 100%;" onclick="submitCheckin()">
+                                <i class="fas fa-check-circle"></i> Confirm Check-in
+                            </button>
+                        </div>
+                        
+                        <div id="tab-qr" class="tab-content text-center">
+                            <p class="text-muted mb-1">Guest can scan this QR in their room to request services directly to reception.</p>
+                            <div class="qr-wrapper" id="room-qr-container"></div>
+                            <br>
+                            <button type="button" class="btn btn-secondary mt-1" onclick="downloadQR()">
+                                <i class="fas fa-download"></i> Download QR PNG
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Checkout/Manage Form (For Booked Rooms) -->
+                <div id="form-manage" class="d-none">
+                     <div class="tabs">
+                        <button class="tab-btn active" onclick="switchTab(this, 'tab-m-info')">Booking Info</button>
+                        <button class="tab-btn" onclick="switchTab(this, 'tab-m-checkout')">Process Checkout</button>
+                    </div>
+
+                    <div id="tab-m-info" class="tab-content active">
+                        <div class="card" style="margin-bottom: 1rem;">
+                            <h3 class="text-highlight" id="m-name">John Doe</h3>
+                            <p class="text-muted" id="m-phone"><i class="fas fa-phone"></i> +91 0000000000</p>
+                            <div class="flex-row" style="margin-top: 1rem; border-top: 1px solid var(--card-border); padding-top: 1rem;">
+                                <div><small class="text-muted">Check-in</small><br><span id="m-ci-date">2023-10-01</span></div>
+                                <div><small class="text-muted">Expected Out</small><br><span id="m-co-date">2023-10-05</span></div>
+                                <div><small class="text-muted">Advance</small><br><span class="text-success">₹<span id="m-advance"></span></span></div>
+                            </div>
+                        </div>
+                        
+                        <h4>Uploaded Documents</h4>
+                        <div class="image-uploader-grid" id="m-images-grid" style="margin-top: 0.5rem;">
+                            <!-- Injected images -->
+                        </div>
+                    </div>
+
+                    <div id="tab-m-checkout" class="tab-content">
+                        <div class="card" style="margin-bottom: 1.5rem; background: rgba(0,0,0,0.3);">
+                            <div class="flex-row" style="justify-content: space-between; margin-bottom: 0.5rem;">
+                                <span>Total Days Stayed:</span>
+                                <strong id="co-days" class="text-highlight">--</strong>
+                            </div>
+                            <div class="flex-row" style="justify-content: space-between; margin-bottom: 0.5rem;">
+                                <span>Total Amount Billable:</span>
+                                <strong>₹<span id="co-total">--</span></strong>
+                            </div>
+                            <div class="flex-row" style="justify-content: space-between; margin-bottom: 0.5rem;">
+                                <span>Advance Paid:</span>
+                                <strong class="text-success">- ₹<span id="co-advance">--</span></strong>
+                            </div>
+                            <div class="flex-row" style="justify-content: space-between; border-top: 1px solid var(--card-border); padding-top: 0.5rem; margin-top: 0.5rem;">
+                                <span>Final Amount to Collect:</span>
+                                <strong class="text-primary" style="font-size: 1.3rem;">₹<span id="co-due">--</span></strong>
+                            </div>
+                        </div>
+
+                        <div class="flex-row" style="margin-bottom: 1rem;">
+                            <div class="flex-col" style="flex:1;">
+                                <label>Payment Mode</label>
+                                <select id="co-pay-mode">
+                                    <option value="Cash">Cash</option>
+                                    <option value="UPI">UPI / Online</option>
+                                    <option value="Card">Credit/Debit Card</option>
+                                </select>
+                            </div>
+                            <div class="flex-col" style="flex:1;">
+                                <label>Txn ID (If Online)</label>
+                                <input type="text" id="co-txn" placeholder="Optional">
+                            </div>
+                        </div>
+
+                        <label>Final Guest Signature (Consent)</label>
+                        <div class="signature-wrapper">
+                            <canvas id="co-signature" class="signature-pad"></canvas>
+                            <button type="button" class="btn clear-sig-btn" onclick="clearSignature('co-signature')">Clear</button>
+                        </div>
+
+                        <button type="button" class="btn" style="width: 100%; background: var(--success);" onclick="processCheckout()">
+                            <i class="fas fa-sign-out-alt"></i> Complete Checkout & Generate Receipt
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Camera / File Upload Modal -->
+    <div id="modal-camera" class="modal-overlay" style="z-index: 1100;">
+        <div class="modal-content" style="max-width: 500px; background: #1a1a1a;">
+            <div class="modal-header">
+                <h2>Add Document/Photo</h2>
+                <button class="modal-close" onclick="closeCameraModal()"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body text-center">
+                
+                <div class="tabs" style="justify-content: center;">
+                    <button class="tab-btn active" onclick="switchTab(this, 'tab-cam-live')">Camera</button>
+                    <button class="tab-btn" onclick="switchTab(this, 'tab-cam-file')">Upload File</button>
+                </div>
+
+                <div id="tab-cam-live" class="tab-content active">
+                    <div id="camera-container">
+                        <video id="video-element" autoplay playsinline></video>
+                        <div class="camera-overlay">
+                            <button id="capture-btn" onclick="captureImage()"></button>
+                        </div>
+                    </div>
+                    <canvas id="capture-canvas" style="display:none;"></canvas>
+                </div>
+
+                <div id="tab-cam-file" class="tab-content text-center" style="padding: 2rem 0;">
+                    <i class="fas fa-cloud-upload-alt text-highlight" style="font-size: 4rem; margin-bottom: 1rem;"></i>
+                    <p class="mb-1 text-muted">Select an image file from your device</p>
+                    <input type="file" id="file-upload-input" accept="image/*" style="display:none;" onchange="handleFileUpload(event)">
+                    <button class="btn btn-secondary" onclick="document.getElementById('file-upload-input').click()">Browse Files</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- Audio Element for notifications -->
+    <audio id="bell-sound" src="data:audio/mp3;base64,//NExAAAAANIAAAAAExBTUUzLjEwMKqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq" preload="auto"></audio>
+    <!-- Note: Real sound omitted for char limits, visual alert used primarily -->
+
+    <!-- ==========================================
+         JAVASCRIPT APPLICATION LOGIC
+    ========================================== -->
+    <script>
+        // -----------------------------------
+        // 1. CONFIG & GLOBALS
+        // -----------------------------------
+        const HOTEL = {
+            name: "HOTEL BENGAL",
+            address: "23, Itkhola Rd, Nabapally, Tarapur, Silchar, Assam, 788001",
+            totalRooms: 115,
+            floors: 5
+        };
+
+        // State variables
+        let appState = {
+            rooms: {},      // keyed by room id '001', '002'
+            history: [],    // array of completed bookings
+            requests: []    // array of customer requests
+        };
+        let currentEditingRoom = null;
+        let tempImages = []; // Stores base64 images during check-in
+        let targetImageContext = ''; 
+        let videoStream = null;
+        let sigPads = {}; // Store signature canvas contexts
+
+        // -----------------------------------
+        // 2. IndexedDB WRAPPER (Robust Offline Storage)
+        // -----------------------------------
+        const DB_NAME = 'HotelBengalDB';
+        const DB_VERSION = 1;
+
+        const IDB = {
+            init: () => {
+                return new Promise((resolve, reject) => {
+                    const request = indexedDB.open(DB_NAME, DB_VERSION);
+                    request.onupgradeneeded = (e) => {
+                        const db = e.target.result;
+                        if (!db.objectStoreNames.contains('store')) {
+                            db.createObjectStore('store');
+                        }
+                    };
+                    request.onsuccess = (e) => resolve(e.target.result);
+                    request.onerror = (e) => reject(e.target.error);
+                });
+            },
+            get: async (key) => {
+                const db = await IDB.init();
+                return new Promise((resolve, reject) => {
+                    const tx = db.transaction('store', 'readonly');
+                    const req = tx.objectStore('store').get(key);
+                    req.onsuccess = () => resolve(req.result);
+                    req.onerror = () => reject(req.error);
+                });
+            },
+            set: async (key, val) => {
+                const db = await IDB.init();
+                return new Promise((resolve, reject) => {
+                    const tx = db.transaction('store', 'readwrite');
+                    const req = tx.objectStore('store').put(val, key);
+                    req.onsuccess = () => resolve();
+                    req.onerror = () => reject(req.error);
+                });
+            }
+        };
+
+        // -----------------------------------
+        // 3. CORE LOGIC & INITIALIZATION
+        // -----------------------------------
+        window.onload = async () => {
+            // Check routing logic
+            const urlParams = new URLSearchParams(window.location.search);
+            const mode = urlParams.get('mode');
+            const roomQuery = urlParams.get('room');
+
+            if (mode === 'customer' && roomQuery) {
+                initCustomerPortal(roomQuery);
+            } else {
+                await loadData();
+                checkAuth();
+            }
+        };
+
+        async function loadData() {
+            try {
+                const loadedRooms = await IDB.get('bengal_rooms');
+                const loadedHistory = await IDB.get('bengal_history');
+                const loadedRequests = await IDB.get('bengal_requests');
+
+                if (loadedRooms) appState.rooms = loadedRooms;
+                else generateInitialRooms();
+
+                if (loadedHistory) appState.history = loadedHistory;
+                if (loadedRequests) appState.requests = loadedRequests;
+            } catch (err) {
+                console.error("DB Load Error", err);
+                generateInitialRooms();
+            }
+        }
+
+        async function saveData() {
+            await IDB.set('bengal_rooms', appState.rooms);
+            await IDB.set('bengal_history', appState.history);
+            await IDB.set('bengal_requests', appState.requests);
+        }
+
+        function generateInitialRooms() {
+            // Generates 115 rooms across 5 floors (23 per floor)
+            // Rooms named 001, 002, ... 115
+            appState.rooms = {};
+            for (let i = 1; i <= HOTEL.totalRooms; i++) {
+                const roomNum = String(i).padStart(3, '0');
+                const floor = Math.ceil(i / 23);
+                appState.rooms[roomNum] = {
+                    id: roomNum,
+                    floor: floor,
+                    status: 'available', // 'available' or 'booked'
+                    bookingData: null
+                };
+            }
+            saveData();
+        }
+
+        // -----------------------------------
+        // 4. AUTHENTICATION
+        // -----------------------------------
+        function checkAuth() {
+            const isAuth = localStorage.getItem('bengal_auth');
+            if (isAuth === 'true') {
+                document.getElementById('auth-view').classList.add('d-none');
+                document.getElementById('app-shell').classList.remove('d-none');
+                initApp();
+            } else {
+                document.getElementById('auth-view').classList.remove('d-none');
+                document.getElementById('app-shell').classList.add('d-none');
+            }
+        }
+
+        document.getElementById('login-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const user = document.getElementById('login-user').value;
+            const pass = document.getElementById('login-pass').value;
+
+            if (user === 'bengalhotel' && pass === 'bengalhotel@tarapur') {
+                localStorage.setItem('bengal_auth', 'true');
+                showToast('Login Successful', 'success');
+                checkAuth();
+            } else {
+                showToast('Invalid Credentials', 'error');
+            }
+        });
+
+        document.getElementById('btn-logout').addEventListener('click', () => {
+            localStorage.removeItem('bengal_auth');
+            location.reload();
+        });
+
+        // -----------------------------------
+        // 5. UI APP INITIALIZATION
+        // -----------------------------------
+        function initApp() {
+            // Setup Navigation
+            document.querySelectorAll('.nav-item[data-target]').forEach(item => {
+                item.addEventListener('click', (e) => {
+                    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+                    e.currentTarget.classList.add('active');
+                    const target = e.currentTarget.getAttribute('data-target');
+                    
+                    document.querySelectorAll('.view-section').forEach(v => v.classList.add('d-none'));
+                    document.getElementById(target).classList.remove('d-none');
+
+                    if(target === 'view-dashboard') renderDashboard();
+                    if(target === 'view-requests') renderRequests();
+                    if(target === 'view-history') renderHistory();
+                });
+            });
+
+            // Setup Filters
+            document.getElementById('search-room').addEventListener('input', renderDashboard);
+            document.getElementById('filter-floor').addEventListener('change', renderDashboard);
+            document.getElementById('filter-status').addEventListener('change', renderDashboard);
+
+            // Initialize Canvas Pads
+            initSignaturePad('ci-signature');
+            initSignaturePad('co-signature');
+
+            // Initial Render
+            renderDashboard();
+            renderRequests();
+
+            // Setup polling for requests (simulating real-time local sync)
+            setInterval(pollRequests, 3000);
+        }
+
+        // -----------------------------------
+        // 6. DASHBOARD & ROOMS
+        // -----------------------------------
+        function renderDashboard() {
+            const grid = document.getElementById('room-grid');
+            grid.innerHTML = '';
+            
+            const search = document.getElementById('search-room').value.toLowerCase();
+            const floorFilt = document.getElementById('filter-floor').value;
+            const statFilt = document.getElementById('filter-status').value;
+
+            let available = 0, booked = 0;
+
+            Object.values(appState.rooms).forEach(room => {
+                if (room.status === 'available') available++;
+                if (room.status === 'booked') booked++;
+
+                // Filtering
+                if (search && !room.id.includes(search)) return;
+                if (floorFilt !== 'all' && String(room.floor) !== floorFilt) return;
+                if (statFilt !== 'all' && room.status !== statFilt) return;
+
+                const div = document.createElement('div');
+                div.className = `room-box ${room.status}`;
+                div.onclick = () => openRoomModal(room.id);
+                
+                div.innerHTML = `
+                    <div class="room-number">${room.id}</div>
+                    <div class="room-floor">Floor ${room.floor}</div>
+                    <div class="status-badge ${room.status === 'available' ? 'status-available' : 'status-booked'}">
+                        ${room.status === 'available' ? 'Available' : 'Booked'}
+                    </div>
+                `;
+                grid.appendChild(div);
+            });
+
+            document.getElementById('stat-available').innerText = available;
+            document.getElementById('stat-booked').innerText = booked;
+        }
+
+        function openRoomModal(roomId) {
+            currentEditingRoom = roomId;
+            const room = appState.rooms[roomId];
+            
+            document.getElementById('modal-room').classList.add('active');
+            document.getElementById('modal-room-title').innerHTML = `Room ${roomId} <span class="status-badge ${room.status === 'available' ? 'status-available' : 'status-booked'}">${room.status}</span>`;
+
+            // Reset temp data
+            tempImages = [];
+            clearSignature('ci-signature');
+            clearSignature('co-signature');
+            renderImageUploader();
+
+            if (room.status === 'available') {
+                document.getElementById('form-checkin').classList.remove('d-none');
+                document.getElementById('form-manage').classList.add('d-none');
+                
+                // Defaults
+                const now = new Date();
+                document.getElementById('ci-date-auto').value = now.toLocaleString();
+                
+                const tomorrow = new Date(now);
+                tomorrow.setDate(tomorrow.getDate() + 1);
+                document.getElementById('ci-checkout').value = tomorrow.toISOString().split('T')[0];
+                
+                document.getElementById('checkin-submit-form').reset();
+                switchTab(document.querySelector('#form-checkin .tab-btn'), 'tab-guest'); // reset to tab 1
+                generateRoomQR(roomId);
+
+            } else {
+                document.getElementById('form-checkin').classList.add('d-none');
+                document.getElementById('form-manage').classList.remove('d-none');
+                
+                const data = room.bookingData;
+                document.getElementById('m-name').innerText = data.name;
+                document.getElementById('m-phone').innerHTML = `<i class="fas fa-phone"></i> ${data.phone}`;
+                document.getElementById('m-ci-date').innerText = new Date(data.checkIn).toLocaleDateString();
+                document.getElementById('m-co-date').innerText = new Date(data.expectedOut).toLocaleDateString();
+                document.getElementById('m-advance').innerText = data.advance;
+
+                // Render saved images safely
+                const mGrid = document.getElementById('m-images-grid');
+                mGrid.innerHTML = '';
+                if(data.images && data.images.length > 0) {
+                    data.images.forEach(imgData => {
+                        const div = document.createElement('div');
+                        div.className = 'img-preview-box';
+                        div.innerHTML = `<img src="${imgData}" onclick="window.open('${imgData}')">`;
+                        mGrid.appendChild(div);
+                    });
+                } else {
+                    mGrid.innerHTML = '<p class="text-muted">No documents uploaded.</p>';
+                }
+
+                // Calc checkout estimates
+                calcCheckout(data);
+                switchTab(document.querySelector('#form-manage .tab-btn'), 'tab-m-info');
+            }
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('active');
+            if(id === 'modal-camera') closeCameraLogic();
+        }
+
+        // -----------------------------------
+        // 7. CHECK-IN LOGIC
+        // -----------------------------------
+        function calcDue() {
+            const rent = parseFloat(document.getElementById('ci-rent').value) || 0;
+            const adv = parseFloat(document.getElementById('ci-advance').value) || 0;
+            const ci = new Date();
+            const co = new Date(document.getElementById('ci-checkout').value);
+            
+            let days = 1;
+            if(co > ci) {
+                const diffTime = Math.abs(co - ci);
+                days = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                if(days === 0) days = 1;
+            }
+            
+            const total = rent * days;
+            const due = total - adv;
+            
+            document.getElementById('ci-total-calc').innerText = `₹${total}`;
+            document.getElementById('ci-due-calc').innerText = `₹${due}`;
+            return { total, due, days };
+        }
+
+        document.getElementById('ci-checkout').addEventListener('change', calcDue);
+        document.getElementById('ci-rent').addEventListener('input', calcDue);
+
+        async function submitCheckin() {
+            // Validation
+            const name = document.getElementById('ci-name').value;
+            const phone = document.getElementById('ci-phone').value;
+            const coDate = document.getElementById('ci-checkout').value;
+            
+            if(!name || !phone || !coDate) {
+                showToast("Please fill all required fields in Guest Info", "error");
+                return;
+            }
+
+            const sigData = getSignatureData('ci-signature');
+            if(!sigData) {
+                showToast("Guest signature is required", "error");
+                return;
+            }
+
+            const room = appState.rooms[currentEditingRoom];
+            const calc = calcDue();
+
+            room.status = 'booked';
+            room.bookingData = {
+                id: 'BKG-' + Date.now(),
+                name: name,
+                phone: phone,
+                members: document.getElementById('ci-members').value,
+                checkIn: new Date().toISOString(),
+                expectedOut: new Date(coDate).toISOString(),
+                idType: document.getElementById('ci-id-type').value,
+                idNum: document.getElementById('ci-id-num').value,
+                rent: document.getElementById('ci-rent').value,
+                advance: document.getElementById('ci-advance').value,
+                totalEst: calc.total,
+                images: [...tempImages], // Save array of base64
+                signatureCi: sigData
+            };
+
+            await saveData();
+            closeModal('modal-room');
+            renderDashboard();
+            showToast(`Room ${currentEditingRoom} Successfully Booked`, 'success');
+        }
+
+        // -----------------------------------
+        // 8. CHECKOUT LOGIC
+        // -----------------------------------
+        function calcCheckout(data) {
+            const ci = new Date(data.checkIn);
+            const now = new Date();
+            const diffTime = Math.abs(now - ci);
+            let days = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            if(days === 0) days = 1; // min 1 day
+
+            const rent = parseFloat(data.rent);
+            const total = days * rent;
+            const adv = parseFloat(data.advance);
+            const due = total - adv;
+
+            document.getElementById('co-days').innerText = days;
+            document.getElementById('co-total').innerText = total;
+            document.getElementById('co-advance').innerText = adv;
+            document.getElementById('co-due').innerText = due > 0 ? due : 0;
+            
+            return { days, total, adv, due };
+        }
+
+        async function processCheckout() {
+            const room = appState.rooms[currentEditingRoom];
+            const data = room.bookingData;
+            
+            const sigData = getSignatureData('co-signature');
+            if(!sigData) {
+                showToast("Final signature required for checkout", "error");
+                return;
+            }
+
+            const calc = calcCheckout(data);
+            
+            // Move to history
+            const completedBkg = {
+                ...data,
+                checkOut: new Date().toISOString(),
+                actualDays: calc.days,
+                finalTotal: calc.total,
+                amountPaid: calc.total, // assuming fully paid at checkout
+                payMode: document.getElementById('co-pay-mode').value,
+                txnId: document.getElementById('co-txn').value,
+                signatureCo: sigData,
+                roomId: currentEditingRoom
+            };
+            
+            appState.history.unshift(completedBkg); // Add to beginning
+            
+            // Reset Room
+            room.status = 'available';
+            room.bookingData = null;
+
+            await saveData();
+            
+            // Generate PDF Receipt
+            generateReceiptPDF(completedBkg);
+
+            closeModal('modal-room');
+            renderDashboard();
+            renderHistory();
+            showToast(`Checkout complete for Room ${currentEditingRoom}`, 'success');
+        }
+
+        // -----------------------------------
+        // 9. IMAGE UPLOAD & CAMERA SYSTEM
+        // -----------------------------------
+        function openCameraModal(context) {
+            if(tempImages.length >= 5) {
+                showToast("Maximum 5 images allowed", "error");
+                return;
+            }
+            targetImageContext = context;
+            document.getElementById('modal-camera').classList.add('active');
+            switchTab(document.querySelector('#modal-camera .tab-btn'), 'tab-cam-live');
+            startCamera();
+        }
+
+        function closeCameraLogic() {
+            if (videoStream) {
+                videoStream.getTracks().forEach(track => track.stop());
+                videoStream = null;
+            }
+        }
+
+        async function startCamera() {
+            const video = document.getElementById('video-element');
+            try {
+                videoStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+                video.srcObject = videoStream;
+            } catch (err) {
+                console.error("Camera error", err);
+                showToast("Camera access denied or unavailable. Use file upload.", "error");
+                switchTab(document.querySelectorAll('#modal-camera .tab-btn')[1], 'tab-cam-file');
+            }
+        }
+
+        function captureImage() {
+            const video = document.getElementById('video-element');
+            const canvas = document.getElementById('capture-canvas');
+            if(!videoStream) return;
+
+            // Make it square and compress
+            const size = Math.min(video.videoWidth, video.videoHeight);
+            canvas.width = 600; // standard compressed size
+            canvas.height = 600;
+            const ctx = canvas.getContext('2d');
+            
+            // Crop center
+            const sx = (video.videoWidth - size) / 2;
+            const sy = (video.videoHeight - size) / 2;
+            ctx.drawImage(video, sx, sy, size, size, 0, 0, 600, 600);
+            
+            const base64 = canvas.toDataURL('image/jpeg', 0.6); // 60% quality compression
+            addImageToContext(base64);
+            closeModal('modal-camera');
+        }
+
+        function handleFileUpload(e) {
+            const file = e.target.files[0];
+            if(!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = 600; canvas.height = 600;
+                    const ctx = canvas.getContext('2d');
+                    
+                    // Cover draw to make square
+                    const scale = Math.max(600 / img.width, 600 / img.height);
+                    const x = (600 - img.width * scale) / 2;
+                    const y = (600 - img.height * scale) / 2;
+                    ctx.drawImage(img, x, y, img.width * scale, img.height * scale);
+                    
+                    const base64 = canvas.toDataURL('image/jpeg', 0.6);
+                    addImageToContext(base64);
+                    closeModal('modal-camera');
+                };
+                img.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function addImageToContext(base64) {
+            if(tempImages.length < 5) {
+                tempImages.push(base64);
+                renderImageUploader();
+            }
+        }
+
+        function removeTempImage(index) {
+            tempImages.splice(index, 1);
+            renderImageUploader();
+        }
+
+        function renderImageUploader() {
+            const grid = document.getElementById('ci-images-grid');
+            grid.innerHTML = '';
+            
+            tempImages.forEach((b64, index) => {
+                const div = document.createElement('div');
+                div.className = 'img-preview-box';
+                div.innerHTML = `
+                    <img src="${b64}">
+                    <button type="button" class="remove-img-btn" onclick="removeTempImage(${index})"><i class="fas fa-times"></i></button>
+                `;
+                grid.appendChild(div);
+            });
+
+            if(tempImages.length < 5) {
+                const btn = document.createElement('div');
+                btn.className = 'img-preview-box';
+                btn.onclick = () => openCameraModal('ci-images');
+                btn.innerHTML = `<i class="fas fa-camera text-highlight" style="font-size: 2rem;"></i><span style="font-size: 0.7rem; margin-top: 5px;">Add Photo</span>`;
+                grid.appendChild(btn);
+            }
+        }
+
+        // -----------------------------------
+        // 10. CANVAS SIGNATURE PAD
+        // -----------------------------------
+        function initSignaturePad(canvasId) {
+            const canvas = document.getElementById(canvasId);
+            const ctx = canvas.getContext('2d');
+            
+            // Fix resolution for high DPI displays
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width;
+            canvas.height = rect.height;
+            
+            ctx.strokeStyle = '#000';
+            ctx.lineWidth = 2;
+            ctx.lineCap = 'round';
+            
+            sigPads[canvasId] = { ctx, isDrawing: false, hasData: false };
+
+            const startPos = (e) => {
+                sigPads[canvasId].isDrawing = true;
+                draw(e);
+            };
+            const endPos = () => {
+                sigPads[canvasId].isDrawing = false;
+                ctx.beginPath();
+            };
+            const draw = (e) => {
+                if(!sigPads[canvasId].isDrawing) return;
+                e.preventDefault(); // Prevent scrolling on touch
+                
+                let clientX, clientY;
+                if (e.touches) {
+                    clientX = e.touches[0].clientX;
+                    clientY = e.touches[0].clientY;
+                } else {
+                    clientX = e.clientX;
+                    clientY = e.clientY;
+                }
+                
+                const rect = canvas.getBoundingClientRect();
+                const x = clientX - rect.left;
+                const y = clientY - rect.top;
+
+                ctx.lineTo(x, y);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(x, y);
+                sigPads[canvasId].hasData = true;
+            };
+
+            canvas.addEventListener('mousedown', startPos);
+            canvas.addEventListener('mouseup', endPos);
+            canvas.addEventListener('mousemove', draw);
+            
+            canvas.addEventListener('touchstart', startPos, {passive: false});
+            canvas.addEventListener('touchend', endPos);
+            canvas.addEventListener('touchmove', draw, {passive: false});
+        }
+
+        function clearSignature(canvasId) {
+            const canvas = document.getElementById(canvasId);
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.beginPath();
+            if(sigPads[canvasId]) sigPads[canvasId].hasData = false;
+        }
+
+        function getSignatureData(canvasId) {
+            if(!sigPads[canvasId] || !sigPads[canvasId].hasData) return null;
+            return document.getElementById(canvasId).toDataURL('image/png');
+        }
+
+        // -----------------------------------
+        // 11. QR CODE GENERATION
+        // -----------------------------------
+        let currentQR = null;
+        function generateRoomQR(roomId) {
+            const container = document.getElementById('room-qr-container');
+            container.innerHTML = '';
+            
+            const url = `${window.location.origin}${window.location.pathname}?mode=customer&room=${roomId}`;
+            
+            currentQR = new QRCode(container, {
+                text: url,
+                width: 200,
+                height: 200,
+                colorDark : "#A04747",
+                colorLight : "#ffffff",
+                correctLevel : QRCode.CorrectLevel.H
+            });
+        }
+
+        function downloadQR() {
+            const container = document.getElementById('room-qr-container');
+            const img = container.querySelector('img');
+            if(img && img.src) {
+                const a = document.createElement('a');
+                a.href = img.src;
+                a.download = `HOTEL_BENGAL_Room_${currentEditingRoom}_QR.png`;
+                a.click();
+            }
+        }
+
+        // -----------------------------------
+        // 12. PDF GENERATION (jsPDF)
+        // -----------------------------------
+        function generateReceiptPDF(bkg) {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            doc.setFillColor(160, 71, 71); // Primary color
+            doc.rect(0, 0, 210, 30, 'F');
+            
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(22);
+            doc.setFont("helvetica", "bold");
+            doc.text("HOTEL BENGAL", 105, 15, { align: "center" });
+            doc.setFontSize(10);
+            doc.setFont("helvetica", "normal");
+            doc.text(HOTEL.address, 105, 22, { align: "center" });
+
+            doc.setTextColor(0, 0, 0);
+            doc.setFontSize(16);
+            doc.text("GUEST INVOICE / RECEIPT", 105, 45, { align: "center" });
+            
+            doc.setFontSize(11);
+            let y = 60;
+            const l = 20;
+            const r = 120;
+
+            doc.text(`Invoice No: ${bkg.id}`, l, y);
+            doc.text(`Date: ${new Date().toLocaleDateString()}`, r, y); y+=10;
+            
+            doc.text(`Guest Name: ${bkg.name}`, l, y);
+            doc.text(`Room No: ${bkg.roomId}`, r, y); y+=10;
+            
+            doc.text(`Phone: ${bkg.phone}`, l, y);
+            doc.text(`Members: ${bkg.members}`, r, y); y+=15;
+
+            doc.line(20, y, 190, y); y+=10;
+            
+            doc.text("Check-in Date:", l, y); doc.text(new Date(bkg.checkIn).toLocaleString(), 60, y); y+=8;
+            doc.text("Check-out Date:", l, y); doc.text(new Date(bkg.checkOut).toLocaleString(), 60, y); y+=8;
+            doc.text("Total Days:", l, y); doc.text(bkg.actualDays.toString(), 60, y); y+=15;
+
+            doc.line(20, y, 190, y); y+=10;
+
+            doc.setFont("helvetica", "bold");
+            doc.text("Payment Details", l, y); y+=10;
+            doc.setFont("helvetica", "normal");
+            
+            doc.text("Room Rent / Day:", l, y); doc.text(`Rs. ${bkg.rent}`, r, y); y+=8;
+            doc.text("Total Amount:", l, y); doc.text(`Rs. ${bkg.finalTotal}`, r, y); y+=8;
+            doc.text("Advance Paid:", l, y); doc.text(`Rs. ${bkg.advance}`, r, y); y+=8;
+            
+            doc.setFont("helvetica", "bold");
+            const due = bkg.finalTotal - bkg.advance;
+            doc.text("Final Collected:", l, y); doc.text(`Rs. ${due > 0 ? due : 0}`, r, y); y+=15;
+            
+            doc.setFont("helvetica", "normal");
+            doc.text(`Payment Mode: ${bkg.payMode} ${bkg.txnId ? '(Txn: '+bkg.txnId+')' : ''}`, l, y); y+=30;
+
+            // Signatures
+            if(bkg.signatureCo) {
+                try { doc.addImage(bkg.signatureCo, 'PNG', 120, y-15, 60, 20); } catch(e){}
+            }
+            doc.line(120, y+5, 180, y+5);
+            doc.text("Guest Signature", 135, y+10);
+
+            doc.text("Authorized Signatory", 20, y+10);
+            doc.line(20, y+5, 70, y+5);
+            
+            doc.setFontSize(9);
+            doc.text("Thank you for staying at Hotel Bengal.", 105, 280, { align: "center" });
+
+            doc.save(`Invoice_${bkg.id}.pdf`);
+        }
+
+        // -----------------------------------
+        // 13. HISTORY & ADMIN VIEWS
+        // -----------------------------------
+        function renderHistory() {
+            const tbody = document.getElementById('history-tbody');
+            tbody.innerHTML = '';
+            
+            const search = document.getElementById('search-history').value.toLowerCase();
+            
+            appState.history.forEach(bkg => {
+                if(search && !bkg.name.toLowerCase().includes(search) && !bkg.roomId.includes(search)) return;
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${new Date(bkg.checkOut).toLocaleDateString()}</td>
+                    <td><strong class="text-highlight">${bkg.roomId}</strong></td>
+                    <td>${bkg.name}</td>
+                    <td>${new Date(bkg.checkIn).toLocaleDateString()}</td>
+                    <td>${new Date(bkg.checkOut).toLocaleDateString()}</td>
+                    <td>₹${bkg.finalTotal}</td>
+                    <td><button class="btn btn-secondary" onclick='reprintPDF(${JSON.stringify(bkg)})'><i class="fas fa-file-pdf"></i></button></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+        
+        // Expose to global scope for inline handler
+        window.reprintPDF = function(bkgData) { generateReceiptPDF(bkgData); };
+
+        document.getElementById('search-history').addEventListener('input', renderHistory);
+
+        // Admin actions
+        document.getElementById('btn-factory-reset').addEventListener('click', async () => {
+            if(confirm("WARNING: This will delete ALL local data. Type 'CONFIRM' to proceed.") === false) return;
+            const promptVal = prompt("Type CONFIRM");
+            if(promptVal === "CONFIRM") {
+                appState.history = [];
+                appState.requests = [];
+                generateInitialRooms(); // saves implicitly
+                location.reload();
+            }
+        });
+
+        document.getElementById('btn-export-data').addEventListener('click', async () => {
+            const data = {
+                rooms: appState.rooms,
+                history: appState.history,
+                requests: appState.requests,
+                exportDate: new Date().toISOString()
+            };
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Hotel_Bengal_Backup_${new Date().getTime()}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        });
+
+        // -----------------------------------
+        // 14. CUSTOMER REQUEST SYSTEM (PORTAL & MANAGER)
+        // -----------------------------------
+        async function initCustomerPortal(roomId) {
+            document.getElementById('auth-view').classList.add('d-none');
+            document.getElementById('customer-view').classList.remove('d-none');
+            
+            document.getElementById('guest-room-display').innerText = `Room ${roomId}`;
+            
+            document.getElementById('guest-request-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const cat = document.getElementById('guest-req-category').value;
+                const msg = document.getElementById('guest-req-msg').value;
+                
+                const reqObj = {
+                    id: Date.now(),
+                    roomId: roomId,
+                    category: cat,
+                    message: msg,
+                    time: new Date().toISOString(),
+                    status: 'pending'
+                };
+
+                // Pull latest, append, save
+                let currentReqs = await IDB.get('bengal_requests') || [];
+                currentReqs.push(reqObj);
+                await IDB.set('bengal_requests', currentReqs);
+
+                document.getElementById('guest-request-form').classList.add('d-none');
+                document.getElementById('guest-req-success').classList.remove('d-none');
+            });
+        }
+
+        async function pollRequests() {
+            // Only poll if logged in
+            if(localStorage.getItem('bengal_auth') !== 'true') return;
+            
+            const reqs = await IDB.get('bengal_requests') || [];
+            if(reqs.length !== appState.requests.length) {
+                // New request detected
+                const diff = reqs.length - appState.requests.length;
+                appState.requests = reqs;
+                
+                if(diff > 0) {
+                    showToast("New Guest Request Received!", "warning");
+                    // document.getElementById('bell-sound').play().catch(e=>{}); // Play sound if allowed
+                }
+                updateRequestBadge();
+                if(!document.getElementById('view-requests').classList.contains('d-none')) {
+                    renderRequests();
+                }
+            } else {
+                appState.requests = reqs; // sync status changes
+            }
+        }
+
+        function updateRequestBadge() {
+            const pending = appState.requests.filter(r => r.status === 'pending').length;
+            const badge = document.getElementById('req-badge');
+            if(pending > 0) {
+                badge.innerText = pending;
+                badge.classList.remove('d-none');
+            } else {
+                badge.classList.add('d-none');
+            }
+        }
+
+        function renderRequests() {
+            const tbody = document.getElementById('requests-tbody');
+            tbody.innerHTML = '';
+            
+            // Sort newest first
+            const sorted = [...appState.requests].sort((a,b) => b.id - a.id);
+            
+            sorted.forEach((req, idx) => {
+                const tr = document.createElement('tr');
+                const time = new Date(req.time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                tr.innerHTML = `
+                    <td>${time}</td>
+                    <td><strong class="text-highlight">${req.roomId}</strong></td>
+                    <td>${req.category}</td>
+                    <td>${req.message}</td>
+                    <td>
+                        <span class="status-badge ${req.status === 'pending' ? 'status-booked' : 'status-available'}">
+                            ${req.status.toUpperCase()}
+                        </span>
+                    </td>
+                    <td>
+                        ${req.status === 'pending' ? 
+                          `<button class="btn btn-secondary" onclick="markRequestDone(${req.id})" style="padding: 0.3rem 0.6rem; font-size: 0.8rem;">Mark Done</button>` : 
+                          `<i class="fas fa-check text-success"></i>`
+                        }
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+            updateRequestBadge();
+        }
+
+        window.markRequestDone = async function(id) {
+            const req = appState.requests.find(r => r.id === id);
+            if(req) {
+                req.status = 'resolved';
+                await saveData();
+                renderRequests();
+            }
+        };
+
+        // -----------------------------------
+        // 15. UTILITIES
+        // -----------------------------------
+        function switchTab(btn, targetId) {
+            // Remove active from all tabs in the closest container
+            const container = btn.closest('.tabs').parentElement;
+            container.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            container.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            
+            // Set active
+            btn.classList.add('active');
+            document.getElementById(targetId).classList.add('active');
+        }
+
+        function showToast(msg, type = 'success') {
+            const cont = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i> ${msg}`;
+            cont.appendChild(toast);
+            setTimeout(() => {
+                toast.style.animation = 'slideInRight 0.3s reverse forwards';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+    </script>
+</body>
+</html>
