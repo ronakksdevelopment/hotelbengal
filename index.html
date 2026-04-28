@@ -219,9 +219,11 @@
             outline: 2px solid var(--secondary);
             outline-offset: 2px;
         }
-        input:disabled, select:disabled, textarea:disabled {
+        input:disabled, select:disabled, textarea:disabled, input[readonly] {
             opacity: 0.6; background: rgba(0,0,0,0.3); cursor: not-allowed; color: var(--text-muted);
         }
+        /* Except Flatpickr readonly inputs which need to look active */
+        input.flatpickr-input[readonly] { opacity: 1; cursor: pointer; color: white; background: rgba(0, 0, 0, 0.3); }
 
         /* 10b. Select Dropdowns */
         select {
@@ -337,21 +339,19 @@
         #capture-btn { width: 64px; height: 64px; border-radius: 50%; background: var(--primary); border: 4px solid white; cursor: pointer; transition: 0.2s; box-shadow: 0 0 15px rgba(0,0,0,0.5); }
         #capture-btn:active { transform: scale(0.9); background: white; }
 
-        /* 7. QR Code Configuration & Styling */
+        /* 7. QR Code Configuration & Styling (FIXED: Solid Borders + Corners) */
         .qr-wrapper { 
             position: relative; background: #ffffff; padding: 1.5rem; 
             display: inline-block; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            border-top: 4px solid #A04747;
-            border-left: 4px solid #A04747;
-            border-bottom: 4px solid #A04747;
-            border-right: 4px solid #000000;
+            border: 4px solid #A04747;
+            border-right-color: #000000;
             margin: 20px;
         }
-        .qr-corner { position: absolute; width: 16px; height: 16px; z-index: 2; }
-        .qr-tl { top: -8px; left: -8px; background: #A04747; }
-        .qr-tr { top: -8px; right: -8px; background: #000000; }
-        .qr-bl { bottom: -8px; left: -8px; background: #000000; }
-        .qr-br { bottom: -8px; right: -8px; background: #A04747; }
+        .qr-corner { position: absolute; width: 20px; height: 20px; border: 4px solid; z-index: 2; background: white; }
+        .qr-tl { top: -12px; left: -12px; border-color: #A04747; }
+        .qr-tr { top: -12px; right: -12px; border-color: #000000; }
+        .qr-bl { bottom: -12px; left: -12px; border-color: #000000; }
+        .qr-br { bottom: -12px; right: -12px; border-color: #A04747; }
         .qr-wrapper img, .qr-wrapper canvas { display: block; margin: 0 auto; }
         
         /* 10e. Custom Context Menu */
@@ -372,7 +372,7 @@
         .flatpickr-current-month .flatpickr-monthDropdown-months, .flatpickr-current-month input.cur-year { color: white !important; }
         .flatpickr-month { fill: white !important; color: white !important; }
         
-        /* 5. Install Banner */
+        /* 5. Install Banner Animation */
         #install-banner {
             position: fixed; top: 10px; left: 50%; transform: translateX(-50%) translateY(-150%);
             z-index: 9999; background: linear-gradient(135deg, var(--primary), #6a1a1a); color: white; padding: 12px 20px; 
@@ -618,9 +618,9 @@
                     <i class="fa-solid fa-circle-check text-success" style="font-size: 3rem; margin-bottom: 1rem; display: block; animation: pulse-green 2s infinite; border-radius: 50%;"></i>
                     <h3 style="color: var(--success);">Sent Successfully</h3>
                     <p style="font-size: 0.9rem; margin-top: 0.5rem;" id="success-msg-desc">Our staff has been notified.</p>
-                    <div class="flex-row mt-1">
-                        <button onclick="resetCustomerForm()" class="btn btn-secondary"><i class="fa-solid fa-rotate-right"></i> Send Another</button>
-                        <button onclick="switchTab(document.querySelectorAll('#customer-view .tab-btn')[1], 'c-tab-requests')" class="btn"><i class="fa-solid fa-list"></i> View Status</button>
+                    <div class="flex-row mt-1" style="justify-content: center;">
+                        <button onclick="resetCustomerForm()" class="btn btn-secondary"><i class="fa-solid fa-rotate-right"></i> Send Another Request</button>
+                        <button onclick="goCustomerHome()" class="btn"><i class="fa-solid fa-house"></i> Go to Home</button>
                     </div>
                 </div>
             </div>
@@ -657,14 +657,14 @@
                             <label>Check-in Date</label>
                             <div class="input-with-icon">
                                 <i class="fa-solid fa-calendar-days text-success clickable-icon"></i>
-                                <input type="text" id="cb-checkin" class="flatpickr-input" required placeholder="Select date">
+                                <input type="text" id="cb-checkin" class="flatpickr-input" required placeholder="Select date" readonly="readonly">
                             </div>
                         </div>
                         <div class="flex-col" style="flex:1">
                             <label>Checkout Date</label>
                             <div class="input-with-icon">
                                 <i class="fa-solid fa-calendar-days text-danger clickable-icon"></i>
-                                <input type="text" id="cb-checkout" class="flatpickr-input" required placeholder="Select date">
+                                <input type="text" id="cb-checkout" class="flatpickr-input" required placeholder="Select date" readonly="readonly">
                             </div>
                         </div>
                     </div>
@@ -872,14 +872,14 @@
                                     <label>Check-in Date/Time *</label>
                                     <div class="input-with-icon">
                                         <i class="fa-solid fa-calendar-check text-success clickable-icon"></i>
-                                        <input type="text" id="ci-date-auto" class="flatpickr-input flatpickr-time" required style="color: var(--success); font-weight: 500;">
+                                        <input type="text" id="ci-date-auto" class="flatpickr-input flatpickr-time" required style="color: var(--success); font-weight: 500;" readonly="readonly">
                                     </div>
                                 </div>
                                 <div class="flex-col" style="flex:1;">
                                     <label>Expected Checkout Date *</label>
                                     <div class="input-with-icon">
                                         <i class="fa-solid fa-calendar-xmark text-danger clickable-icon"></i>
-                                        <input type="text" id="ci-checkout" class="flatpickr-input" required placeholder="Select date">
+                                        <input type="text" id="ci-checkout" class="flatpickr-input" required placeholder="Select date" readonly="readonly">
                                     </div>
                                 </div>
                             </div>
@@ -1562,6 +1562,15 @@
             document.getElementById('guest-req-success').classList.add('d-none');
         };
 
+        window.goCustomerHome = () => {
+            resetCustomerForm();
+            switchTab(document.querySelectorAll('#customer-view .tab-btn')[0], 'c-tab-home');
+            const grid = document.getElementById('guest-booking-section');
+            if(grid && !grid.classList.contains('d-none')) {
+                grid.scrollIntoView({behavior: 'smooth'});
+            }
+        };
+
         function renderCustomerRooms() {
             const grid = document.getElementById('customer-rooms-grid'); if(!grid) return; grid.innerHTML = '';
             let hasRooms = false;
@@ -1586,11 +1595,24 @@
             const myReqs = appState.requests.filter(r => r.roomId === cRoomId || r.type === 'booking').sort((a,b)=>b.id-a.id);
             if(myReqs.length===0) { list.innerHTML = `<p class="text-muted"><i class="fa-solid fa-ghost"></i> No recent activity.</p>`; return; }
             myReqs.forEach(r => {
-                let color = r.status.includes('pending') ? 'var(--warning)' : (r.status === 'rejected' ? 'var(--danger)' : 'var(--success)');
-                let icon = r.status.includes('pending') ? 'fa-clock' : (r.status === 'rejected' ? 'fa-xmark' : 'fa-check');
-                list.innerHTML += `<div class="card noise-bg mb-1" style="border-left: 4px solid ${color}"><div class="flex-row" style="justify-content:space-between"><strong>${r.category}</strong><span style="color:${color}"><i class="fa-solid ${icon}"></i> ${r.status.replace('_',' ').toUpperCase()}</span></div><p class="text-muted mt-1" style="font-size:0.8rem">${r.message}</p></div>`;
+                let color = r.status.includes('pending') ? 'var(--warning)' : (r.status.includes('reject') || r.status.includes('cancel') ? 'var(--danger)' : 'var(--success)');
+                let icon = r.status.includes('pending') ? 'fa-clock' : (r.status.includes('reject') || r.status.includes('cancel') ? 'fa-xmark' : 'fa-check');
+                let cancelBtn = r.status.includes('pending') ? `<button class="btn btn-secondary mt-1" style="padding:0.2rem 0.5rem; font-size:0.7rem; min-height: 24px;" onclick="cancelCustomerRequest(${r.id})"><i class="fa-solid fa-ban"></i> Cancel Request</button>` : '';
+                list.innerHTML += `<div class="card noise-bg mb-1" style="border-left: 4px solid ${color}"><div class="flex-row" style="justify-content:space-between"><strong>${r.category}</strong><span style="color:${color}"><i class="fa-solid ${icon}"></i> ${r.status.replace('_',' ').toUpperCase()}</span></div><p class="text-muted mt-1" style="font-size:0.8rem">${r.message}</p>${cancelBtn}</div>`;
             });
         }
+
+        window.cancelCustomerRequest = async (id) => {
+            if(await showConfirmDialog("Are you sure you want to cancel this request?")) {
+                const req = appState.requests.find(x=>x.id===id);
+                if(req) {
+                    req.status = 'cancelled';
+                    await saveData();
+                    renderCustomerActivity();
+                    showToast("Request Cancelled");
+                }
+            }
+        };
 
         // MANAGER POLLING & REQUESTS
         async function pollRequests(isManual = false) {
