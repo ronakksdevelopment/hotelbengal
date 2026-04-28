@@ -59,11 +59,9 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        /* Override ALL browser defaults for text selection */
         ::selection { background: var(--primary); color: white; }
         ::-moz-selection { background: var(--primary); color: white; }
 
-        /* Disable text selection on interactive elements */
         .room-box, .btn, .nav-item, .tab-btn, .status-badge {
             user-select: none; -webkit-user-select: none;
         }
@@ -134,7 +132,7 @@
             transition: var(--transition);
             cursor: pointer;
             border-left: 4px solid transparent;
-            min-height: 44px; /* Minimum touch target */
+            min-height: 44px;
         }
 
         .nav-item i { width: 24px; text-align: center; color: white; }
@@ -176,13 +174,12 @@
             position: relative;
         }
 
-        /* Button Ripple Effect */
         .btn {
             background: var(--primary);
             color: white;
             border: none;
             padding: 0.8rem 1.5rem;
-            min-height: 44px; /* Mobile touch optimization */
+            min-height: 44px; 
             border-radius: var(--radius-md);
             font-weight: 600;
             cursor: pointer;
@@ -217,7 +214,7 @@
         .btn-highlight i { color: var(--bg-main); }
         .btn-highlight:hover { background: #ffeaa7; }
 
-        /* Inputs & Form Controls - Min 48px height, 16px font to prevent iOS zoom */
+        /* Inputs & Form Controls */
         input, select, textarea {
             width: 100%;
             background: rgba(0, 0, 0, 0.3);
@@ -240,7 +237,6 @@
             opacity: 0.8; background: rgba(0,0,0,0.5); cursor: not-allowed; color: var(--text-muted);
         }
 
-        /* Custom Theme for Dropdowns (Select) */
         select {
             background-color: rgba(0, 0, 0, 0.3) !important;
             color: white !important;
@@ -255,20 +251,16 @@
         select option { background-color: var(--bg-surface) !important; color: white !important; padding: 1rem !important; }
         select option:hover, select option:focus, select option:active, select option:checked { background: var(--primary) !important; color: white !important; }
 
-        /* Theme-Based Calendar / Date Picker */
+        /* Themed Calendar Picker */
         input[type="date"], input[type="datetime-local"] {
             color-scheme: dark; background-color: rgba(0, 0, 0, 0.3) !important;
             border: 1px solid var(--card-border) !important; color: white !important;
             font-family: 'Poppins', sans-serif !important; padding: 0.8rem 1rem; border-radius: var(--radius-md);
         }
         input[type="date"]::-webkit-calendar-picker-indicator, input[type="datetime-local"]::-webkit-calendar-picker-indicator {
-            filter: invert(1); cursor: pointer; opacity: 1; background-color: transparent;
+            filter: invert(1); cursor: pointer; opacity: 1; background-color: transparent; padding: 5px;
         }
-        ::-webkit-calendar-picker { background-color: var(--bg-surface); border: 1px solid var(--card-border); border-radius: var(--radius-md); }
         
-        input.custom-date-auto { background: rgba(0, 0, 0, 0.5); border: 1px dashed var(--card-border); color: var(--highlight); font-weight: 500; min-height: 48px; }
-
-        /* Icons */
         .input-with-icon { position: relative; display: flex; align-items: center; margin-bottom: 1rem; width: 100%; }
         .input-with-icon i { position: absolute; left: 1rem; color: white; font-size: 1.1rem; pointer-events: none;}
         .input-with-icon input { padding-left: 3rem; margin-bottom: 0; background: rgba(0, 0, 0, 0.3); }
@@ -585,7 +577,7 @@
     </div>
 
     <!-- ==========================================
-         AUTH VIEW
+         AUTH VIEW (Management Login)
     ========================================== -->
     <div id="auth-view" class="auth-wrapper d-none noise-bg">
         <div class="auth-card card">
@@ -619,7 +611,41 @@
     </div>
 
     <!-- ==========================================
-         CUSTOMER PORTAL (QR VIEW / SELF BOOKING)
+         GUEST LOGIN VIEW (QR SCAN)
+    ========================================== -->
+    <div id="guest-login-view" class="auth-wrapper d-none noise-bg" style="z-index: 2500;">
+        <div class="auth-card card">
+            <h1 class="text-highlight hotel-name-display" style="font-size: clamp(2rem, 5vw, 2.5rem); letter-spacing: 3px; margin-bottom: 0.5rem;">HOTEL BENGAL</h1>
+            <p style="color: var(--secondary); margin-bottom: 2rem;">Guest Verification</p>
+            
+            <form id="guest-login-form">
+                <div class="flex-col" style="text-align: left;">
+                    <label>Room Number</label>
+                    <div class="input-with-icon">
+                        <i class="fa-solid fa-door-open"></i>
+                        <input type="text" id="guest-login-room" placeholder="e.g. 001" required disabled>
+                    </div>
+                </div>
+                <div class="flex-col" style="text-align: left;">
+                    <label>5-Digit Security PIN</label>
+                    <div class="input-with-icon">
+                        <i class="fa-solid fa-key"></i>
+                        <input type="text" id="guest-login-pin" placeholder="Enter your PIN" required maxlength="5" style="text-transform: uppercase;">
+                    </div>
+                    <p style="font-size: 0.75rem; color: var(--text-muted);">Provided by management at check-in.</p>
+                </div>
+                <button type="submit" class="btn btn-highlight" style="width: 100%; margin-top: 1rem; padding: 1rem;">
+                    <i class="fa-solid fa-unlock-keyhole"></i> Verify Access
+                </button>
+            </form>
+            <button class="btn btn-secondary w-100 mt-1" onclick="exitGuestLogin()">
+                <i class="fa-solid fa-arrow-left"></i> Public Home
+            </button>
+        </div>
+    </div>
+
+    <!-- ==========================================
+         CUSTOMER PORTAL (PUBLIC & SECURE)
     ========================================== -->
     <div id="customer-view" class="auth-wrapper noise-bg" style="justify-content: flex-start; padding-top: env(safe-area-inset-top, 1rem); padding-bottom: 80px;">
         <div class="auth-card card" style="margin-top: 1rem; max-width: 600px; width: 100%; padding: 2rem 1.5rem; border: none; background: transparent; box-shadow: none;">
@@ -630,49 +656,8 @@
                 <p style="color: var(--text-main); margin-top: 0.5rem; font-weight: 500;">Guest Services Portal</p>
             </div>
             
-            <!-- HOME TAB: Service Request -->
-            <div id="c-tab-home" class="tab-content active text-left">
-                <div id="guest-room-context" class="d-none" style="background: rgba(0,0,0,0.3); padding: 1.5rem; border-radius: var(--radius-md); margin-bottom: 1.5rem; border: 1px dashed var(--card-border);">
-                    <h2 id="guest-room-display" class="text-highlight mb-1" style="font-size: 2rem;">Room ---</h2>
-                    <p>Welcome. Request room services below.</p>
-                </div>
-                
-                <!-- Service Form -->
-                <form id="guest-request-form" class="d-none">
-                    <label>Choose Service Type...</label>
-                    <select id="guest-req-category" required>
-                        <option value="">Choose Service Type...</option>
-                        <option value="Housekeeping">Room Cleaning</option>
-                        <option value="Room Service">Room Service (Food/Drinks)</option>
-                        <option value="Maintenance">Repair Work</option>
-                        <option value="Front Desk">Reception Help</option>
-                        <option value="Other">Other Request</option>
-                    </select>
-                    <label>Details</label>
-                    <textarea id="guest-req-msg" rows="3" placeholder="Please specify your request..." required></textarea>
-                    <button type="submit" class="btn btn-highlight" style="width: 100%;">
-                        <i class="fa-solid fa-paper-plane"></i> Send to Front Desk
-                    </button>
-                </form>
-
-                <!-- Success State (Service) -->
-                <div id="guest-req-success" class="d-none mt-2 card text-center" style="background: rgba(76, 175, 80, 0.1); border-color: var(--success);">
-                    <i class="fa-solid fa-circle-check text-success" style="font-size: 3rem; margin-bottom: 1rem; display: inline-block; animation: pulse-yellow 2s infinite; border-radius: 50%;"></i>
-                    <h3 style="color: var(--success);">Sent Successfully</h3>
-                    <p style="font-size: 0.9rem; margin-top: 0.5rem;" id="success-msg-desc">Our staff has been notified.</p>
-                    <div id="another-request-section" class="mt-2 flex-col" style="gap:0.8rem">
-                        <button class="btn btn-secondary w-100" onclick="resetRequestForm()">
-                            <i class="fa-solid fa-plus"></i> New Request
-                        </button>
-                        <button class="btn w-100" onclick="showCustomerSection('c-tab-rooms')">
-                            <i class="fa-solid fa-door-open"></i> Browse Available Rooms
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ROOMS TAB: Booking -->
-            <div id="c-tab-rooms" class="tab-content text-left">
+            <!-- ROOMS TAB: Booking (PUBLIC) -->
+            <div id="c-tab-rooms" class="tab-content active text-left">
                 <h3 style="margin-bottom: 1rem;"><i class="fa-solid fa-door-open text-success"></i> Available Rooms</h3>
                 <div id="customer-room-list" class="room-grid" style="grid-template-columns: repeat(2, 1fr);">
                     <!-- Available rooms injected here -->
@@ -745,26 +730,118 @@
                 </div>
             </div>
 
-            <!-- ACTIVITY TAB -->
+            <!-- CONTACT TAB (PUBLIC) -->
+            <div id="c-tab-contact" class="tab-content text-left">
+                <h3 style="margin-bottom: 1rem;"><i class="fa-solid fa-address-book text-secondary"></i> Contact Us</h3>
+                <div class="flex-col" style="gap: 1rem;">
+                    <button class="btn" style="background: #25D366; width:100%; min-height:60px;" onclick="contactAction('wa')">
+                        <i class="fa-brands fa-whatsapp" style="font-size: 1.5rem;"></i> Message on WhatsApp
+                    </button>
+                    <button class="btn btn-secondary" style="width:100%; min-height:60px; color: white; border-color:var(--card-border);" onclick="contactAction('tel')">
+                        <i class="fa-solid fa-phone" style="color:white; font-size: 1.5rem;"></i> Call Reception
+                    </button>
+                    <button class="btn btn-secondary" style="width:100%; min-height:60px; color: white; border-color:var(--card-border);" onclick="contactAction('email')">
+                        <i class="fa-solid fa-envelope" style="color:white; font-size: 1.5rem;"></i> Email Us
+                    </button>
+                </div>
+            </div>
+
+            <!-- HOME TAB: Service Request (SECURE) -->
+            <div id="c-tab-home" class="tab-content text-left">
+                <div class="card" style="background: rgba(0,0,0,0.3); padding: 1.5rem; margin-bottom: 1.5rem; border: 1px dashed var(--card-border);">
+                    <h2 id="guest-room-display" class="text-highlight mb-1" style="font-size: 2rem;">Room ---</h2>
+                    <p>Welcome. Request room services below.</p>
+                </div>
+                
+                <!-- Service Form -->
+                <form id="guest-request-form">
+                    <label>Choose Service Type...</label>
+                    <select id="guest-req-category" required>
+                        <option value="">Choose Service Type...</option>
+                        <option value="Housekeeping">Room Cleaning</option>
+                        <option value="Room Service">Room Service (Food/Drinks)</option>
+                        <option value="Maintenance">Repair Work</option>
+                        <option value="Front Desk">Reception Help</option>
+                        <option value="Other">Other Request</option>
+                    </select>
+                    <label>Details</label>
+                    <textarea id="guest-req-msg" rows="3" placeholder="Please specify your request..." required></textarea>
+                    <button type="submit" class="btn btn-highlight" style="width: 100%;">
+                        <i class="fa-solid fa-paper-plane"></i> Send to Front Desk
+                    </button>
+                </form>
+
+                <!-- Success State (Service) -->
+                <div id="guest-req-success" class="d-none mt-2 card text-center" style="background: rgba(76, 175, 80, 0.1); border-color: var(--success);">
+                    <i class="fa-solid fa-circle-check text-success" style="font-size: 3rem; margin-bottom: 1rem; display: inline-block; border-radius: 50%;"></i>
+                    <h3 style="color: var(--success);">Sent Successfully</h3>
+                    <p style="font-size: 0.9rem; margin-top: 0.5rem;" id="success-msg-desc">Our staff has been notified.</p>
+                    <button class="btn btn-secondary w-100 mt-2" onclick="resetRequestForm()">
+                        <i class="fa-solid fa-plus"></i> New Request
+                    </button>
+                </div>
+            </div>
+
+            <!-- ACTIVITY TAB (SECURE) -->
             <div id="c-tab-activity" class="tab-content text-left">
                 <h3 class="text-secondary mb-1">Your Recent Activity</h3>
                 <div id="customer-activity-list" class="flex-col">
                     <!-- Injected via JS -->
                 </div>
             </div>
+
+            <!-- PAY & CHECKOUT TAB (SECURE) -->
+            <div id="c-tab-checkout" class="tab-content text-left">
+                <h3 style="margin-bottom: 1rem;"><i class="fa-solid fa-wallet text-highlight"></i> Payment & Checkout</h3>
+                
+                <div class="card" style="margin-bottom: 1.5rem; background: rgba(0,0,0,0.4);">
+                    <div class="flex-row" style="justify-content: space-between; margin-bottom: 0.5rem;">
+                        <span>Days Stayed:</span><strong id="guest-stay-days" class="text-highlight">--</strong>
+                    </div>
+                    <div class="flex-row" style="justify-content: space-between; margin-bottom: 0.5rem;">
+                        <span>Total Room Charges:</span><strong>₹<span id="guest-stay-total">--</span></strong>
+                    </div>
+                    <div class="flex-row" style="justify-content: space-between; margin-bottom: 0.5rem;">
+                        <span>Deposit Paid:</span><strong class="text-success">- ₹<span id="guest-stay-adv">--</span></strong>
+                    </div>
+                    <div class="flex-row" style="justify-content: space-between; border-top: 1px dashed var(--card-border); padding-top: 0.5rem; margin-top: 0.5rem;">
+                        <span>Balance Due:</span><strong class="text-primary" style="font-size: 1.4rem;">₹<span id="guest-stay-due">--</span></strong>
+                    </div>
+                </div>
+
+                <div class="flex-col" style="gap: 1rem;">
+                    <button class="btn btn-highlight" style="width:100%; min-height:50px;" onclick="payViaUPI()">
+                        <i class="fa-solid fa-qrcode"></i> Pay via UPI App
+                    </button>
+                    <button class="btn" style="width:100%; min-height:50px; background:var(--success);" onclick="requestCheckout()">
+                        <i class="fa-solid fa-clipboard-check"></i> Request Checkout
+                    </button>
+                </div>
+            </div>
+
         </div>
 
         <!-- Customer Bottom Navigation Bar -->
         <div class="customer-bottom-bar" id="customer-bottom-bar">
-            <button class="btn btn-secondary" onclick="showCustomerSection('c-tab-home')" id="btn-c-home">
-                <i class="fa-solid fa-bell-concierge"></i> Services
-            </button>
-            <button class="btn btn-secondary" onclick="showCustomerSection('c-tab-rooms')" id="btn-c-rooms">
+            <!-- Public Buttons -->
+            <button class="btn btn-secondary pub-btn active" onclick="showCustomerSection('c-tab-rooms')" id="btn-c-rooms">
                 <i class="fa-solid fa-door-open"></i> Book Room
             </button>
-            <button class="btn btn-secondary" onclick="showCustomerSection('c-tab-activity')" id="btn-c-activity">
-                <i class="fa-solid fa-list"></i> My Records
+            <button class="btn btn-secondary pub-btn" onclick="showCustomerSection('c-tab-contact')" id="btn-c-contact">
+                <i class="fa-solid fa-address-book"></i> Contact Us
             </button>
+            
+            <!-- Secure Buttons (Hidden until logged in) -->
+            <button class="btn btn-secondary sec-btn d-none" onclick="showCustomerSection('c-tab-home')" id="btn-c-home">
+                <i class="fa-solid fa-bell-concierge"></i> Services
+            </button>
+            <button class="btn btn-secondary sec-btn d-none" onclick="showCustomerSection('c-tab-activity')" id="btn-c-activity">
+                <i class="fa-solid fa-list"></i> Records
+            </button>
+            <button class="btn btn-secondary sec-btn d-none" onclick="showCustomerSection('c-tab-checkout')" id="btn-c-checkout">
+                <i class="fa-solid fa-wallet"></i> Pay & Exit
+            </button>
+
             <button class="btn" onclick="showLoginScreen()" style="background: var(--bg-surface); color: var(--secondary); border: 1px solid var(--secondary);">
                 <i class="fa-solid fa-shield-halved"></i> Admin
             </button>
@@ -870,7 +947,7 @@
                     </table>
                 </div>
 
-                <h3 class="text-highlight mb-1 mt-2"><i class="fa-solid fa-bell-concierge"></i> Service Needs</h3>
+                <h3 class="text-highlight mb-1 mt-2"><i class="fa-solid fa-bell-concierge"></i> Service & Checkout Needs</h3>
                 <div class="card table-responsive noise-bg">
                     <table id="requests-table">
                         <thead><tr><th>Time</th><th>Room</th><th>Category</th><th>Message</th><th>Status</th><th>Action</th></tr></thead>
@@ -882,7 +959,7 @@
             <!-- VIEW: PAST BOOKINGS -->
             <div id="view-history" class="view-section d-none">
                 <div class="flex-row" style="justify-content: space-between; margin-bottom: 1.5rem;">
-                    <h2 style="font-size: 1.8rem;"><i class="fa-solid fa-clock-rotate-left text-secondary"></i> Past Bookings</h2>
+                    <h2 style="font-size: 1.8rem;"><i class="fa-solid fa-clock-rotate-left text-secondary"></i> Past Bookings List</h2>
                     <div class="flex-row" style="gap: 0.5rem;">
                         <button class="btn btn-secondary" onclick="printHistoryTable()"><i class="fa-solid fa-print"></i> Print List</button>
                         <button class="btn btn-highlight" onclick="exportHistoryPDFList()"><i class="fa-solid fa-file-pdf"></i> Download PDF List</button>
@@ -896,7 +973,7 @@
                 </div>
                 <div class="card table-responsive noise-bg">
                     <table id="history-table">
-                        <thead><tr><th>Date Out</th><th>Room</th><th>Guest Name</th><th>Arrival Date</th><th>Departure Date</th><th>Total Cost</th><th>Bill</th></tr></thead>
+                        <thead><tr><th>Date Out</th><th>Room</th><th>Guest Name</th><th>Doc Type</th><th>Doc Number</th><th>Total Cost</th><th>Bill</th></tr></thead>
                         <tbody id="history-tbody"></tbody>
                     </table>
                 </div>
@@ -908,7 +985,7 @@
                 <div class="stats-row">
                     <div class="card noise-bg">
                         <h3 class="text-highlight mb-1"><i class="fa-solid fa-database"></i> Data Controls</h3>
-                        <p class="text-muted mb-1" style="font-size: 0.9rem; margin-bottom: 1rem;">Erase all local bookings, rooms, and photos.</p>
+                        <p class="text-muted mb-1" style="font-size: 0.9rem; margin-bottom: 1rem;">Erase all local bookings, rooms, requests, and past booking history permanently.</p>
                         <button id="btn-factory-reset" class="btn" style="background: var(--danger); width: 100%;"><i class="fa-solid fa-triangle-exclamation"></i> ⚠ Delete All Data</button>
                     </div>
                     <div class="card noise-bg">
@@ -917,18 +994,46 @@
                         <button id="btn-export-data" class="btn btn-secondary" style="width: 100%;"><i class="fa-solid fa-download"></i> Download Backup</button>
                     </div>
                 </div>
+                
                 <div class="card mt-2 noise-bg">
                     <h3 class="text-highlight" style="margin-bottom: 1rem;"><i class="fa-solid fa-building-user"></i> Hotel Details (Public)</h3>
                     <div class="flex-row">
                         <div class="flex-col" style="flex: 1;">
                             <label>Hotel Name</label>
-                            <input type="text" id="admin-hotel-name" value="HOTEL BENGAL">
+                            <input type="text" id="admin-hotel-name" value="" placeholder="Hotel Name">
                         </div>
                         <div class="flex-col" style="flex: 2;">
                             <label>Address</label>
-                            <input type="text" id="admin-hotel-address" value="23, Itkhola Rd, Nabapally, Tarapur, Silchar, Assam, 788001">
+                            <input type="text" id="admin-hotel-address" value="" placeholder="Complete Address">
                         </div>
                     </div>
+                    
+                    <h4 style="margin: 1.5rem 0 1rem 0; color: var(--secondary); border-bottom: 1px dashed var(--card-border); padding-bottom: 0.5rem;">Contact & Payment Info</h4>
+                    <div class="flex-row">
+                        <div class="flex-col" style="flex: 1;">
+                            <label>Reception Phone (Call)</label>
+                            <input type="tel" id="admin-phone" placeholder="e.g. +919876543210">
+                        </div>
+                        <div class="flex-col" style="flex: 1;">
+                            <label>WhatsApp Number</label>
+                            <input type="tel" id="admin-wa" placeholder="e.g. +919876543210">
+                        </div>
+                    </div>
+                    <div class="flex-row">
+                        <div class="flex-col" style="flex: 1;">
+                            <label>Contact Email</label>
+                            <input type="email" id="admin-email" placeholder="hotel@example.com">
+                        </div>
+                        <div class="flex-col" style="flex: 1;">
+                            <label>UPI ID (For Guest Payments)</label>
+                            <input type="text" id="admin-upi" placeholder="example@ybl">
+                        </div>
+                    </div>
+                    <div class="flex-col">
+                        <label>WhatsApp Default Message</label>
+                        <textarea id="admin-wa-msg" rows="2" placeholder="e.g. Hello Hotel Bengal, I need assistance..."></textarea>
+                    </div>
+                    
                     <button class="btn btn-highlight mt-1" onclick="saveHotelConfig()"><i class="fa-solid fa-floppy-disk"></i> Save Hotel Details</button>
                 </div>
             </div>
@@ -954,7 +1059,6 @@
                         <button class="tab-btn active" onclick="switchTab(this, 'tab-guest')"><i class="fa-solid fa-user-plus"></i> Guest Details</button>
                         <button class="tab-btn" onclick="switchTab(this, 'tab-docs')"><i class="fa-solid fa-id-card"></i> Documents / ID</button>
                         <button class="tab-btn" onclick="switchTab(this, 'tab-payment')"><i class="fa-solid fa-file-signature"></i> Payment & Signature</button>
-                        <button class="tab-btn" onclick="switchTab(this, 'tab-qr')"><i class="fa-solid fa-qrcode"></i> Room Scanner</button>
                     </div>
 
                     <form id="checkin-submit-form">
@@ -971,7 +1075,7 @@
                                 </div>
                                 <div class="flex-col" style="flex:1;">
                                     <label>Members</label>
-                                    <input type="number" id="ci-members" value="1" min="1" max="10">
+                                    <input type="number" id="ci-members" value="1" min="1" max="10" placeholder="1">
                                 </div>
                             </div>
                             
@@ -1065,20 +1169,6 @@
                                 <i class="fa-solid fa-circle-check"></i> ✓ Confirm Booking
                             </button>
                         </div>
-                        
-                        <div id="tab-qr" class="tab-content text-center">
-                            <p class="text-muted mb-1">Guest can scan this QR to request services directly to reception.</p>
-                            <div class="qr-wrapper" id="room-qr-container">
-                                <div class="qr-corner qr-tl"></div>
-                                <div class="qr-corner qr-tr"></div>
-                                <div class="qr-corner qr-bl"></div>
-                                <div class="qr-corner qr-br"></div>
-                            </div>
-                            <br>
-                            <button type="button" class="btn btn-secondary mt-1" onclick="downloadQR()">
-                                <i class="fa-solid fa-download"></i> Download QR
-                            </button>
-                        </div>
                     </form>
                 </div>
 
@@ -1087,6 +1177,7 @@
                      <div class="tabs">
                         <button class="tab-btn active" onclick="switchTab(this, 'tab-m-info')"><i class="fa-solid fa-circle-info"></i> Guest Details</button>
                         <button class="tab-btn" onclick="switchTab(this, 'tab-m-checkout')" id="m-checkout-tab-btn"><i class="fa-solid fa-cash-register"></i> Guest Departure</button>
+                        <button class="tab-btn" onclick="switchTab(this, 'tab-qr')"><i class="fa-solid fa-qrcode"></i> Room Scanner</button>
                     </div>
 
                     <div id="tab-m-info" class="tab-content active">
@@ -1109,6 +1200,13 @@
                                 <div><small class="text-muted" id="m-arr-lbl">Arrival Date</small><br><span id="m-ci-date" style="font-weight: 500;">--</span></div>
                                 <div><small class="text-muted">Check-out Date</small><br><span id="m-co-date" style="font-weight: 500;">--</span></div>
                                 <div><small class="text-muted">Deposit Paid</small><br><span class="text-success" style="font-weight: bold;">₹<span id="m-advance"></span></span></div>
+                            </div>
+                            <div class="mt-1" style="border-top: 1px dashed var(--card-border); padding-top: 1rem;">
+                                <small class="text-muted">Guest Login PIN (For Customer Portal)</small><br>
+                                <div class="flex-row" style="gap:0.5rem; justify-content: flex-start; align-items:center;">
+                                    <strong id="m-pin-display" class="text-highlight" style="font-size: 1.5rem; letter-spacing: 2px;">-----</strong>
+                                    <button class="btn btn-secondary" style="padding: 0.2rem 0.6rem; min-height: 24px; font-size: 0.7rem;" onclick="regeneratePin()">Regenerate</button>
+                                </div>
                             </div>
                         </div>
                         
@@ -1157,6 +1255,21 @@
                             <i class="fa-solid fa-clipboard-check"></i> Finish & Print Bill
                         </button>
                     </div>
+
+                    <!-- Room QR inside Manage -->
+                    <div id="tab-qr" class="tab-content text-center">
+                        <p class="text-muted mb-1">Guest can scan this QR to login and request services.</p>
+                        <div class="qr-wrapper" id="room-qr-container-manage">
+                            <div class="qr-corner qr-tl"></div>
+                            <div class="qr-corner qr-tr"></div>
+                            <div class="qr-corner qr-bl"></div>
+                            <div class="qr-corner qr-br"></div>
+                        </div>
+                        <br>
+                        <button type="button" class="btn btn-secondary mt-1" onclick="downloadQR('manage')">
+                            <i class="fa-solid fa-download"></i> Download QR
+                        </button>
+                    </div>
                 </div>
 
             </div>
@@ -1201,7 +1314,16 @@
         // -----------------------------------
         // 1. CONFIG & GLOBALS
         // -----------------------------------
-        const HOTEL = { name: "HOTEL BENGAL", address: "23, Itkhola Rd, Nabapally, Tarapur, Silchar, Assam, 788001", totalRooms: 115 };
+        const HOTEL = { 
+            name: "HOTEL BENGAL", 
+            address: "23, Itkhola Rd, Nabapally, Tarapur, Silchar, Assam, 788001", 
+            totalRooms: 115,
+            phone: "",
+            wa: "",
+            email: "",
+            upi: "",
+            waMsg: "Hello Hotel Bengal, I need assistance."
+        };
         let appState = { rooms: {}, history: [], requests: [] };
         let currentEditingRoom = null;
         let tempImages = []; 
@@ -1213,6 +1335,12 @@
         function debounce(func, wait) { let timeout; return function(...args) { clearTimeout(timeout); timeout = setTimeout(() => func.apply(this, args), wait); }; }
         function showLoading() { document.getElementById('loading-overlay').classList.add('active'); }
         function hideLoading() { document.getElementById('loading-overlay').classList.remove('active'); }
+        
+        function generatePIN(len = 5) {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'; let res = '';
+            for(let i=0; i<len; i++) res += chars.charAt(Math.floor(Math.random() * chars.length));
+            return res;
+        }
 
         // Context Menu & Interaction Globals
         document.addEventListener('click', (e) => {
@@ -1283,6 +1411,13 @@
                     const req = db.transaction('store', 'readwrite').objectStore('store').put(val, key);
                     req.onsuccess = () => resolve(); req.onerror = () => reject(req.error);
                 });
+            },
+            clearStore: async () => {
+                const db = await IDB.init();
+                return new Promise((resolve, reject) => {
+                    const req = db.transaction('store', 'readwrite').objectStore('store').clear();
+                    req.onsuccess = () => resolve(); req.onerror = () => reject(req.error);
+                });
             }
         };
 
@@ -1343,43 +1478,66 @@
                 
                 const roomId = urlParams.get('room');
                 initCustomerPortal(roomId);
-                
-                if (urlParams.get('mode') === 'booking' || !roomId) {
-                    showCustomerSection('c-tab-rooms');
-                }
             }
         };
         
         function showLoginScreen() {
             document.getElementById('customer-view').classList.add('d-none');
+            document.getElementById('guest-login-view').classList.add('d-none');
             document.getElementById('auth-view').classList.remove('d-none');
         }
 
         function hideLoginScreen() {
             document.getElementById('auth-view').classList.add('d-none');
             document.getElementById('customer-view').classList.remove('d-none');
+            
+            const urlParams = new URLSearchParams(window.location.search);
+            if(urlParams.get('mode') === 'customer' && urlParams.get('room')) {
+                initCustomerPortal(urlParams.get('room'));
+            }
         }
 
         function loadHotelConfig() {
             const stored = localStorage.getItem('hotel_config');
             if(stored) {
                 try {
-                    const parsed = JSON.parse(stored);
-                    HOTEL.name = parsed.name || HOTEL.name;
-                    HOTEL.address = parsed.address || HOTEL.address;
+                    const p = JSON.parse(stored);
+                    HOTEL.name = p.name || HOTEL.name;
+                    HOTEL.address = p.address || HOTEL.address;
+                    HOTEL.phone = p.phone || "";
+                    HOTEL.wa = p.wa || "";
+                    HOTEL.email = p.email || "";
+                    HOTEL.upi = p.upi || "";
+                    HOTEL.waMsg = p.waMsg || "Hello Hotel Bengal, I need assistance.";
                 } catch(e){}
             }
             document.querySelectorAll('.hotel-name-display').forEach(el => el.innerText = HOTEL.name);
             document.querySelectorAll('.hotel-addr-display').forEach(el => el.innerText = HOTEL.address);
-            document.getElementById('admin-hotel-name').value = HOTEL.name;
-            document.getElementById('admin-hotel-address').value = HOTEL.address;
+            
+            if(document.getElementById('admin-hotel-name')) {
+                document.getElementById('admin-hotel-name').value = HOTEL.name;
+                document.getElementById('admin-hotel-address').value = HOTEL.address;
+                document.getElementById('admin-phone').value = HOTEL.phone;
+                document.getElementById('admin-wa').value = HOTEL.wa;
+                document.getElementById('admin-email').value = HOTEL.email;
+                document.getElementById('admin-upi').value = HOTEL.upi;
+                document.getElementById('admin-wa-msg').value = HOTEL.waMsg;
+            }
         }
 
         function saveHotelConfig() {
-            const name = document.getElementById('admin-hotel-name').value;
-            const addr = document.getElementById('admin-hotel-address').value;
-            HOTEL.name = name; HOTEL.address = addr;
-            localStorage.setItem('hotel_config', JSON.stringify({name: name, address: addr}));
+            HOTEL.name = document.getElementById('admin-hotel-name').value;
+            HOTEL.address = document.getElementById('admin-hotel-address').value;
+            HOTEL.phone = document.getElementById('admin-phone').value;
+            HOTEL.wa = document.getElementById('admin-wa').value;
+            HOTEL.email = document.getElementById('admin-email').value;
+            HOTEL.upi = document.getElementById('admin-upi').value;
+            HOTEL.waMsg = document.getElementById('admin-wa-msg').value;
+            
+            localStorage.setItem('hotel_config', JSON.stringify({
+                name: HOTEL.name, address: HOTEL.address, phone: HOTEL.phone, 
+                wa: HOTEL.wa, email: HOTEL.email, upi: HOTEL.upi, waMsg: HOTEL.waMsg
+            }));
             loadHotelConfig();
             showToast("Hotel Details Updated Successfully");
         }
@@ -1590,7 +1748,7 @@
                 document.getElementById('ci-planned-date').value = tmrw.toISOString().split('T')[0];
                 
                 switchTab(document.querySelector('#form-checkin .tab-btn'), 'tab-guest'); 
-                generateRoomQR(roomId);
+                generateRoomQR(roomId, 'room-qr-container');
                 
                 setTimeout(() => initSignaturePad('ci-signature'), 100);
 
@@ -1606,6 +1764,7 @@
                 document.getElementById('m-ci-date').innerText = new Date(data.checkIn).toLocaleString('en-IN', {day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit', hour12:true});
                 document.getElementById('m-co-date').innerText = new Date(data.expectedOut).toLocaleDateString('en-IN');
                 document.getElementById('m-advance').innerText = data.advance;
+                document.getElementById('m-pin-display').innerText = data.pin || "-----";
 
                 document.getElementById('m-pending-actions').classList.add('d-none');
                 document.getElementById('m-upcoming-actions').classList.add('d-none');
@@ -1625,7 +1784,18 @@
 
                 calcCheckout(data);
                 switchTab(document.querySelector('#form-manage .tab-btn'), 'tab-m-info');
+                generateRoomQR(roomId, 'room-qr-container-manage');
                 setTimeout(() => initSignaturePad('co-signature'), 100);
+            }
+        }
+
+        async function regeneratePin() {
+            if(await showCustomDialog("Regenerate PIN", "This will invalidate the old PIN for the guest. Continue?", "confirm")) {
+                const room = appState.rooms[currentEditingRoom];
+                room.bookingData.pin = generatePIN(5);
+                document.getElementById('m-pin-display').innerText = room.bookingData.pin;
+                await saveData();
+                showToast("PIN Regenerated");
             }
         }
 
@@ -1783,11 +1953,12 @@
             room.bookingData = {
                 id: 'BKG-' + Date.now(), name, phone, members: document.getElementById('ci-members').value,
                 checkIn: ciDate.toISOString(), expectedOut: coDate.toISOString(), idType: document.getElementById('ci-id-type').value, idNum: document.getElementById('ci-id-num').value,
-                rent: document.getElementById('ci-rent').value || 0, advance: document.getElementById('ci-advance').value || 0, totalEst: calc.total, images: [...tempImages], signatureCi: sigData
+                rent: document.getElementById('ci-rent').value || 0, advance: document.getElementById('ci-advance').value || 0, totalEst: calc.total, images: [...tempImages], signatureCi: sigData,
+                pin: generatePIN(5)
             };
             
             await saveData(); closeModal('modal-room'); renderDashboard(); 
-            showToast(`Room ${currentEditingRoom} ${type === 'advance' ? 'Reserved' : 'Booked'}!`);
+            showToast(`Room ${currentEditingRoom} ${type === 'advance' ? 'Reserved' : 'Booked'}! PIN: ${room.bookingData.pin}`);
         }
 
         async function checkInUpcomingBooking() {
@@ -1837,13 +2008,15 @@
         // -----------------------------------
         // 9. QR CODE
         // -----------------------------------
-        function generateRoomQR(roomId) {
-            const c = document.getElementById('room-qr-container'); 
+        let currentQR = null;
+        function generateRoomQR(roomId, containerId) {
+            const c = document.getElementById(containerId); 
             Array.from(c.children).forEach(ch=>{if(!ch.classList.contains('qr-corner'))ch.remove();});
             currentQR = new QRCode(c, { text: `${window.location.origin}${window.location.pathname}?mode=customer&room=${roomId}`, width: 220, height: 220, colorDark: "#000000", colorLight: "#ffffff", correctLevel: QRCode.CorrectLevel.H });
         }
-        function downloadQR() {
-            const c = document.getElementById('room-qr-container'), img = c.querySelector('img'), cv = c.querySelector('canvas'); 
+        function downloadQR(context = 'checkin') {
+            const c = document.getElementById(context === 'manage' ? 'room-qr-container-manage' : 'room-qr-container');
+            const img = c.querySelector('img'), cv = c.querySelector('canvas'); 
             let d = null;
             if (img && img.src && img.src.startsWith('data:image')) d = img.src; 
             else if (cv) d = cv.toDataURL('image/png', 1.0);
@@ -1867,7 +2040,7 @@
         function renderHistory() {
             const tb=document.getElementById('history-tbody'), s=document.getElementById('search-history').value.toLowerCase(); tb.innerHTML='';
             if(appState.history.length===0){tb.innerHTML=`<tr><td colspan="7"><div class="empty-state"><i class="fa-solid fa-clock-rotate-left"></i><p>No past bookings yet.</p></div></td></tr>`;return;}
-            appState.history.forEach((b,i)=>{ if(s&&!b.name.toLowerCase().includes(s)&&!b.roomId.includes(s))return; tb.innerHTML+=`<tr><td>${new Date(b.checkOut).toLocaleDateString()}</td><td><strong class="text-highlight">${b.roomId}</strong></td><td>${b.name}</td><td>${new Date(b.checkIn).toLocaleDateString()}</td><td>${new Date(b.checkOut).toLocaleDateString()}</td><td>₹${b.finalTotal}</td><td><button class="btn btn-secondary" onclick="reprintPDF(${i})" title="Reprint Bill"><i class="fa-solid fa-file-pdf"></i></button></td></tr>`; });
+            appState.history.forEach((b,i)=>{ if(s&&!b.name.toLowerCase().includes(s)&&!b.roomId.includes(s))return; tb.innerHTML+=`<tr><td>${new Date(b.checkOut).toLocaleDateString()}</td><td><strong class="text-highlight">${b.roomId}</strong></td><td>${b.name}</td><td>${b.idType||'-'}</td><td>${b.idNum||'-'}</td><td>₹${b.finalTotal}</td><td><button class="btn btn-secondary" onclick="reprintPDF(${i})" title="Reprint Bill"><i class="fa-solid fa-file-pdf"></i></button></td></tr>`; });
         }
         window.reprintPDF = i => generateReceiptPDF(appState.history[i]);
         
@@ -1881,18 +2054,19 @@
                 h2 { text-align: center; color: #000; border-bottom: 2px solid #ddd; padding-bottom: 10px; }
                 .text-right { text-align: right; }
             </style></head><body>`;
-            html += `<h2>${HOTEL.name} - Past Bookings Register</h2>`;
-            html += `<table><thead><tr><th>#</th><th>Room</th><th>Guest Name</th><th>Phone</th><th>Arrival Date</th><th>Departure Date</th><th class="text-right">Total Cost</th></tr></thead><tbody>`;
+            html += `<h2>${HOTEL.name} - Past Bookings List</h2>`;
+            html += `<table><thead><tr><th>#</th><th>Room</th><th>Guest Name</th><th>Doc Type</th><th>Doc Number</th><th>Arrival</th><th>Departure</th><th class="text-right">Total Cost</th></tr></thead><tbody>`;
             
             if(appState.history.length === 0) {
-                html += `<tr><td colspan="7" style="text-align:center;">No past bookings found.</td></tr>`;
+                html += `<tr><td colspan="8" style="text-align:center;">No past bookings found.</td></tr>`;
             } else {
                 appState.history.forEach((b, index) => {
                     html += `<tr>
                         <td>${index + 1}</td>
                         <td>${b.roomId}</td>
                         <td>${b.name}</td>
-                        <td>${b.phone}</td>
+                        <td>${b.idType||'-'}</td>
+                        <td>${b.idNum||'-'}</td>
                         <td>${new Date(b.checkIn).toLocaleDateString()}</td>
                         <td>${new Date(b.checkOut).toLocaleDateString()}</td>
                         <td class="text-right">Rs. ${b.finalTotal}</td>
@@ -1904,18 +2078,18 @@
             printWin.document.write(html);
             printWin.document.close();
             printWin.focus();
-            setTimeout(() => { printWin.print(); }, 500); // Small delay to ensure render
+            setTimeout(() => { printWin.print(); }, 500); 
         }
 
         function exportHistoryPDFList() {
             if(!appState.history.length) { showToast("No history to export", "error"); return; }
             
             const { jsPDF } = window.jspdf;
-            const doc = new jsPDF('p', 'pt', 'a4');
+            const doc = new jsPDF('l', 'pt', 'a4'); // Landscape layout
             
             doc.setFontSize(18);
             doc.setTextColor(40, 40, 40);
-            doc.text(`${HOTEL.name} - Booking History Register`, 40, 40);
+            doc.text(`${HOTEL.name} - Past Bookings List`, 40, 40);
             doc.setFontSize(10);
             doc.setTextColor(100, 100, 100);
             doc.text(`Generated on: ${new Date().toLocaleString()}`, 40, 55);
@@ -1924,7 +2098,9 @@
                 i+1, 
                 b.roomId, 
                 b.name, 
-                b.phone, 
+                b.phone,
+                b.idType || '-',
+                b.idNum || '-',
                 new Date(b.checkIn).toLocaleDateString(), 
                 new Date(b.checkOut).toLocaleDateString(), 
                 `Rs. ${b.finalTotal}`
@@ -1932,7 +2108,7 @@
 
             doc.autoTable({
                 startY: 70,
-                head: [['#', 'Room', 'Name', 'Phone', 'Check-In', 'Check-Out', 'Total Cost']],
+                head: [['#', 'Room', 'Name', 'Phone', 'Doc Type', 'Doc Number', 'Check-In', 'Check-Out', 'Total Cost']],
                 body: body,
                 theme: 'grid',
                 styles: { fontSize: 9, cellPadding: 6 },
@@ -1945,12 +2121,249 @@
         }
         
         document.getElementById('btn-factory-reset').onclick = async () => {
-            const res = await showCustomDialog("Delete All Data", "WARNING: This erases all local data permanently. Type 'CONFIRM' to proceed.", "prompt");
+            const res = await showCustomDialog("Delete All Data", "WARNING: This erases all local data permanently (Rooms, Booking History, Requests, Photos). Type 'CONFIRM' to proceed.", "prompt");
             if(res === 'CONFIRM') { 
-                appState.history=[]; appState.requests=[]; 
+                showLoading();
+                await IDB.clearStore();
                 localStorage.removeItem('hotel_config');
-                generateInitialRooms(); 
                 location.reload(); 
+            }
+        };
+
+        document.getElementById('btn-export-data').onclick = () => {
+            const url = URL.createObjectURL(new Blob([JSON.stringify({rooms:appState.rooms,history:appState.history,requests:appState.requests,date:new Date().toISOString()})], {type:'application/json'}));
+            const a=document.createElement('a');a.href=url;a.download=`Backup_${Date.now()}.json`;document.body.appendChild(a);a.click();document.body.removeChild(a);showToast("Backup Exported");
+        };
+
+        // -----------------------------------
+        // 11. CUSTOMER PORTAL & LOGIN
+        // -----------------------------------
+        let cRoomId = null;
+        async function initCustomerPortal(roomId) {
+            cRoomId = roomId && roomId !== 'null' ? roomId : null;
+            document.getElementById('auth-view').classList.add('d-none');
+            
+            if(cRoomId && appState.rooms[cRoomId] && appState.rooms[cRoomId].status === 'booked') {
+                // Check if already authenticated via session
+                if(sessionStorage.getItem('guest_auth_'+cRoomId) === 'true') {
+                    unlockGuestPortal();
+                } else {
+                    document.getElementById('customer-view').classList.add('d-none');
+                    document.getElementById('guest-login-view').classList.remove('d-none');
+                    document.getElementById('guest-login-room').value = cRoomId;
+                }
+            } else {
+                document.getElementById('guest-login-view').classList.add('d-none');
+                document.getElementById('customer-view').classList.remove('d-none');
+                showCustomerSection('c-tab-rooms');
+            }
+
+            // Bind guest login form
+            document.getElementById('guest-login-form').onsubmit = (e) => {
+                e.preventDefault();
+                const pin = document.getElementById('guest-login-pin').value.toUpperCase();
+                const room = appState.rooms[cRoomId];
+                if(room && room.bookingData && room.bookingData.pin && room.bookingData.pin === pin) {
+                    sessionStorage.setItem('guest_auth_'+cRoomId, 'true');
+                    document.getElementById('guest-login-pin').value = '';
+                    unlockGuestPortal();
+                    showCustomDialog("Welcome!", `Welcome to ${HOTEL.name}, Room ${cRoomId}. How can we assist you today?`, "alert", "fa-door-open");
+                } else {
+                    showToast("Invalid PIN", "error");
+                }
+            };
+
+            // Bind service request
+            document.getElementById('guest-request-form').onsubmit = async(e) => {
+                e.preventDefault(); showLoading();
+                appState.requests.push({ id: Date.now(), roomId: cRoomId, category: document.getElementById('guest-req-category').value, message: document.getElementById('guest-req-msg').value, time: new Date().toISOString(), status: 'pending', type: 'service' });
+                await IDB.set('bengal_requests', appState.requests);
+                document.getElementById('guest-request-form').classList.add('d-none'); document.getElementById('guest-req-success').classList.remove('d-none');
+                hideLoading(); triggerVibration(); renderCustomerActivity();
+            };
+
+            // Bind booking request
+            document.getElementById('customer-booking-form').onsubmit = async(e) => {
+                e.preventDefault(); showLoading();
+                const name = document.getElementById('cb-name').value, phone = document.getElementById('cb-phone').value;
+                const ci = new Date(document.getElementById('cb-checkin').value), co = new Date(document.getElementById('cb-checkout').value);
+                if(co <= ci) { showToast("Check-out must be after Arrival.", "error"); hideLoading(); return; }
+                
+                const roomSel = document.getElementById('booking-room-num').innerText.replace('Room ', '');
+                appState.rooms[roomSel].status = 'pending';
+                appState.rooms[roomSel].bookingData = { name, phone, checkIn: ci.toISOString(), expectedOut: co.toISOString(), idType: document.getElementById('cb-id-type').value, idNum: document.getElementById('cb-id-num').value, advance: 0, rent: 1500, totalEst: 1500, images: [] };
+
+                appState.requests.push({ id: Date.now(), roomId: roomSel, category: "Booking Request", message: `Name: ${name}, Ph: ${phone}, IN: ${ci.toLocaleDateString()}, OUT: ${co.toLocaleDateString()}`, time: new Date().toISOString(), status: 'pending_booking', type: 'booking', bkgData: appState.rooms[roomSel].bookingData });
+                await saveData();
+                
+                document.getElementById('customer-booking-form-container').classList.add('d-none');
+                document.getElementById('booking-success').classList.remove('d-none');
+                hideLoading(); showToast("Booking Request Sent!"); triggerVibration();
+            };
+            
+            setInterval(async () => { await loadData(); renderCustomerRooms(); if(sessionStorage.getItem('guest_auth_'+cRoomId)==='true') renderCustomerActivity(); }, 5000);
+        }
+
+        function unlockGuestPortal() {
+            document.getElementById('guest-login-view').classList.add('d-none');
+            document.getElementById('customer-view').classList.remove('d-none');
+            
+            // Show secure navigation buttons
+            document.querySelectorAll('.pub-btn').forEach(el => el.classList.add('d-none'));
+            document.querySelectorAll('.sec-btn').forEach(el => el.classList.remove('d-none'));
+            
+            document.getElementById('guest-room-display').innerText = `Room ${cRoomId}`;
+            document.getElementById('guest-request-form').classList.remove('d-none');
+            
+            // Calc current bill
+            const room = appState.rooms[cRoomId];
+            if(room && room.bookingData) {
+                const data = room.bookingData;
+                const days = Math.max(1, Math.ceil(Math.abs(new Date() - new Date(data.checkIn)) / 86400000));
+                const total = days * parseFloat(data.rent||0), adv = parseFloat(data.advance||0), due = total - adv;
+                document.getElementById('guest-stay-days').innerText = days;
+                document.getElementById('guest-stay-total').innerText = total;
+                document.getElementById('guest-stay-adv').innerText = adv;
+                document.getElementById('guest-stay-due').innerText = Math.max(0, due);
+            }
+            
+            showCustomerSection('c-tab-home');
+            renderCustomerActivity();
+        }
+
+        function exitGuestLogin() {
+            document.getElementById('guest-login-view').classList.add('d-none');
+            document.getElementById('customer-view').classList.remove('d-none');
+            showCustomerSection('c-tab-rooms');
+        }
+
+        window.contactAction = (type) => {
+            if(type === 'wa') {
+                if(!HOTEL.wa) return showToast("WhatsApp number not set by admin", "error");
+                const num = HOTEL.wa.replace(/\D/g,'');
+                window.open(`https://wa.me/${num}?text=${encodeURIComponent(HOTEL.waMsg)}`, '_blank');
+            } else if(type === 'tel') {
+                if(!HOTEL.phone) return showToast("Phone number not set by admin", "error");
+                window.location.href = `tel:${HOTEL.phone}`;
+            } else if(type === 'email') {
+                if(!HOTEL.email) return showToast("Email not set by admin", "error");
+                window.location.href = `mailto:${HOTEL.email}`;
+            }
+        };
+
+        window.payViaUPI = () => {
+            if(!HOTEL.upi) return showToast("UPI ID not configured by management", "error");
+            const amt = document.getElementById('guest-stay-due').innerText;
+            if(parseFloat(amt) <= 0) return showToast("No pending balance", "success");
+            const upiLink = `upi://pay?pa=${HOTEL.upi}&pn=${encodeURIComponent(HOTEL.name)}&am=${amt}&cu=INR`;
+            window.location.href = upiLink;
+        };
+
+        window.requestCheckout = async () => {
+            if(await showCustomDialog("Request Checkout", "Are you ready to check out? This will notify reception.", "confirm")) {
+                showLoading();
+                appState.requests.push({ id: Date.now(), roomId: cRoomId, category: "Checkout Request", message: `Guest is ready to check out and pay final bills.`, time: new Date().toISOString(), status: 'pending', type: 'service' });
+                await saveData();
+                hideLoading();
+                showToast("Reception notified for checkout");
+                renderCustomerActivity();
+            }
+        };
+
+        window.showCustomerSection = (targetId) => {
+            document.querySelectorAll('#customer-view .tab-content').forEach(c => c.classList.remove('active'));
+            document.getElementById(targetId).classList.add('active');
+            
+            document.querySelectorAll('#customer-bottom-bar .btn').forEach(b => {
+                b.classList.remove('active');
+                if(!b.classList.contains('pub-btn') && !b.classList.contains('sec-btn')) return;
+                b.style.background = 'transparent'; b.style.borderColor = 'var(--secondary)';
+            });
+            
+            const activeBtn = document.getElementById('btn-' + targetId.replace('tab-',''));
+            if(activeBtn) {
+                activeBtn.classList.add('active');
+                activeBtn.style.background = 'rgba(216, 162, 94, 0.2)';
+            }
+            
+            if(targetId === 'c-tab-rooms') renderCustomerRooms();
+            if(targetId === 'c-tab-activity') renderCustomerActivity();
+        }
+
+        window.resetRequestForm = () => {
+            document.getElementById('guest-request-form').reset();
+            document.getElementById('guest-request-form').classList.remove('d-none');
+            document.getElementById('guest-req-success').classList.add('d-none');
+        };
+
+        window.cancelCustomerBooking = () => {
+            document.getElementById('customer-booking-form-container').classList.add('d-none');
+            document.getElementById('customer-room-list').classList.remove('d-none');
+        }
+
+        function renderCustomerRooms() {
+            const grid = document.getElementById('customer-room-list'); if(!grid) return; grid.innerHTML = '';
+            let hasRooms = false;
+            Object.keys(appState.rooms).sort().forEach(rId => {
+                const r = appState.rooms[rId];
+                if(r.status === 'available') {
+                    hasRooms = true;
+                    grid.innerHTML += `<div class="room-box status-free" style="padding:1rem" onclick="openCustomerBookForm('${r.id}')"><div class="room-number" style="font-size:1.3rem">Room ${r.id}</div><div class="room-floor">Floor ${r.floor}</div><button class="btn mt-1" style="width:100%; font-size:0.8rem; min-height:30px">Book</button></div>`;
+                }
+            });
+            if(!hasRooms) grid.innerHTML = `<p class="text-muted w-100 text-center" style="grid-column: 1/-1;"><i class="fa-solid fa-bed" style="font-size:2rem;margin-bottom:1rem;display:block"></i> All rooms are currently occupied.</p>`;
+        }
+        
+        window.openCustomerBookForm = (rId) => {
+            document.getElementById('customer-room-list').classList.add('d-none');
+            document.getElementById('booking-success').classList.add('d-none');
+            document.getElementById('customer-booking-form-container').classList.remove('d-none');
+            document.getElementById('booking-room-num').innerText = `Room ${rId}`;
+            document.getElementById('customer-booking-form').reset();
+        };
+
+        function renderCustomerActivity() {
+            const list = document.getElementById('customer-activity-list'); if(!list) return; list.innerHTML = '';
+            const myReqs = appState.requests.filter(r => r.roomId === cRoomId || r.type === 'booking').sort((a,b)=>b.id-a.id);
+            if(myReqs.length===0) { list.innerHTML = `<div class="empty-state"><i class="fa-solid fa-folder-open"></i><p>No recent activity found.</p></div>`; return; }
+            
+            let showedNotification = false;
+
+            myReqs.forEach(r => {
+                let color = r.status.includes('pending') ? 'var(--pending)' : (r.status.includes('reject') || r.status.includes('cancel') ? 'var(--danger)' : 'var(--success)');
+                let icon = r.status.includes('pending') ? 'fa-clock' : (r.status.includes('reject') || r.status.includes('cancel') ? 'fa-xmark' : 'fa-check');
+                let cancelBtn = r.status.includes('pending') ? `<button class="btn btn-secondary mt-1" style="padding:0.2rem 0.5rem; font-size:0.7rem; min-height: 24px;" onclick="cancelCustomerRequest(${r.id})"><i class="fa-solid fa-ban"></i> Cancel</button>` : '';
+                
+                if(r.type === 'booking' && !r.status.includes('pending') && !r.notified) {
+                    if(!showedNotification) {
+                        const notif = document.getElementById('customer-notification');
+                        document.getElementById('notif-title').innerText = r.status === 'approved' ? 'Booking Confirmed!' : 'Booking Rejected';
+                        document.getElementById('notif-msg').innerText = r.status === 'approved' ? `Your booking for Room ${r.roomId} is confirmed.` : `Sorry, your booking for Room ${r.roomId} could not be confirmed.`;
+                        notif.querySelector('.card').style.borderLeftColor = r.status === 'approved' ? 'var(--success)' : 'var(--danger)';
+                        notif.classList.remove('d-none');
+                        showedNotification = true;
+                    }
+                    r.notified = true; 
+                    IDB.set('bengal_requests', appState.requests);
+                }
+
+                list.innerHTML += `<div class="card noise-bg mb-1" style="border-left: 4px solid ${color}"><div class="flex-row" style="justify-content:space-between"><strong>${r.category} (${r.roomId})</strong><span style="color:${color}"><i class="fa-solid ${icon}"></i> ${r.status.replace('_',' ').toUpperCase()}</span></div><p class="text-muted mt-1" style="font-size:0.8rem">${r.message}</p>${cancelBtn}</div>`;
+            });
+        }
+
+        window.cancelCustomerRequest = async (id) => {
+            if(await showCustomDialog("Confirm", "Are you sure you want to cancel this request?", "confirm")) {
+                const req = appState.requests.find(x=>x.id===id);
+                if(req) {
+                    req.status = 'cancelled';
+                    if(req.type === 'booking' && appState.rooms[req.roomId].status === 'pending') {
+                        appState.rooms[req.roomId].status = 'available';
+                        appState.rooms[req.roomId].bookingData = null;
+                    }
+                    await saveData();
+                    renderCustomerActivity();
+                    showToast("Request Cancelled");
+                }
             }
         };
 
@@ -2010,6 +2423,7 @@
                 if(appState.rooms[r.roomId].status === 'booked' || appState.rooms[r.roomId].status === 'upcoming') { showToast("Room occupied!", "error"); return; }
                 appState.rooms[r.roomId].status = 'booked';
                 appState.rooms[r.roomId].bookingData.id = 'BKG-'+Date.now();
+                appState.rooms[r.roomId].bookingData.pin = generatePIN(5); // Auto Gen PIN
                 r.status = 'approved'; showToast("Booking Approved"); renderDashboard();
             } else { 
                 appState.rooms[r.roomId].status = 'available';
@@ -2033,7 +2447,7 @@
             doc.setFontSize(11); let y=60; const l=20, r=120;
             doc.text(`Invoice No: ${bkg.id}`,l,y); doc.text(`Date: ${new Date().toLocaleDateString()}`,r,y); y+=10; doc.text(`Guest: ${bkg.name}`,l,y); doc.text(`Room: ${bkg.roomId}`,r,y); y+=10; doc.text(`Phone: ${bkg.phone}`,l,y); y+=15;
             doc.line(20,y,190,y); y+=10; doc.text(`Arrival: ${new Date(bkg.checkIn).toLocaleString()}`,l,y); y+=8; doc.text(`Departure: ${new Date(bkg.checkOut).toLocaleString()}`,l,y); y+=8; doc.text(`Days Stayed: ${bkg.actualDays}`,l,y); y+=15; doc.line(20,y,190,y); y+=10;
-            doc.setFont("helvetica","bold"); doc.text("Payment Summary",l,y); y+=10; doc.setFont("helvetica","normal"); doc.text(`Rate/Night: Rs. ${bkg.rent||1500}`,l,y); doc.text(`Total Charges: Rs. ${bkg.finalTotal}`,r,y); y+=8; doc.text(`Deposit Paid: Rs. ${bkg.advance}`,r,y); y+=15;
+            doc.setFont("helvetica","bold"); doc.text("Payment Summary",l,y); y+=10; doc.setFont("helvetica","normal"); doc.text(`Rate/Day: Rs. ${bkg.rent||1500}`,l,y); doc.text(`Total Charges: Rs. ${bkg.finalTotal}`,r,y); y+=8; doc.text(`Deposit Paid: Rs. ${bkg.advance}`,r,y); y+=15;
             doc.setFont("helvetica","bold"); doc.text("Collected:",l,y); doc.text(`Rs. ${Math.max(0,bkg.finalTotal-bkg.advance)}`,r,y); y+=15; doc.setFont("helvetica","normal"); doc.text(`Method: ${bkg.payMode||'N/A'} ${bkg.txnId?'('+bkg.txnId+')':''}`,l,y); y+=30;
             if(bkg.signatureCo)try{doc.addImage(bkg.signatureCo,'PNG',120,y-15,60,20);}catch(e){} doc.line(120,y+5,180,y+5); doc.text("Guest Signature",135,y+10); doc.text("Authorized Signatory",20,y+10); doc.line(20,y+5,70,y+5); doc.save(`Invoice_${bkg.id}.pdf`);
         }
